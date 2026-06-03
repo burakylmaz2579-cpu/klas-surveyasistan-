@@ -185,27 +185,83 @@ class SurveyDocumentProcessor:
                     has_contradiction = False
                     
                 final_status = clean_status
-                final_desc = remarks if remarks else f"Sörvey raporu maddesi denetlendi."
+                final_desc = ""
                 recommendation = ""
+                
+                # Fetch details if rule exists
+                rule_title = ""
+                rule_desc = ""
+                satisfactory_condition = ""
+                if rule_code != "N/A" and rule_code in REGULATIONS_DB:
+                    rule_info = REGULATIONS_DB[rule_code]
+                    rule_title = rule_info["title"]
+                    rule_desc = rule_info["description"]
+                    satisfactory_condition = rule_info["satisfactory_condition"]
                 
                 if has_contradiction:
                     final_status = "Uygun Değil"
                     severity = "critical"
-                    final_desc = f"[ÇAPRAZ KONTROL UYARISI] Raporda bu madde '{reported_status}' olarak işaretlenmiş, ancak sörveyör notlarında '{found_keyword}' ifadesi geçmektedir: \"{remarks}\""
-                    if rule_code != "N/A" and rule_code in REGULATIONS_DB:
+                    if rule_code != "N/A":
+                        final_desc = (
+                            f"[ÇAPRAZ KONTROL UYARISI] Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
+                            f"(Uygun) olarak işaretlenmiştir; ancak sörveyör açıklamalarında uygunsuzluk belirtilmiştir: \"{remarks}\".\n\n"
+                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
+                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}"
+                        )
                         recommendation = REGULATIONS_DB[rule_code]["deficiency_action"]
                     else:
+                        final_desc = (
+                            f"[ÇAPRAZ KONTROL UYARISI] Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
+                            f"(Uygun) olarak işaretlenmiştir; ancak sörveyör açıklamalarında eksiklik belirtilmiştir: \"{remarks}\"."
+                        )
                         recommendation = "Maddedeki eksikliğin giderilmesi ve sörveyöre raporlanması gerekmektedir."
                 elif is_empty_box:
                     final_status = "Düzeltilmeli"
                     severity = "warning"
-                    final_desc = "[ÇAPRAZ KONTROL UYARISI] Formdaki ilgili onay kutusu boş bırakılmıştır. Sörveyörün bu alanı doğrulaması veya açıklaması gerekir."
+                    if rule_code != "N/A":
+                        final_desc = (
+                            f"[FORM EKSİKLİĞİ] Kontrol formundaki ilgili onay kutusu boş bırakılmıştır.\n\n"
+                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
+                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}. Sörveyörün bu alanı doldurarak (☑/☒) onaylaması gerekir."
+                        )
+                    else:
+                        final_desc = "[FORM EKSİKLİĞİ] Kontrol formundaki ilgili onay kutusu boş bırakılmıştır. Sörveyörün bu alanı doğrulaması ve doldurması gerekmektedir."
                     recommendation = "Kutunun uygunluk durumunu (☑/☒) işaretleyin veya açıklama ekleyin."
                 elif not is_applicable:
                     final_status = "Düzeltilmeli"
                     severity = "info"
-                    final_desc = f"[ÇAPRAZ KONTROL UYARISI] Bu kural ({rule_code}) sadece '{REGULATIONS_DB[rule_code]['applicability']}' için geçerlidir. Mevcut gemi türü '{vessel_type}'. Lütfen N/A işaretlendiğinden emin olun."
+                    app_spec = REGULATIONS_DB[rule_code]['applicability']
+                    final_desc = (
+                        f"[UYUMLULUK UYARISI] Bu madde ({rule_code} - {rule_title}) kural gereği sadece '{app_spec}' sınıfı için geçerlidir.\n"
+                        f"Mevcut gemi türü '{vessel_type}' olduğu için bu kurala tabi değildir.\n"
+                        f"Gemi formunda '{reported_status}' olarak işaretlenmiş olan bu madde, kural uyumluluğu açısından N/A (Geçersiz) olarak düzeltilmelidir."
+                    )
                     recommendation = "Durumu N/A (Not Applicable) olarak revize edin."
+                elif clean_status == "Uygun Değil": # Detected deficiency directly
+                    final_status = "Uygun Değil"
+                    severity = "error"
+                    if rule_code != "N/A":
+                        final_desc = (
+                            f"Uygunsuzluk Tespit Edilmiştir. Sörveyörün notu: \"{remarks}\".\n\n"
+                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
+                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}"
+                        )
+                        recommendation = REGULATIONS_DB[rule_code]["deficiency_action"]
+                    else:
+                        final_desc = f"Uygunsuzluk Tespit Edilmiştir. Sörveyör açıklaması: \"{remarks}\""
+                        recommendation = "Eksikliğin giderilmesi ve sörveyörün yeniden denetlemesi gerekmektedir."
+                else: # Satisfactory and compliant!
+                    final_status = "Uygun"
+                    severity = "success"
+                    if rule_code != "N/A":
+                        final_desc = (
+                            f"Maddenin durumu kural gereksinimlerine uygundur. Raporlanan durum: '{reported_status}'.\n\n"
+                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
+                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}. Raporlanan sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\""
+                        )
+                    else:
+                        final_desc = f"Bu kontrol maddesinde herhangi bir uygunsuzluk veya çelişki tespit edilmemiştir. Maddenin durumu uygundur. (Sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\")"
+                    recommendation = ""
                     
                 findings.append({
                     "item_no": str(item_counter),

@@ -6,6 +6,7 @@ import os
 import tempfile
 import re
 from io import BytesIO
+from datetime import datetime
 
 import vessel_db as db
 from doc_processor import SurveyDocumentProcessor
@@ -19,6 +20,12 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# --- MONTH NAMES IN TURKISH ---
+MONTH_NAMES = {
+    1: "Ocak", 2: "Şubat", 3: "Mart", 4: "Nisan", 5: "Mayıs", 6: "Haziran",
+    7: "Temmuz", 8: "Ağustos", 9: "Eylül", 10: "Ekim", 11: "Kasım", 12: "Aralık"
+}
 
 # --- V3 PREMIUM TASARIM SİSTEMİ (CSS) ---
 st.markdown("""
@@ -49,7 +56,7 @@ st.markdown("""
         right: -20%;
         width: 400px;
         height: 400px;
-        background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 60%);
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
         border-radius: 50%;
     }
     .header-title-container {
@@ -178,6 +185,7 @@ st.markdown("""
         font-size: 0.95rem;
         line-height: 1.5;
         margin-bottom: 0.8rem;
+        white-space: pre-line; /* preserves newlines in details */
     }
     .finding-rec {
         background: rgba(255, 255, 255, 0.7);
@@ -242,12 +250,84 @@ if 'analysis_vessel_name' not in st.session_state:
     st.session_state['analysis_vessel_name'] = ""
 if 'search_query' not in st.session_state:
     st.session_state['search_query'] = ""
+if 'filter_type' not in st.session_state:
+    st.session_state['filter_type'] = "All"
+if 'filter_flag' not in st.session_state:
+    st.session_state['filter_flag'] = "All"
+if 'filter_status' not in st.session_state:
+    st.session_state['filter_status'] = "All"
 if 'fleet_page' not in st.session_state:
     st.session_state['fleet_page'] = 0
 
+# --- DATA LOADERS FOR PHRS SCARPER DATA ---
+def load_phrs_certificates():
+    """Loads certificate data from pre-scraped Excel files if available."""
+    f1 = "PHRS_Acil_Sertifikalar.xlsx"
+    f2 = "PHRS_CERT_DUE_DATE.xlsx"
+    
+    df = None
+    today = datetime.now()
+    
+    if os.path.exists(f1):
+        try:
+            df = pd.read_excel(f1)
+            # Normalize column naming (fix encoding issues)
+            df.columns = [c.replace('', 'ı').replace('', 'ş').strip() for c in df.columns]
+            df = df.rename(columns={
+                'Gemi Adı': 'Vessel',
+                'Sertifika': 'Certificate',
+                'Bitiş Tarihi': 'DueDate',
+                'Durum': 'Status'
+            })
+            
+            # Robust Date parser
+            def parse_date(d):
+                if isinstance(d, datetime):
+                    return d
+                try:
+                    return datetime.strptime(str(d).strip(), "%d/%m/%Y")
+                except:
+                    try:
+                        return pd.to_datetime(d)
+                    except:
+                        return None
+                        
+            df['ParsedDate'] = df['DueDate'].apply(parse_date)
+            # Drop invalid dates
+            df = df.dropna(subset=['ParsedDate'])
+            df['IMO'] = "N/A"
+        except Exception as e:
+            print(f"Error loading {f1}: {e}")
+            
+    elif os.path.exists(f2):
+        try:
+            df = pd.read_excel(f2)
+            df.columns = [c.strip() for c in df.columns]
+            df = df.rename(columns={
+                'COMPANY/VESSEL': 'Vessel',
+                'CERTIFICATE': 'Certificate',
+                'CERTIFICATE ': 'Certificate',
+                'DUE DATE': 'DueDate',
+                'IMO NO': 'IMO',
+                'IMO NO ': 'IMO'
+            })
+            df['ParsedDate'] = pd.to_datetime(df['DueDate'])
+            df['DueDate'] = df['ParsedDate'].dt.strftime("%d/%m/%Y")
+            df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
+        except Exception as e:
+            print(f"Error loading {f2}: {e}")
+            
+    if df is not None and not df.empty:
+        # Calculate remaining days
+        df['DaysLeft'] = (df['ParsedDate'] - today).dt.days
+        # Sort so expired and closest-to-expire are on top
+        df = df.sort_values(by=['DaysLeft', 'Vessel'])
+        return df
+        
+    return None
+
 # --- YEREL ANALİZ/RAPOR ÖZETİ ÜRETİCİ ---
 def generate_local_evaluation(findings, vessel_name, vessel_type):
-    """Generates a structured text summary based on rules and findings."""
     total = len(findings)
     if total == 0:
         return "Yüklenen belgede kontrol edilecek madde bulunamadı. Lütfen geçerli bir sörvey kontrol tablosu yükleyin."
@@ -312,7 +392,7 @@ def generate_html_report(findings, vessel_name):
             .st-duzeltilmeli .status-pill {{ background: #fef3c7; color: #92400e; }}
             
             .item-title {{ font-size: 18px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 8px; }}
-            .item-desc {{ font-size: 14px; color: #334155; margin-bottom: 10px; }}
+            .item-desc {{ font-size: 14px; color: #334155; margin-bottom: 10px; white-space: pre-line; }}
             .item-rec {{ background: #f1f5f9; border-left: 3px solid #64748b; padding: 10px 15px; font-size: 13px; color: #475569; border-radius: 4px; }}
         </style>
     </head>
@@ -332,7 +412,7 @@ def generate_html_report(findings, vessel_name):
                 <span class="rule-badge">{f.get('rule', 'N/A')}</span>
             </div>
             <div class="item-title">{f.get('item_no', '-')}. {f.get('title', '')}</div>
-            <div class="item-desc"><b>Açıklama:</b> {f.get('description', '')}</div>
+            <div class="item-desc"><b>Açıklama:</b><br/>{f.get('description', '').replace('\n', '<br/>')}</div>
             {f'<div class="item-rec"><b>🔧 Düzeltici Eylem Önerisi:</b> {f.get("recommendation")}</div>' if f.get("recommendation") else ''}
         </div>
         """
@@ -354,6 +434,10 @@ with st.sidebar:
         if st.session_state.selected_vessel_id is None:
             st.session_state.selected_vessel_id = 1
         st.session_state.active_view = "Vessel Profile"
+        st.rerun()
+        
+    if st.button("📅 PHRS Sertifika Takip (Yeni)", use_container_width=True, type="primary" if st.session_state.active_view == "PHRS Certs" else "secondary"):
+        st.session_state.active_view = "PHRS Certs"
         st.rerun()
         
     if st.button("🔍 Sörvey Denetim Konsolu", use_container_width=True, type="primary" if st.session_state.active_view == "Audit Console" else "secondary"):
@@ -380,7 +464,9 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
+# ==========================================
 # VIEW 1: FLEET DASHBOARD
+# ==========================================
 if st.session_state.active_view == "Fleet Dashboard":
     st.subheader("📊 Filo Genel Durum Analizi")
     metrics = db.get_fleet_summary_metrics()
@@ -421,82 +507,105 @@ if st.session_state.active_view == "Fleet Dashboard":
     col_s1, col_s2, col_s3, col_s4 = st.columns([1.5, 1, 1, 1])
     
     with col_s1:
-        search_q = st.text_input("Gemi Adı veya IMO Numarası", value=st.session_state.search_query, placeholder="Aramak için yazın...")
-        st.session_state.search_query = search_q
+        search_q = st.text_input("Gemi Adı veya IMO Numarası", value=st.session_state.search_query, placeholder="Arama kelimesini girip Enter'a basın...")
+        if search_q != st.session_state.search_query:
+            st.session_state.search_query = search_q
+            st.session_state.fleet_page = 0
+            st.rerun()
+            
     with col_s2:
-        type_filter = st.selectbox("Gemi Türü Filtresi", ["All"] + db.VESSEL_TYPES)
+        type_filter = st.selectbox("Gemi Türü Filtresi", ["All"] + db.VESSEL_TYPES, index=(["All"] + db.VESSEL_TYPES).index(st.session_state.filter_type))
+        if type_filter != st.session_state.filter_type:
+            st.session_state.filter_type = type_filter
+            st.session_state.fleet_page = 0
+            st.rerun()
+            
     with col_s3:
-        flag_filter = st.selectbox("Bayrak Devleti Filtresi", ["All"] + db.FLAGS)
+        flag_filter = st.selectbox("Bayrak Devleti Filtresi", ["All"] + db.FLAGS, index=(["All"] + db.FLAGS).index(st.session_state.filter_flag))
+        if flag_filter != st.session_state.filter_flag:
+            st.session_state.filter_flag = flag_filter
+            st.session_state.fleet_page = 0
+            st.rerun()
+            
     with col_s4:
-        status_filter = st.selectbox("Durum Filtresi", ["All", "Active", "Warning", "Critical"])
+        status_filter = st.selectbox("Durum Filtresi", ["All", "Active", "Warning", "Critical"], index=["All", "Active", "Warning", "Critical"].index(st.session_state.filter_status))
+        if status_filter != st.session_state.filter_status:
+            st.session_state.filter_status = status_filter
+            st.session_state.fleet_page = 0
+            st.rerun()
         
     limit = 12
     offset = st.session_state.fleet_page * limit
     
     vessels, total_count = db.search_vessels(
         query=st.session_state.search_query,
-        filter_type=type_filter,
-        filter_flag=flag_filter,
-        filter_status=status_filter,
+        filter_type=st.session_state.filter_type,
+        filter_flag=st.session_state.filter_flag,
+        filter_status=st.session_state.filter_status,
         limit=limit,
         offset=offset
     )
     
     st.markdown(f"**Arama Sonuçları ({total_count} gemi bulundu)**")
     
-    cols = st.columns(3)
-    for idx, v in enumerate(vessels):
-        v_id, name, imo, grt, dwt, v_type, flag, class_soc, status, comp_score = v
-        status_class = "status-active" if status == "Active" else "status-warning" if status == "Warning" else "status-critical"
-        status_tr = "Sorunsuz" if status == "Active" else "Uyarı" if status == "Warning" else "Kritik"
-        score_color = "#ef4444" if comp_score < 60 else ("#f59e0b" if comp_score < 85 else "#10b981")
-        
-        col_cell = cols[idx % 3]
-        with col_cell:
-            st.markdown(f"""
-            <div class="vessel-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                    <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">{name}</div>
-                    <span class="status-pill {status_class}">{status_tr}</span>
-                </div>
-                <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">
-                    <b>IMO:</b> {imo} &bull; <b>Flag:</b> {flag}<br/>
-                    <b>Type:</b> {v_type}<br/>
-                    <b>Tonnage:</b> {grt:,} GRT / {dwt:,} DWT<br/>
-                    <b>Classification:</b> {class_soc}
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 0.75rem;">
-                    <div>
-                        <span style="font-size: 0.8rem; font-weight: 600; color: #94a3b8;">UYUMLULUK</span>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: {score_color};">% {comp_score}</div>
+    if total_count == 0:
+        st.warning("Aranan kriterlere uygun gemi bulunamadı. Lütfen arama metnini veya filtreleri değiştirin.")
+    else:
+        cols = st.columns(3)
+        for idx, v in enumerate(vessels):
+            v_id, name, imo, grt, dwt, v_type, flag, class_soc, status, comp_score = v
+            status_class = "status-active" if status == "Active" else "status-warning" if status == "Warning" else "status-critical"
+            status_tr = "Sorunsuz" if status == "Active" else "Uyarı" if status == "Warning" else "Kritik"
+            score_color = "#ef4444" if comp_score < 60 else ("#f59e0b" if comp_score < 85 else "#10b981")
+            
+            col_cell = cols[idx % 3]
+            with col_cell:
+                st.markdown(f"""
+                <div class="vessel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                        <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">{name}</div>
+                        <span class="status-pill {status_class}">{status_tr}</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">
+                        <b>IMO:</b> {imo} &bull; <b>Flag:</b> {flag}<br/>
+                        <b>Type:</b> {v_type}<br/>
+                        <b>Tonnage:</b> {grt:,} GRT / {dwt:,} DWT<br/>
+                        <b>Classification:</b> {class_soc}
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 0.75rem;">
+                        <div>
+                            <span style="font-size: 0.8rem; font-weight: 600; color: #94a3b8;">UYUMLULUK</span>
+                            <div style="font-size: 1.25rem; font-weight: 700; color: {score_color};">% {comp_score}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button(f"🚢 Detayları Gör: {name}", key=f"v_btn_{v_id}", use_container_width=True):
-                st.session_state.selected_vessel_id = v_id
-                st.session_state.active_view = "Vessel Profile"
-                st.rerun()
+                """, unsafe_allow_html=True)
+                
+                if st.button(f"🚢 Detayları Gör: {name}", key=f"v_btn_{v_id}", use_container_width=True):
+                    st.session_state.selected_vessel_id = v_id
+                    st.session_state.active_view = "Vessel Profile"
+                    st.rerun()
 
-    st.write("---")
-    col_p1, col_p2, col_p3 = st.columns([1, 2, 1])
-    with col_p1:
-        if st.session_state.fleet_page > 0:
-            if st.button("⬅️ Önceki Sayfa", use_container_width=True):
-                st.session_state.fleet_page -= 1
-                st.rerun()
-    with col_p2:
-        max_pages = max(1, (total_count + limit - 1) // limit)
-        st.markdown(f"<div style='text-align: center; color: #64748b; padding-top: 8px;'>Sayfa {st.session_state.fleet_page + 1} / {max_pages}</div>", unsafe_allow_html=True)
-    with col_p3:
-        if (st.session_state.fleet_page + 1) * limit < total_count:
-            if st.button("Sonraki Sayfa ➡️", use_container_width=True):
-                st.session_state.fleet_page += 1
-                st.rerun()
+        st.write("---")
+        col_p1, col_p2, col_p3 = st.columns([1, 2, 1])
+        with col_p1:
+            if st.session_state.fleet_page > 0:
+                if st.button("⬅️ Önceki Sayfa", use_container_width=True):
+                    st.session_state.fleet_page -= 1
+                    st.rerun()
+        with col_p2:
+            max_pages = max(1, (total_count + limit - 1) // limit)
+            st.markdown(f"<div style='text-align: center; color: #64748b; padding-top: 8px;'>Sayfa {st.session_state.fleet_page + 1} / {max_pages}</div>", unsafe_allow_html=True)
+        with col_p3:
+            if (st.session_state.fleet_page + 1) * limit < total_count:
+                if st.button("Sonraki Sayfa ➡️", use_container_width=True):
+                    st.session_state.fleet_page += 1
+                    st.rerun()
 
 
+# ==========================================
 # VIEW 2: VESSEL PROFILE & CERTIFICATES
+# ==========================================
 elif st.session_state.active_view == "Vessel Profile":
     v_id = st.session_state.selected_vessel_id
     vessel = db.get_vessel_by_id(v_id)
@@ -535,11 +644,21 @@ elif st.session_state.active_view == "Vessel Profile":
                 <div style="margin-top: 1.5rem; font-weight: 700; font-size: 1.1rem; color: {score_color};">
                     DURUM: {status_text}
                 </div>
-                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #64748b;">
-                    Gemi son sörveylerinde tespit edilen kural ihlallerine ve sertifika geçerlilik durumlarına göre hesaplanmıştır.
-                </div>
             </div>
             """, unsafe_allow_html=True)
+            
+            with st.expander("ℹ️ Uyumluluk Oranı Nedir? Nereden Geliyor?"):
+                st.markdown("""
+                **Uyumluluk Oranı (% Score)**, gemilerin emniyet durumunu gösteren iki yönlü bir metriktir:
+                
+                1. **Mevcut Gemi Uyumluluğu (Veritabanındaki Puan)**:
+                   - Gemi Detay kartında gördüğünüz puan, sistem veritabanından (`vessels.db`) çekilir.
+                   - Bu puan geminin aktif klas sertifikalarının geçerlilik durumlarına (süresi geçen/yaklaşan sertifika sayısı) göre geçmiş verilerden hesaplanır.
+                   
+                2. **Sörvey Raporu Uyumluluğu (Yeni Analiz Puanı)**:
+                   - Kontrol konsolundan bir PDF denetlendiğinde ise, raporun maddelerine göre anlık yeni bir puan üretilir.
+                   - **Formül**: `Skor = [(Toplam Madde - (Kritik Uygunsuzluk x 1.5) - (Uyarılı Madde x 0.5)) / Toplam Madde] * 100` olarak işletilir.
+                """)
             
         st.write("---")
         
@@ -580,7 +699,138 @@ elif st.session_state.active_view == "Vessel Profile":
             """, unsafe_allow_html=True)
 
 
-# VIEW 3: SURVEY AUDIT CONSOLE (100% PURE PYTHON DETECTOR)
+# ==========================================
+# VIEW 3: PHRS CERTIFICATE TRACKING (NEW)
+# ==========================================
+elif st.session_state.active_view == "PHRS Certs":
+    st.subheader("📅 PHRS Sertifika Son Kullanma Tarihi Takip Ekranı")
+    st.markdown("PHRS B2B sisteminden çekilen (scraped) güncel sertifika bitiş tarihlerine göre planlama ve uyarı ekranı.")
+    
+    cert_df = load_phrs_certificates()
+    
+    if cert_df is None:
+        st.warning("⚠️ Sistemde yüklü taranmış sertifika dosyası bulunamadı. Lütfen `PHRS_Acil_Sertifikalar.xlsx` veya `PHRS_CERT_DUE_DATE.xlsx` dosyasını uygulama klasörüne atın.")
+    else:
+        # Statistics
+        total_alerts = len(cert_df)
+        expired_count = sum(1 for d in cert_df['DaysLeft'] if d < 0)
+        expiring_30_count = sum(1 for d in cert_df['DaysLeft'] if 0 <= d <= 30)
+        
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(f"""
+            <div class="metric-panel">
+                <div class="metric-label">Toplam Takip Edilen Uyarı</div>
+                <div class="metric-value">📅 {total_alerts} Adet</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""
+            <div class="metric-panel">
+                <div class="metric-label">Tarihi GEÇENLER (Süresi Dolan)</div>
+                <div class="metric-value" style="color: #ef4444;">🚨 {expired_count} Gemi/Sertifika</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with c3:
+            st.markdown(f"""
+            <div class="metric-panel">
+                <div class="metric-label">Süresi Yaklaşanlar (<30 Gün)</div>
+                <div class="metric-value" style="color: #f59e0b;">⚠️ {expiring_30_count} Adet</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.write("---")
+        
+        # Categorize by expiry status and month
+        today = datetime.now()
+        
+        # 1. Expired ones at the very top (Süresi Geçenler en üstte)
+        expired_df = cert_df[cert_df['DaysLeft'] < 0]
+        if not expired_df.empty:
+            st.markdown("### 🚨 SÜRESİ GEÇMİŞ SERTİFİKALAR (Acil Aksiyon Gerekenler)")
+            rows_html = []
+            for _, r in expired_df.iterrows():
+                rows_html.append(f"""
+                <tr>
+                    <td style="padding: 10px; font-weight: 700; color: #991b1b;">{r['Vessel']}</td>
+                    <td style="padding: 10px;">{r.get('IMO', 'N/A')}</td>
+                    <td style="padding: 10px; font-weight: 600;">{r['Certificate']}</td>
+                    <td style="padding: 10px; color: #ef4444; font-weight: 700;">{r['DueDate']}</td>
+                    <td style="padding: 10px;"><span class="status-pill status-critical">{abs(r['DaysLeft'])} Gün Önce Geçti</span></td>
+                </tr>
+                """)
+                
+            st.markdown(f"""
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 2rem;">
+                <thead>
+                    <tr style="background: #fee2e2; text-align: left; color: #991b1b;">
+                        <th style="padding: 12px 10px;">Gemi Adı</th>
+                        <th style="padding: 12px 10px;">IMO No</th>
+                        <th style="padding: 12px 10px;">Sertifika</th>
+                        <th style="padding: 12px 10px;">Bitiş Tarihi</th>
+                        <th style="padding: 12px 10px;">Kalan Süre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {"".join(rows_html)}
+                </tbody>
+            </table>
+            """, unsafe_allow_html=True)
+
+        # 2. Upcoming grouped month by month (Gelecek aylara göre gruplama)
+        future_df = cert_df[cert_df['DaysLeft'] >= 0]
+        if not future_df.empty:
+            # Extract month and year keys for grouping
+            future_df = future_df.copy()
+            future_df['Month'] = future_df['ParsedDate'].dt.month
+            future_df['Year'] = future_df['ParsedDate'].dt.year
+            
+            # Sort by parsed date ascending
+            grouped = future_df.groupby(['Year', 'Month'])
+            
+            st.markdown("### 📅 Gelecek Aylara Göre Sertifika Yenileme Takvimi")
+            
+            for (year, month), group in sorted(grouped.groups.items()):
+                month_name = MONTH_NAMES.get(month, f"Ay: {month}")
+                st.markdown(f"#### 📅 {month_name} {year}")
+                
+                rows_html = []
+                for _, r in future_df.loc[group].iterrows():
+                    days = r['DaysLeft']
+                    pill_style = "status-warning" if days <= 30 else "status-active"
+                    pill_text = f"{days} Gün Kaldı" if days > 0 else "Bugün Son Gün!"
+                    
+                    rows_html.append(f"""
+                    <tr>
+                        <td style="padding: 10px; font-weight: 600; color: #1e293b;">{r['Vessel']}</td>
+                        <td style="padding: 10px;">{r.get('IMO', 'N/A')}</td>
+                        <td style="padding: 10px;">{r['Certificate']}</td>
+                        <td style="padding: 10px; font-weight: 600;">{r['DueDate']}</td>
+                        <td style="padding: 10px;"><span class="status-pill {pill_style}">{pill_text}</span></td>
+                    </tr>
+                    """)
+                    
+                st.markdown(f"""
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+                            <th style="padding: 12px 10px; width: 25%;">Gemi Adı</th>
+                            <th style="padding: 12px 10px; width: 15%;">IMO No</th>
+                            <th style="padding: 12px 10px; width: 30%;">Sertifika</th>
+                            <th style="padding: 12px 10px; width: 15%;">Bitiş Tarihi</th>
+                            <th style="padding: 12px 10px; width: 15%;">Kalan Süre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {"".join(rows_html)}
+                    </tbody>
+                </table>
+                """, unsafe_allow_html=True)
+
+
+# ==========================================
+# VIEW 4: SURVEY AUDIT CONSOLE
+# ==========================================
 elif st.session_state.active_view == "Audit Console":
     st.subheader("🔍 Sörvey Denetim ve Çapraz Kontrol Konsolu")
     st.markdown("Yüklediğiniz sörvey formlarındaki tüm maddeleri ve onay kutularını otomatik olarak analiz ederek kural uyumluluğunu denetler.")
@@ -695,7 +945,6 @@ elif st.session_state.active_view == "Audit Console":
             try:
                 findings_all = []
                 with st.spinner("📥 PDF belgelerindeki tablolar ve onay kutuları analiz ediliyor..."):
-                    # Process files purely using python modules
                     for pdf_bytes in target_bytes_list:
                         processor = SurveyDocumentProcessor(pdf_bytes)
                         doc_findings = processor.process_findings(vessel_type, grt_dwt)
@@ -703,7 +952,6 @@ elif st.session_state.active_view == "Audit Console":
                         
                 st.toast(f"Yerel analiz motoru tamamlandı! {len(findings_all)} madde bulundu.", icon="✅")
                 
-                # Check for checklist metrics
                 compliance_score = 100
                 total_findings = len(findings_all)
                 if total_findings > 0:
@@ -711,10 +959,8 @@ elif st.session_state.active_view == "Audit Console":
                     warnings = sum(1 for f in findings_all if f["status"] == "Düzeltilmeli")
                     compliance_score = max(0, int(((total_findings - (failures * 1.5) - (warnings * 0.5)) / total_findings) * 100))
                 
-                # Apply local rule evaluation text generator
                 vessel_evaluation = generate_local_evaluation(findings_all, vessel_name, vessel_type)
                 
-                # Save structured data
                 structured_data = {
                     "vessel_name": vessel_name,
                     "imo_number": imo_number,
@@ -851,7 +1097,9 @@ elif st.session_state.active_view == "Audit Console":
             render_findings_list([f for f in findings if f.get("status") == "Uygun"])
 
 
-# VIEW 4: IMO REGULATIONS LIBRARY
+# ==========================================
+# VIEW 5: IMO REGULATIONS LIBRARY
+# ==========================================
 elif st.session_state.active_view == "Reg Library":
     st.subheader("📚 SOLAS / MARPOL Mevzuat Kütüphanesi")
     st.markdown("Sistemimizde yüklü olan ve sörvey denetimi sırasında kullanılan temel uluslararası kurallar.")
