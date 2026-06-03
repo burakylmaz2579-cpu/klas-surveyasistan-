@@ -259,6 +259,27 @@ if 'filter_status' not in st.session_state:
 if 'fleet_page' not in st.session_state:
     st.session_state['fleet_page'] = 0
 
+# --- COLUMN NORMALIZATION HELPER ---
+def normalize_excel_columns(df):
+    import re
+    mapping = {}
+    for col in df.columns:
+        c_clean = str(col).strip().lower()
+        c_clean = c_clean.replace('ı', 'i').replace('ş', 's').replace('ğ', 'g').replace('ü', 'u').replace('ö', 'o').replace('ç', 'c')
+        c_clean = re.sub(r'[^a-z0-9]', '', c_clean)
+        
+        if 'gemi' in c_clean or 'vessel' in c_clean or 'company' in c_clean:
+            mapping[col] = 'Vessel'
+        elif 'sertifika' in c_clean or 'certificate' in c_clean or 'cert' in c_clean:
+            mapping[col] = 'Certificate'
+        elif 'bitis' in c_clean or 'duedate' in c_clean or 'due' in c_clean or 'tarih' in c_clean:
+            mapping[col] = 'DueDate'
+        elif 'durum' in c_clean or 'status' in c_clean:
+            mapping[col] = 'Status'
+        elif 'imo' in c_clean:
+            mapping[col] = 'IMO'
+    return df.rename(columns=mapping)
+
 # --- DATA LOADERS FOR PHRS SCARPER DATA ---
 def load_phrs_certificates():
     """Loads certificate data from pre-scraped Excel files if available."""
@@ -268,54 +289,54 @@ def load_phrs_certificates():
     df = None
     today = datetime.now()
     
+    def parse_date(d):
+        if isinstance(d, datetime):
+            return d
+        try:
+            return datetime.strptime(str(d).strip(), "%d/%m/%Y")
+        except:
+            try:
+                return pd.to_datetime(d)
+            except:
+                return None
+
     if os.path.exists(f1):
         try:
             df = pd.read_excel(f1)
-            # Normalize column naming (fix encoding issues)
-            df.columns = [c.replace('', 'ı').replace('', 'ş').strip() for c in df.columns]
-            df = df.rename(columns={
-                'Gemi Adı': 'Vessel',
-                'Sertifika': 'Certificate',
-                'Bitiş Tarihi': 'DueDate',
-                'Durum': 'Status'
-            })
+            df = normalize_excel_columns(df)
             
-            # Robust Date parser
-            def parse_date(d):
-                if isinstance(d, datetime):
-                    return d
-                try:
-                    return datetime.strptime(str(d).strip(), "%d/%m/%Y")
-                except:
-                    try:
-                        return pd.to_datetime(d)
-                    except:
-                        return None
-                        
-            df['ParsedDate'] = df['DueDate'].apply(parse_date)
-            # Drop invalid dates
-            df = df.dropna(subset=['ParsedDate'])
-            df['IMO'] = "N/A"
+            if 'Vessel' not in df.columns or 'Certificate' not in df.columns or 'DueDate' not in df.columns:
+                print(f"Warning: {f1} is missing key columns: {df.columns}")
+                df = None
+            else:
+                df['ParsedDate'] = df['DueDate'].apply(parse_date)
+                df = df.dropna(subset=['ParsedDate'])
+                if 'IMO' not in df.columns:
+                    df['IMO'] = "N/A"
+                if 'Status' not in df.columns:
+                    df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
         except Exception as e:
             print(f"Error loading {f1}: {e}")
+            df = None
             
-    elif os.path.exists(f2):
+    if (df is None or df.empty) and os.path.exists(f2):
         try:
             df = pd.read_excel(f2)
-            df.columns = [c.strip() for c in df.columns]
-            df = df.rename(columns={
-                'COMPANY/VESSEL': 'Vessel',
-                'CERTIFICATE': 'Certificate',
-                'CERTIFICATE ': 'Certificate',
-                'DUE DATE': 'DueDate',
-                'IMO NO': 'IMO',
-                'IMO NO ': 'IMO'
-            })
-            df['ParsedDate'] = pd.to_datetime(df['DueDate'])
-            df['DueDate'] = df['ParsedDate'].dt.strftime("%d/%m/%Y")
-            df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
+            df = normalize_excel_columns(df)
+            df = df[df['Vessel'].astype(str).str.strip().str.lower() != 'company/vessel']
+            
+            if 'Vessel' not in df.columns or 'Certificate' not in df.columns or 'DueDate' not in df.columns:
+                print(f"Warning: {f2} is missing key columns: {df.columns}")
+                df = None
+            else:
+                df['ParsedDate'] = pd.to_datetime(df['DueDate'])
+                df['DueDate'] = df['ParsedDate'].dt.strftime("%d/%m/%Y")
+                df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
+                if 'IMO' not in df.columns:
+                    df['IMO'] = "N/A"
         except Exception as e:
             print(f"Error loading {f2}: {e}")
+            df = None
             
     if df is not None and not df.empty:
         # Calculate remaining days
@@ -705,6 +726,56 @@ elif st.session_state.active_view == "Vessel Profile":
 elif st.session_state.active_view == "PHRS Certs":
     st.subheader("📅 PHRS Sertifika Son Kullanma Tarihi Takip Ekranı")
     st.markdown("PHRS B2B sisteminden çekilen (scraped) güncel sertifika bitiş tarihlerine göre planlama ve uyarı ekranı.")
+    
+    # B2B Integration Panel
+    with st.expander("🔄 B2B Entegrasyonu ve Veri Güncelleme Konsolu", expanded=False):
+        st.markdown("""
+        Bu konsol aracılığıyla PHRS B2B sistemindeki güncel sertifika bilgilerini doğrudan çekebilirsiniz.
+        **B2B Tarayıcıyı Başlat** butonuna bastığınızda, sistem arka planda Selenium botunu çalıştıracak ve verileri anlık olarak güncelleyecektir.
+        """)
+        
+        if st.button("🚀 B2B Tarayıcıyı Başlat", use_container_width=True):
+            import subprocess
+            import sys
+            
+            log_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+            status_placeholder.info("B2B Scraper başlatılıyor... Lütfen bekleyin. Tarayıcı arka planda (headless) çalışıyor.")
+            
+            bot_script = r"C:\Users\LIVAPC8\Desktop\PHRS_Bot\sertifika.py"
+            
+            try:
+                process = subprocess.Popen(
+                    [sys.executable, "-u", bot_script],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+                
+                log_content = []
+                while True:
+                    line = process.stdout.readline()
+                    if not line:
+                        break
+                    log_content.append(line)
+                    log_placeholder.code("".join(log_content[-15:]))
+                    
+                process.wait()
+                
+                if process.returncode == 0:
+                    status_placeholder.success("Tarama başarıyla tamamlandı! Portal veritabanı güncelleniyor...")
+                    db.refresh_db()
+                    st.success("Veritabanı başarıyla senkronize edildi! Güncel verileri görmek için sayfayı yenileyiniz.")
+                    if st.button("Sayfayı Şimdi Yenile"):
+                        st.rerun()
+                else:
+                    status_placeholder.error(f"Tarayıcı hata ile sonlandı (Hata kodu: {process.returncode}).")
+            except Exception as ex:
+                status_placeholder.error(f"Hata oluştu: {ex}")
+                
+    st.write("---")
     
     cert_df = load_phrs_certificates()
     

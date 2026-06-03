@@ -131,10 +131,52 @@ class SurveyDocumentProcessor:
             for row in table_data[1:]:
                 if len(row) <= max(desc_idx, status_idx):
                     continue
-                    
-                item_desc = row[desc_idx]
-                reported_status = row[status_idx]
-                remarks = row[remarks_idx] if remarks_idx != -1 and len(row) > remarks_idx else ""
+                
+                # Search all cells in row for hierarchical numbering pattern (e.g., 1. or 1.1 or 1.1.1)
+                h_num, h_idx = None, -1
+                for idx, cell in enumerate(row):
+                    val = str(cell).strip()
+                    match = re.match(r'^(\d+)(?:\.(\d+)){0,4}\.?$', val)
+                    if match:
+                        groups = [g for g in match.groups() if g is not None]
+                        # Exclude long numbers (like IMO 9076466)
+                        if len(groups) == 1 and len(groups[0]) >= 5:
+                            continue
+                        h_num = val
+                        h_idx = idx
+                        break
+                
+                row_cells = list(row)
+                temp_desc_idx = desc_idx
+                
+                # If hierarchical number is found in the description column,
+                # shift description index to the next cell
+                if h_num is not None and h_idx == desc_idx:
+                    found_new_desc = False
+                    for idx in range(h_idx + 1, len(row_cells)):
+                        if idx != status_idx and idx != remarks_idx and row_cells[idx].strip():
+                            temp_desc_idx = idx
+                            found_new_desc = True
+                            break
+                    if not found_new_desc:
+                        temp_desc_idx = desc_idx
+                        
+                item_desc = row_cells[temp_desc_idx]
+                if h_num is not None and item_desc == h_num:
+                    for idx, cell in enumerate(row_cells):
+                        if idx != h_idx and idx != status_idx and idx != remarks_idx and cell.strip():
+                            item_desc = cell
+                            break
+                            
+                reported_status = row_cells[status_idx]
+                remarks = row_cells[remarks_idx] if remarks_idx != -1 and len(row_cells) > remarks_idx else ""
+                
+                # Clear hierarchical number from remarks or description if it matches exactly
+                if h_num is not None:
+                    if remarks.strip() == h_num:
+                        remarks = ""
+                    if item_desc.strip() == h_num:
+                        item_desc = "Survey Item"
                 
                 if not item_desc or item_desc.lower() in ["inspection item", "madde", "gemi adı", "imo"]:
                     continue
@@ -168,7 +210,6 @@ class SurveyDocumentProcessor:
                     
                 notes_text = (item_desc + " " + remarks).lower()
                 has_contradiction = False
-                found_keyword = ""
                 
                 if clean_status == "Uygun":
                     for kw in CONTRADICTION_KEYWORDS:
@@ -176,7 +217,6 @@ class SurveyDocumentProcessor:
                             if f"no {kw}" in notes_text or f"not {kw}" in notes_text or f"no outstanding {kw}" in notes_text:
                                 continue
                             has_contradiction = True
-                            found_keyword = kw
                             break
                             
                 if "see attachment" in notes_text or "eke atıf" in notes_text:
@@ -188,7 +228,6 @@ class SurveyDocumentProcessor:
                 final_desc = ""
                 recommendation = ""
                 
-                # Fetch details if rule exists
                 rule_title = ""
                 rule_desc = ""
                 satisfactory_condition = ""
@@ -203,16 +242,16 @@ class SurveyDocumentProcessor:
                     severity = "critical"
                     if rule_code != "N/A":
                         final_desc = (
-                            f"[ÇAPRAZ KONTROL UYARISI] Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
-                            f"(Uygun) olarak işaretlenmiştir; ancak sörveyör açıklamalarında uygunsuzluk belirtilmiştir: \"{remarks}\".\n\n"
-                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
-                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}"
+                            f"İlgili Kural: {rule_code} ({rule_title})\n\n"
+                            f"Neden: Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
+                            f"(Uygun) olarak işaretlenmiş olmasına rağmen, sörveyör açıklamalarında uygunsuzluk/hasar belirtilmiştir: \"{remarks}\".\n"
+                            f"{rule_code} kuralı gereğince '{satisfactory_condition}' koşulu tam olarak sağlanmalıdır. Sörveyörün notu bu kuralla çelişmektedir."
                         )
                         recommendation = REGULATIONS_DB[rule_code]["deficiency_action"]
                     else:
                         final_desc = (
-                            f"[ÇAPRAZ KONTROL UYARISI] Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
-                            f"(Uygun) olarak işaretlenmiştir; ancak sörveyör açıklamalarında eksiklik belirtilmiştir: \"{remarks}\"."
+                            f"Neden: Çelişkili Durum Tespit Edilmiştir. Gemi formunda bu madde '{reported_status}' "
+                            f"(Uygun) olarak işaretlenmiş olmasına rağmen, sörveyör açıklamalarında eksiklik belirtilmiştir: \"{remarks}\"."
                         )
                         recommendation = "Maddedeki eksikliğin giderilmesi ve sörveyöre raporlanması gerekmektedir."
                 elif is_empty_box:
@@ -220,51 +259,55 @@ class SurveyDocumentProcessor:
                     severity = "warning"
                     if rule_code != "N/A":
                         final_desc = (
-                            f"[FORM EKSİKLİĞİ] Kontrol formundaki ilgili onay kutusu boş bırakılmıştır.\n\n"
-                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
-                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}. Sörveyörün bu alanı doldurarak (☑/☒) onaylaması gerekir."
+                            f"İlgili Kural: {rule_code} ({rule_title})\n\n"
+                            f"Neden: Kontrol formundaki onay kutusu boş bırakılmıştır.\n"
+                            f"{rule_code} kuralı gereğince '{satisfactory_condition}' durumunun doğrulanması ve formda işaretlenerek onaylanması gerekmektedir."
                         )
+                        recommendation = REGULATIONS_DB[rule_code]["deficiency_action"]
                     else:
-                        final_desc = "[FORM EKSİKLİĞİ] Kontrol formundaki ilgili onay kutusu boş bırakılmıştır. Sörveyörün bu alanı doğrulaması ve doldurması gerekmektedir."
-                    recommendation = "Kutunun uygunluk durumunu (☑/☒) işaretleyin veya açıklama ekleyin."
+                        final_desc = "Neden: Kontrol formundaki onay kutusu boş bırakılmıştır. Sörveyörün bu alanı doğrulaması ve doldurması gerekmektedir."
+                        recommendation = "Kutunun uygunluk durumunu (☑/☒) işaretleyin veya açıklama ekleyin."
                 elif not is_applicable:
                     final_status = "Düzeltilmeli"
                     severity = "info"
                     app_spec = REGULATIONS_DB[rule_code]['applicability']
                     final_desc = (
-                        f"[UYUMLULUK UYARISI] Bu madde ({rule_code} - {rule_title}) kural gereği sadece '{app_spec}' sınıfı için geçerlidir.\n"
+                        f"İlgili Kural: {rule_code} ({rule_title})\n\n"
+                        f"Neden (Kapsam Dışı): Bu kural ({rule_code}) sadece '{app_spec}' sınıfı için geçerlidir.\n"
                         f"Mevcut gemi türü '{vessel_type}' olduğu için bu kurala tabi değildir.\n"
                         f"Gemi formunda '{reported_status}' olarak işaretlenmiş olan bu madde, kural uyumluluğu açısından N/A (Geçersiz) olarak düzeltilmelidir."
                     )
                     recommendation = "Durumu N/A (Not Applicable) olarak revize edin."
-                elif clean_status == "Uygun Değil": # Detected deficiency directly
+                elif clean_status == "Uygun Değil":
                     final_status = "Uygun Değil"
                     severity = "error"
                     if rule_code != "N/A":
                         final_desc = (
-                            f"Uygunsuzluk Tespit Edilmiştir. Sörveyörün notu: \"{remarks}\".\n\n"
-                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
-                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}"
+                            f"İlgili Kural: {rule_code} ({rule_title})\n\n"
+                            f"Neden: Gemi sörveyör formunda bu madde direkt olarak Uygunsuz ('{reported_status}') olarak işaretlenmiştir. Sörveyörün notu: \"{remarks}\".\n"
+                            f"{rule_code} kuralı gereğince '{satisfactory_condition}' koşulunun sağlanması zorunludur."
                         )
                         recommendation = REGULATIONS_DB[rule_code]["deficiency_action"]
                     else:
-                        final_desc = f"Uygunsuzluk Tespit Edilmiştir. Sörveyör açıklaması: \"{remarks}\""
+                        final_desc = f"Neden: Uygunsuzluk Tespit Edilmiştir. Sörveyör açıklaması: \"{remarks}\""
                         recommendation = "Eksikliğin giderilmesi ve sörveyörün yeniden denetlemesi gerekmektedir."
                 else: # Satisfactory and compliant!
                     final_status = "Uygun"
                     severity = "success"
                     if rule_code != "N/A":
                         final_desc = (
-                            f"Maddenin durumu kural gereksinimlerine uygundur. Raporlanan durum: '{reported_status}'.\n\n"
-                            f"İlgili Mevzuat ({rule_code} - {rule_title}): {rule_desc}\n"
-                            f"Beklenen Uyumluluk Koşulu: {satisfactory_condition}. Raporlanan sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\""
+                            f"İlgili Kural: {rule_code} ({rule_title})\n\n"
+                            f"Neden: {rule_code} kuralına göre gemide '{satisfactory_condition}' sağlanmış olmalıdır. "
+                            f"Sörveyör raporunda da bu durum '{reported_status}' olarak onaylanmıştır. (Sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\")"
                         )
                     else:
-                        final_desc = f"Bu kontrol maddesinde herhangi bir uygunsuzluk veya çelişki tespit edilmemiştir. Maddenin durumu uygundur. (Sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\")"
+                        final_desc = f"Neden: Bu kontrol maddesinde herhangi bir uygunsuzluk veya çelişki tespit edilmemiştir. Maddenin durumu uygundur. (Sörveyör notu: \"{remarks if remarks else 'Sorunsuz'}\")"
                     recommendation = ""
                     
+                item_no_val = h_num if h_num is not None else str(item_counter)
+                
                 findings.append({
-                    "item_no": str(item_counter),
+                    "item_no": item_no_val,
                     "title": item_desc[:80] + ("..." if len(item_desc) > 80 else ""),
                     "rule": rule_code,
                     "status": final_status,
@@ -272,8 +315,10 @@ class SurveyDocumentProcessor:
                     "description": final_desc,
                     "recommendation": recommendation
                 })
-                item_counter += 1
                 
+                if h_num is None:
+                    item_counter += 1
+                    
         return findings
 
 class BytesIO_wrapper:
