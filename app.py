@@ -628,8 +628,29 @@ if st.session_state.active_view == "Fleet Dashboard":
 # VIEW 2: VESSEL PROFILE & CERTIFICATES
 # ==========================================
 elif st.session_state.active_view == "Vessel Profile":
+    # Searchable selectbox to switch between vessels directly from this page
+    conn = db.get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name, imo FROM vessels ORDER BY name ASC")
+    all_vessels_list = cursor.fetchall()
+    conn.close()
+    
+    vessel_options = {f"{row[1]} (IMO: {row[2]})": row[0] for row in all_vessels_list}
+    
     v_id = st.session_state.selected_vessel_id
-    vessel = db.get_vessel_by_id(v_id)
+    if v_id is None:
+        v_id = 1
+        
+    selected_key = next((k for k, v in vessel_options.items() if v == v_id), list(vessel_options.keys())[0])
+    
+    selected_vessel_name = st.selectbox("🚢 İncelemek İstediğiniz Gemiyi Seçin:", list(vessel_options.keys()), index=list(vessel_options.keys()).index(selected_key))
+    new_v_id = vessel_options[selected_vessel_name]
+    
+    if new_v_id != v_id:
+        st.session_state.selected_vessel_id = new_v_id
+        st.rerun()
+        
+    vessel = db.get_vessel_by_id(new_v_id)
     
     if not vessel:
         st.warning("Lütfen listeden bir gemi seçin.")
@@ -734,46 +755,54 @@ elif st.session_state.active_view == "PHRS Certs":
         **B2B Tarayıcıyı Başlat** butonuna bastığınızda, sistem arka planda Selenium botunu çalıştıracak ve verileri anlık olarak güncelleyecektir.
         """)
         
-        if st.button("🚀 B2B Tarayıcıyı Başlat", use_container_width=True):
-            import subprocess
-            import sys
-            
-            log_placeholder = st.empty()
-            status_placeholder = st.empty()
-            
-            status_placeholder.info("B2B Scraper başlatılıyor... Lütfen bekleyin. Tarayıcı arka planda (headless) çalışıyor.")
-            
-            bot_script = r"C:\Users\LIVAPC8\Desktop\PHRS_Bot\sertifika.py"
-            
-            try:
-                process = subprocess.Popen(
-                    [sys.executable, "-u", bot_script],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    bufsize=1
-                )
+        is_windows = (os.name == 'nt')
+        bot_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sertifika.py")
+        
+        if not is_windows:
+            st.warning("⚠️ **Bulut Sunucu Uyarısı**: PHRS B2B Selenium Tarayıcısı, web tarayıcısı ve sürücülere (Chrome/ChromeDriver) ihtiyaç duyduğundan dolayı **Streamlit Cloud üzerinde çalıştırılamaz.** Lütfen bu işlemi kendi bilgisayarınızda (yerel sunucuda) gerçekleştirin ve güncellenen Excel dosyasını GitHub'a yükleyin.")
+            st.button("🚀 B2B Tarayıcıyı Başlat", disabled=True, use_container_width=True)
+        elif not os.path.exists(bot_script):
+            st.error(f"⚠️ `sertifika.py` dosyası bulunamadı. Lütfen dosyanın uygulama klasöründe ({bot_script}) olduğundan emin olun.")
+            st.button("🚀 B2B Tarayıcıyı Başlat", disabled=True, use_container_width=True)
+        else:
+            if st.button("🚀 B2B Tarayıcıyı Başlat", use_container_width=True):
+                import subprocess
+                import sys
                 
-                log_content = []
-                while True:
-                    line = process.stdout.readline()
-                    if not line:
-                        break
-                    log_content.append(line)
-                    log_placeholder.code("".join(log_content[-15:]))
+                log_placeholder = st.empty()
+                status_placeholder = st.empty()
+                
+                status_placeholder.info("B2B Scraper başlatılıyor... Lütfen bekleyin. Tarayıcı arka planda (headless) çalışıyor.")
+                
+                try:
+                    process = subprocess.Popen(
+                        [sys.executable, "-u", bot_script],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        bufsize=1
+                    )
                     
-                process.wait()
-                
-                if process.returncode == 0:
-                    status_placeholder.success("Tarama başarıyla tamamlandı! Portal veritabanı güncelleniyor...")
-                    db.refresh_db()
-                    st.success("Veritabanı başarıyla senkronize edildi! Güncel verileri görmek için sayfayı yenileyiniz.")
-                    if st.button("Sayfayı Şimdi Yenile"):
-                        st.rerun()
-                else:
-                    status_placeholder.error(f"Tarayıcı hata ile sonlandı (Hata kodu: {process.returncode}).")
-            except Exception as ex:
-                status_placeholder.error(f"Hata oluştu: {ex}")
+                    log_content = []
+                    while True:
+                        line = process.stdout.readline()
+                        if not line:
+                            break
+                        log_content.append(line)
+                        log_placeholder.code("".join(log_content[-15:]))
+                        
+                    process.wait()
+                    
+                    if process.returncode == 0:
+                        status_placeholder.success("Tarama başarıyla tamamlandı! Portal veritabanı güncelleniyor...")
+                        db.refresh_db()
+                        st.success("Veritabanı başarıyla senkronize edildi! Güncel verileri görmek için sayfayı yenileyiniz.")
+                        if st.button("Sayfayı Şimdi Yenile"):
+                            st.rerun()
+                    else:
+                        status_placeholder.error(f"Tarayıcı hata ile sonlandı (Hata kodu: {process.returncode}).")
+                except Exception as ex:
+                    status_placeholder.error(f"Hata oluştu: {ex}")
                 
     st.write("---")
     

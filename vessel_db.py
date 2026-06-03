@@ -202,7 +202,11 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM vessels")
     count = cursor.fetchone()[0]
     
-    if count < 2000:
+    # Check if a real vessel from Excel exists in the db
+    cursor.execute("SELECT COUNT(*) FROM vessels WHERE imo = '9076466' OR name = 'CANOPUS S'")
+    has_real = cursor.fetchone()[0] > 0
+    
+    if count < 2000 or not has_real:
         # Re-build cleanly
         cursor.execute("DELETE FROM certificates")
         cursor.execute("DELETE FROM vessels")
