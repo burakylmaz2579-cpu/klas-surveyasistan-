@@ -41,6 +41,7 @@ def normalize_vessel_name(name):
 def load_excel_vessels():
     import pandas as pd
     
+    f_fleet = os.path.join(os.path.dirname(__file__), "PHRS_Tüm_Gemiler.xlsx")
     f1 = os.path.join(os.path.dirname(__file__), "PHRS_Acil_Sertifikalar.xlsx")
     f2 = os.path.join(os.path.dirname(__file__), "PHRS_CERT_DUE_DATE.xlsx")
     
@@ -54,7 +55,6 @@ def load_excel_vessels():
             return datetime.strptime(str(d).strip(), "%d/%m/%Y")
         except:
             try:
-                # Handles ISO dates like 2026-06-14 00:00:00
                 return pd.to_datetime(d)
             except:
                 return None
@@ -65,20 +65,56 @@ def load_excel_vessels():
             val = (val * 31 + ord(char)) & 0xFFFFFFFF
         return str(9000000 + (val % 1000000))
 
-    # Read f2 first because it has IMOs
-    if os.path.exists(f2):
+    # 1. Read real fleet list from f_fleet first
+    if os.path.exists(f_fleet):
         try:
-            df2 = pd.read_excel(f2)
-            df2 = normalize_excel_columns(df2)
-            # Filter out headers
-            df2 = df2[df2['Vessel'].astype(str).str.strip().str.lower() != 'company/vessel']
+            df_fleet = pd.read_excel(f_fleet)
+            df_fleet = normalize_excel_columns(df_fleet)
+            df_fleet = df_fleet[df_fleet['Vessel'].astype(str).str.strip().str.lower() != 'vessel']
             
-            for _, r in df2.iterrows():
+            for _, r in df_fleet.iterrows():
                 v_name = normalize_vessel_name(r['Vessel'])
                 imo = str(r.get('IMO', '')).strip().split('.')[0]
                 if not imo or imo == 'nan' or not imo.isdigit():
                     imo = generate_imo_stable(v_name)
                     
+                v_type = str(r.get('Type', 'General Cargo')).strip()
+                flag = str(r.get('Flag', 'Panama')).strip()
+                class_soc = str(r.get('Class', 'DNV')).strip()
+                
+                try:
+                    grt = int(r.get('GRT', 5000))
+                except:
+                    grt = 5000
+                    
+                try:
+                    dwt = int(r.get('DWT', 8000))
+                except:
+                    dwt = int(grt * 1.5)
+                    
+                vessels_data[v_name] = {
+                    "name": v_name,
+                    "imo": imo,
+                    "vessel_type": v_type,
+                    "flag": flag,
+                    "class_society": class_soc,
+                    "grt": grt,
+                    "dwt": dwt,
+                    "certs": []
+                }
+            print(f"Loaded {len(vessels_data)} real vessels from {f_fleet}")
+        except Exception as e:
+            print(f"Error loading {f_fleet}: {e}")
+            
+    # 2. Read f2 (PHRS_CERT_DUE_DATE.xlsx)
+    if os.path.exists(f2):
+        try:
+            df2 = pd.read_excel(f2)
+            df2 = normalize_excel_columns(df2)
+            df2 = df2[df2['Vessel'].astype(str).str.strip().str.lower() != 'company/vessel']
+            
+            for _, r in df2.iterrows():
+                v_name = normalize_vessel_name(r['Vessel'])
                 cert_name = str(r['Certificate']).strip()
                 due_date_raw = r['DueDate']
                 parsed_dt = parse_date(due_date_raw)
@@ -99,11 +135,20 @@ def load_excel_vessels():
                     c_status = "Valid"
                     
                 if v_name not in vessels_data:
+                    imo = str(r.get('IMO', '')).strip().split('.')[0]
+                    if not imo or imo == 'nan' or not imo.isdigit():
+                        imo = generate_imo_stable(v_name)
                     vessels_data[v_name] = {
                         "name": v_name,
                         "imo": imo,
+                        "vessel_type": "General Cargo",
+                        "flag": "Panama",
+                        "class_society": "DNV",
+                        "grt": 5000,
+                        "dwt": 8000,
                         "certs": []
                     }
+                    
                 vessels_data[v_name]["certs"].append({
                     "name": cert_name,
                     "issue_date": issue_str,
@@ -113,7 +158,7 @@ def load_excel_vessels():
         except Exception as e:
             print(f"Error loading {f2} in db initialization: {e}")
             
-    # Read f1 next
+    # 3. Read f1 (PHRS_Acil_Sertifikalar.xlsx)
     if os.path.exists(f1):
         try:
             df1 = pd.read_excel(f1)
@@ -139,13 +184,16 @@ def load_excel_vessels():
                 else:
                     c_status = "Valid"
                     
-                if v_name in vessels_data:
-                    imo = vessels_data[v_name]["imo"]
-                else:
+                if v_name not in vessels_data:
                     imo = generate_imo_stable(v_name)
                     vessels_data[v_name] = {
                         "name": v_name,
                         "imo": imo,
+                        "vessel_type": "General Cargo",
+                        "flag": "Panama",
+                        "class_society": "DNV",
+                        "grt": 5000,
+                        "dwt": 8000,
                         "certs": []
                     }
                     
@@ -237,26 +285,29 @@ def init_db():
                 status = "Active"
                 score = 100
                 
-            flag = random.choice(FLAGS)
-            class_soc = random.choice(CLASS_SOCIETIES)
-            vessel_type = random.choice(VESSEL_TYPES)
+            flag = v_info.get("flag", random.choice(FLAGS))
+            class_soc = v_info.get("class_society", random.choice(CLASS_SOCIETIES))
+            vessel_type = v_info.get("vessel_type", random.choice(VESSEL_TYPES))
+            grt = v_info.get("grt", 5000)
+            dwt = v_info.get("dwt", 8000)
             
-            if "Tanker" in vessel_type:
-                grt = random.randint(20000, 160000)
-                dwt = int(grt * random.uniform(1.6, 2.0))
-            elif "Bulk" in vessel_type or "Dökme" in vessel_type:
-                grt = random.randint(15000, 90000)
-                dwt = int(grt * random.uniform(1.5, 1.8))
-            elif "Konteyner" in vessel_type:
-                grt = random.randint(10000, 220000)
-                dwt = int(grt * random.uniform(0.9, 1.2))
-            elif "Yolcu" in vessel_type:
-                grt = random.randint(5000, 150000)
-                dwt = int(grt * random.uniform(0.1, 0.25))
-            else:
-                grt = random.randint(2000, 30000)
-                dwt = int(grt * random.uniform(1.2, 1.5))
-                
+            if grt == 5000 and dwt == 8000:
+                if "Tanker" in vessel_type:
+                    grt = random.randint(20000, 160000)
+                    dwt = int(grt * random.uniform(1.6, 2.0))
+                elif "Bulk" in vessel_type or "Dökme" in vessel_type:
+                    grt = random.randint(15000, 90000)
+                    dwt = int(grt * random.uniform(1.5, 1.8))
+                elif "Konteyner" in vessel_type:
+                    grt = random.randint(10000, 220000)
+                    dwt = int(grt * random.uniform(0.9, 1.2))
+                elif "Yolcu" in vessel_type:
+                    grt = random.randint(5000, 150000)
+                    dwt = int(grt * random.uniform(0.1, 0.25))
+                else:
+                    grt = random.randint(2000, 30000)
+                    dwt = int(grt * random.uniform(1.2, 1.5))
+                    
             vessels_to_insert.append((v_name, imo, grt, dwt, vessel_type, flag, class_soc, status, score))
             vessels_certs_map[imo] = v_info["certs"]
             

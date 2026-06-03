@@ -6,12 +6,18 @@ from datetime import datetime, timedelta
 import pandas as pd
 import time
 
-# Chrome güvenlik ayarlarını atla ve arka planda (headless) çalıştır
+# Chrome güvenlik ayarlarını atla
 options = webdriver.ChromeOptions()
 options.add_argument('--ignore-certificate-errors')
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
+
+import sys
+if '--headless' in sys.argv:
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    print("Selenium tarayıcı arka plan (headless) modunda çalıştırılıyor.")
+else:
+    print("Selenium tarayıcı normal pencere modunda çalıştırılıyor.")
 
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 10)
@@ -103,14 +109,20 @@ def export_to_excel(data):
     df.to_excel(filename_local, index=False)
     print(f"İşlem tamamlandı! Rapor kaydedildi: {filename_local}")
     
-    # Save to portal workspace (overwrite default name)
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    filename_portal = os.path.join(script_dir, "PHRS_Acil_Sertifikalar.xlsx")
-    try:
-        df.to_excel(filename_portal, index=False)
-        print(f"Portal veritabanı dosyası başarıyla güncellendi: {filename_portal}")
-    except Exception as e:
-        print(f"Portal dosyası güncellenirken hata oluştu: {e}")
+    # Define target directories to sync
+    target_dirs = [
+        r"C:\Users\LIVAPC8\Desktop\KODLAR\YENI DENEYİŞ",
+        r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
+    ]
+    
+    for t_dir in target_dirs:
+        if os.path.exists(t_dir):
+            target_path = os.path.join(t_dir, "PHRS_Acil_Sertifikalar.xlsx")
+            try:
+                df.to_excel(target_path, index=False)
+                print(f"Dosya kopyalandı ve güncellendi: {target_path}")
+            except Exception as e:
+                print(f"Hata ({target_path}): {e}")
 
 try:
     login_and_navigate()

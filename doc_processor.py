@@ -308,7 +308,7 @@ class SurveyDocumentProcessor:
                 
                 findings.append({
                     "item_no": item_no_val,
-                    "title": item_desc[:80] + ("..." if len(item_desc) > 80 else ""),
+                    "title": item_desc,
                     "rule": rule_code,
                     "status": final_status,
                     "severity": severity,

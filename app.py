@@ -751,32 +751,55 @@ elif st.session_state.active_view == "PHRS Certs":
     # B2B Integration Panel
     with st.expander("🔄 B2B Entegrasyonu ve Veri Güncelleme Konsolu", expanded=False):
         st.markdown("""
-        Bu konsol aracılığıyla PHRS B2B sistemindeki güncel sertifika bilgilerini doğrudan çekebilirsiniz.
-        **B2B Tarayıcıyı Başlat** butonuna bastığınızda, sistem arka planda Selenium botunu çalıştıracak ve verileri anlık olarak güncelleyecektir.
+        Bu konsol aracılığıyla PHRS B2B sistemindeki güncel gemi ve sertifika bilgilerini doğrudan çekebilirsiniz.
+        Yerel bilgisayarınızda çalıştığınızda, bu butonlar arka planda Selenium tarayıcısını (Chrome) açarak verileri anlık çeker.
         """)
         
         is_windows = (os.name == 'nt')
-        bot_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sertifika.py")
+        bot_script_certs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sertifika.py")
+        bot_script_fleet = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scrape_vessels.py")
         
         if not is_windows:
-            st.warning("⚠️ **Bulut Sunucu Uyarısı**: PHRS B2B Selenium Tarayıcısı, web tarayıcısı ve sürücülere (Chrome/ChromeDriver) ihtiyaç duyduğundan dolayı **Streamlit Cloud üzerinde çalıştırılamaz.** Lütfen bu işlemi kendi bilgisayarınızda (yerel sunucuda) gerçekleştirin ve güncellenen Excel dosyasını GitHub'a yükleyin.")
-            st.button("🚀 B2B Tarayıcıyı Başlat", disabled=True, use_container_width=True)
-        elif not os.path.exists(bot_script):
-            st.error(f"⚠️ `sertifika.py` dosyası bulunamadı. Lütfen dosyanın uygulama klasöründe ({bot_script}) olduğundan emin olun.")
-            st.button("🚀 B2B Tarayıcıyı Başlat", disabled=True, use_container_width=True)
+            st.warning("⚠️ **Bulut Sunucu Uyarısı**: PHRS B2B Selenium Tarayıcıları (Chrome/ChromeDriver gerektirdiğinden) **Streamlit Cloud üzerinde çalıştırılamaz.** Lütfen bu güncelleme işlemlerini kendi bilgisayarınızda (yerel sunucuda) gerçekleştirin ve güncellenen Excel dosyalarını GitHub deposuna yükleyin.")
+            col_b1, col_b2 = st.columns(2)
+            with col_b1:
+                st.button("🚀 B2B Sertifika Tarihlerini Güncelle", disabled=True, use_container_width=True, key="btn_certs_disabled")
+            with col_b2:
+                st.button("🚀 B2B Filo Listesini Güncelle (Gemileri Çek)", disabled=True, use_container_width=True, key="btn_fleet_disabled")
         else:
-            if st.button("🚀 B2B Tarayıcıyı Başlat", use_container_width=True):
+            col_b1, col_b2 = st.columns(2)
+            
+            run_script = None
+            script_name = ""
+            
+            with col_b1:
+                if not os.path.exists(bot_script_certs):
+                    st.error("`sertifika.py` bulunamadı.")
+                else:
+                    if st.button("🚀 B2B Sertifika Tarihlerini Güncelle", use_container_width=True, key="btn_certs_run"):
+                        run_script = bot_script_certs
+                        script_name = "Sertifika Tarayıcısı (sertifika.py)"
+            
+            with col_b2:
+                if not os.path.exists(bot_script_fleet):
+                    st.error("`scrape_vessels.py` bulunamadı.")
+                else:
+                    if st.button("🚀 B2B Filo Listesini Güncelle (Gemileri Çek)", use_container_width=True, key="btn_fleet_run"):
+                        run_script = bot_script_fleet
+                        script_name = "Filo Listesi Tarayıcısı (scrape_vessels.py)"
+            
+            if run_script is not None:
                 import subprocess
                 import sys
                 
                 log_placeholder = st.empty()
                 status_placeholder = st.empty()
                 
-                status_placeholder.info("B2B Scraper başlatılıyor... Lütfen bekleyin. Tarayıcı arka planda (headless) çalışıyor.")
+                status_placeholder.info(f"⏳ {script_name} başlatılıyor... Lütfen bekleyin. Tarayıcı penceresi açılacaktır.")
                 
                 try:
                     process = subprocess.Popen(
-                        [sys.executable, "-u", bot_script],
+                        [sys.executable, "-u", run_script],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
                         text=True,
@@ -794,13 +817,13 @@ elif st.session_state.active_view == "PHRS Certs":
                     process.wait()
                     
                     if process.returncode == 0:
-                        status_placeholder.success("Tarama başarıyla tamamlandı! Portal veritabanı güncelleniyor...")
+                        status_placeholder.success(f"✅ {script_name} başarıyla tamamlandı! Veritabanı güncelleniyor...")
                         db.refresh_db()
-                        st.success("Veritabanı başarıyla senkronize edildi! Güncel verileri görmek için sayfayı yenileyiniz.")
-                        if st.button("Sayfayı Şimdi Yenile"):
+                        st.success("🎉 Veritabanı başarıyla senkronize edildi! Güncel verileri görmek için sayfayı yenileyiniz.")
+                        if st.button("Sayfayı Şimdi Yenile", key="btn_refresh_page"):
                             st.rerun()
                     else:
-                        status_placeholder.error(f"Tarayıcı hata ile sonlandı (Hata kodu: {process.returncode}).")
+                        status_placeholder.error(f"❌ Tarayıcı hata ile sonlandı (Hata kodu: {process.returncode}).")
                 except Exception as ex:
                     status_placeholder.error(f"Hata oluştu: {ex}")
                 
