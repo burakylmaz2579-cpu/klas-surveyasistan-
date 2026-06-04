@@ -5,12 +5,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime, timedelta
 import pandas as pd
 import time
+import sys
+import os
 
 # Chrome güvenlik ayarlarını atla
 options = webdriver.ChromeOptions()
 options.add_argument('--ignore-certificate-errors')
 
-import sys
 if '--headless' in sys.argv:
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
@@ -109,20 +110,40 @@ def export_to_excel(data):
     df.to_excel(filename_local, index=False)
     print(f"İşlem tamamlandı! Rapor kaydedildi: {filename_local}")
     
-    # Define target directories to sync
-    target_dirs = [
-        r"C:\Users\LIVAPC8\Desktop\KODLAR\YENI DENEYİŞ",
-        r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
-    ]
-    
-    for t_dir in target_dirs:
-        if os.path.exists(t_dir):
-            target_path = os.path.join(t_dir, "PHRS_Acil_Sertifikalar.xlsx")
-            try:
-                df.to_excel(target_path, index=False)
-                print(f"Dosya kopyalandı ve güncellendi: {target_path}")
-            except Exception as e:
-                print(f"Hata ({target_path}): {e}")
+    # Save to the script's own directory (workspace or PHRS_Bot)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filename_portal = os.path.join(script_dir, "PHRS_Acil_Sertifikalar.xlsx")
+    try:
+        df.to_excel(filename_portal, index=False)
+        print(f"Dosya guncellendi: {filename_portal}")
+    except Exception as e:
+        print(f"Hata ({filename_portal}): {e}")
+        
+    # Also sync to the OTHER directory if it exists
+    other_dir = None
+    if "PHRS_Bot" in script_dir:
+        user_profile = os.environ.get("USERPROFILE", "C:\\Users\\LIVAPC8")
+        desktop_path = os.path.join(user_profile, "Desktop")
+        if os.path.exists(desktop_path):
+            kodlar_path = os.path.join(desktop_path, "KODLAR")
+            if os.path.exists(kodlar_path):
+                for item in os.listdir(kodlar_path):
+                    if item.upper().startswith("YENI"):
+                        other_dir = os.path.join(kodlar_path, item)
+                        break
+    else:
+        user_profile = os.environ.get("USERPROFILE", "C:\\Users\\LIVAPC8")
+        bot_cand = os.path.join(user_profile, "Desktop", "PHRS_Bot")
+        if os.path.exists(bot_cand):
+            other_dir = bot_cand
+            
+    if other_dir:
+        target_path = os.path.join(other_dir, "PHRS_Acil_Sertifikalar.xlsx")
+        try:
+            df.to_excel(target_path, index=False)
+            print(f"Dosya diger klasora senkronize edildi: {target_path}")
+        except Exception as e:
+            print(f"Senkronizasyon hatasi ({target_path}): {e}")
 
 try:
     login_and_navigate()

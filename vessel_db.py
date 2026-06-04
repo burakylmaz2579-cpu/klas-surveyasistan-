@@ -247,29 +247,63 @@ def init_db():
     """)
     conn.commit()
     
+    # Check if Excel sheets exist in repository
+    f_fleet = os.path.join(os.path.dirname(__file__), "PHRS_Tüm_Gemiler.xlsx")
+    f1 = os.path.join(os.path.dirname(__file__), "PHRS_Acil_Sertifikalar.xlsx")
+    f2 = os.path.join(os.path.dirname(__file__), "PHRS_CERT_DUE_DATE.xlsx")
+    excel_exists = os.path.exists(f_fleet) or os.path.exists(f1) or os.path.exists(f2)
+    
     cursor.execute("SELECT COUNT(*) FROM vessels")
     count = cursor.fetchone()[0]
     
-    # Check if a real vessel from Excel exists in the db
-    cursor.execute("SELECT COUNT(*) FROM vessels WHERE imo = '9076466' OR name = 'CANOPUS S'")
-    has_real = cursor.fetchone()[0] > 0
-    
-    if count < 2000 or not has_real:
-        # Re-build cleanly
-        cursor.execute("DELETE FROM certificates")
-        cursor.execute("DELETE FROM vessels")
+    # Always rebuild from Excel sheets on startup to ensure 100% sync with GitHub commits
+    if count == 0 or excel_exists:
+        print("Excel dosyalarından gerçek gemiler veritabanına yükleniyor (Temiz Rebuild)...")
+        
+        # Re-build cleanly by dropping tables to make sure schema is fresh
+        cursor.execute("DROP TABLE IF EXISTS certificates")
+        cursor.execute("DROP TABLE IF EXISTS vessels")
+        
+        cursor.execute("""
+        CREATE TABLE vessels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            imo TEXT NOT NULL UNIQUE,
+            grt INTEGER,
+            dwt INTEGER,
+            vessel_type TEXT,
+            flag TEXT,
+            class_society TEXT,
+            status TEXT,
+            compliance_score INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        
+        cursor.execute("""
+        CREATE TABLE certificates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vessel_id INTEGER,
+            name TEXT NOT NULL,
+            issue_date TEXT,
+            expiry_date TEXT,
+            status TEXT,
+            FOREIGN KEY (vessel_id) REFERENCES vessels(id) ON DELETE CASCADE
+        )
+        """)
         conn.commit()
         
-        print("Populating database with real vessels from Excel files...")
         real_vessels_dict = load_excel_vessels()
         
         used_imos = set()
         vessels_to_insert = []
         vessels_certs_map = {}
         
-        # 1. Insert real vessels first
+        # Insert real vessels
         for v_name, v_info in real_vessels_dict.items():
             imo = v_info["imo"]
+            if imo in used_imos:
+                continue
             used_imos.add(imo)
             
             expired_count = sum(1 for c in v_info["certs"] if c["status"] == "Expired")
@@ -310,52 +344,6 @@ def init_db():
                     
             vessels_to_insert.append((v_name, imo, grt, dwt, vessel_type, flag, class_soc, status, score))
             vessels_certs_map[imo] = v_info["certs"]
-            
-        # 2. Add synthetic vessels up to 2050
-        target = 2050
-        while len(vessels_to_insert) < target:
-            prefix = random.choice(VESSEL_PREFIXES)
-            name = random.choice(VESSEL_NAMES)
-            vessel_name = f"{prefix} {name}"
-            if len(vessels_to_insert) > 300:
-                vessel_name += f" {random.randint(1, 99)}"
-                
-            imo = f"{random.randint(9000000, 9999999)}"
-            if imo in used_imos:
-                continue
-            used_imos.add(imo)
-            vessel_type = random.choice(VESSEL_TYPES)
-            flag = random.choice(FLAGS)
-            class_soc = random.choice(CLASS_SOCIETIES)
-            
-            if "Tanker" in vessel_type:
-                grt = random.randint(20000, 160000)
-                dwt = int(grt * random.uniform(1.6, 2.0))
-            elif "Bulk" in vessel_type or "Dökme" in vessel_type:
-                grt = random.randint(15000, 90000)
-                dwt = int(grt * random.uniform(1.5, 1.8))
-            elif "Konteyner" in vessel_type:
-                grt = random.randint(10000, 220000)
-                dwt = int(grt * random.uniform(0.9, 1.2))
-            elif "Yolcu" in vessel_type:
-                grt = random.randint(5000, 150000)
-                dwt = int(grt * random.uniform(0.1, 0.25))
-            else:
-                grt = random.randint(2000, 30000)
-                dwt = int(grt * random.uniform(1.2, 1.5))
-                
-            status_prob = random.random()
-            if status_prob < 0.70:
-                status = "Active"
-                score = random.randint(85, 100)
-            elif status_prob < 0.92:
-                status = "Warning"
-                score = random.randint(65, 84)
-            else:
-                status = "Critical"
-                score = random.randint(30, 64)
-                
-            vessels_to_insert.append((vessel_name, imo, grt, dwt, vessel_type, flag, class_soc, status, score))
             
         cursor.executemany("""
         INSERT INTO vessels (name, imo, grt, dwt, vessel_type, flag, class_society, status, compliance_score)

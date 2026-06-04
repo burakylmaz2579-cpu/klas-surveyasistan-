@@ -49,7 +49,6 @@ def scrape_all_vessels():
     while True:
         print(f"Sayfa {sayfa_no} taraniyor...")
         
-        # B2B MyVessels grid uses custom divs containing 'nameClass' class for the vessel name column
         name_divs = driver.find_elements(By.XPATH, "//div[contains(@class, 'nameClass')]")
         print(f"Bu sayfada {len(name_divs)} gemi satiri bulundu.")
         
@@ -156,20 +155,42 @@ def export_to_excel(data):
     df.to_excel(filename_local, index=False)
     print(f"Islem tamamlandi! Filo listesi kaydedildi: {filename_local}")
     
-    # Sync file to the target paths
-    target_dirs = [
-        r"C:\Users\LIVAPC8\Desktop\KODLAR\YENI DENEYİŞ",
-        r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
-    ]
-    
-    for t_dir in target_dirs:
-        if os.path.exists(t_dir):
-            target_path = os.path.join(t_dir, "PHRS_Tum_Gemiler.xlsx")
-            try:
-                df.to_excel(target_path, index=False)
-                print(f"Dosya kopyalandi ve guncellendi: {target_path}")
-            except Exception as e:
-                print(f"Hata ({target_path}): {e}")
+    # Save to the script's own directory (workspace or PHRS_Bot)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filename_portal = os.path.join(script_dir, "PHRS_Tüm_Gemiler.xlsx")
+    try:
+        df.to_excel(filename_portal, index=False)
+        print(f"Dosya guncellendi: {filename_portal}")
+    except Exception as e:
+        print(f"Hata ({filename_portal}): {e}")
+        
+    # Also sync to the OTHER directory if it exists
+    other_dir = None
+    if "PHRS_Bot" in script_dir:
+        user_profile = os.environ.get("USERPROFILE", "C:\\Users\\LIVAPC8")
+        # Find path dynamically using OS listdir to prevent hardcoding Turkish chars in python file
+        desktop_path = os.path.join(user_profile, "Desktop")
+        if os.path.exists(desktop_path):
+            kodlar_path = os.path.join(desktop_path, "KODLAR")
+            if os.path.exists(kodlar_path):
+                # Search for directory that matches 'YENI DENEYIS' case insensitively or starts with 'YENI'
+                for item in os.listdir(kodlar_path):
+                    if item.upper().startswith("YENI"):
+                        other_dir = os.path.join(kodlar_path, item)
+                        break
+    else:
+        user_profile = os.environ.get("USERPROFILE", "C:\\Users\\LIVAPC8")
+        bot_cand = os.path.join(user_profile, "Desktop", "PHRS_Bot")
+        if os.path.exists(bot_cand):
+            other_dir = bot_cand
+            
+    if other_dir:
+        target_path = os.path.join(other_dir, "PHRS_Tüm_Gemiler.xlsx")
+        try:
+            df.to_excel(target_path, index=False)
+            print(f"Dosya diger klasora senkronize edildi: {target_path}")
+        except Exception as e:
+            print(f"Senkronizasyon hatasi ({target_path}): {e}")
 
 try:
     login_and_navigate()
