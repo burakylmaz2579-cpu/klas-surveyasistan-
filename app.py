@@ -347,6 +347,41 @@ def load_phrs_certificates():
         
     return None
 
+def get_cert_category_tr(cert_name):
+    c = str(cert_name).upper().strip()
+    if any(x in c for x in ["LSA", "LIFEBOAT", "LIFERAFT", "LIFEBUOY", "LIFEJACKET", "CAN KURTARMA", "PERSONAL LIFE"]):
+        return "Can Kurtarma Araçları (LSA)"
+    elif any(x in c for x in ["FFE", "FIRE", "EXTINGUISHER", "YANGIN", "SÖNDÜRME", "DONANIM"]):
+        return "Yangın Güvenlik Donanımları (FFE)"
+    elif any(x in c for x in ["IOPP", "OIL POLLUTION", "PETROL KİRLİLİĞİ", "OIL RECORD"]):
+        return "Petrol Kirliliğini Önleme (MARPOL Annex I)"
+    elif any(x in c for x in ["IAPPC", "IAPP", "AIR POLLUTION", "HAVA KİRLİLİĞİ", "EMISSION"]):
+        return "Hava Kirliliğini Önleme (MARPOL Annex VI)"
+    elif any(x in c for x in ["ISPP", "SEWAGE", "LAĞIM"]):
+        return "Atık Su / Sewage (MARPOL Annex IV)"
+    elif any(x in c for x in ["GARBAGE", "ÇÖP"]):
+        return "Çöp Kirliliği (MARPOL Annex V)"
+    elif any(x in c for x in ["SRT", "RADIO", "TELSİZ", "TELEGRAPHY", "TELEFON", "DSC"]):
+        return "Telsiz Telgraf Emniyeti (SRT)"
+    elif any(x in c for x in ["SC ", "SAFETY CONSTRUCTION", "EMNİYET İNŞAAT", "SAFCON"]):
+        return "Gemi Emniyet İnşaat (SC)"
+    elif any(x in c for x in ["CL ", "CLASS ", "KLAS", "CLASSIFICATION"]):
+        return "Klas Sertifikası (CL)"
+    elif any(x in c for x in ["LL ", "LOAD LINE", "YÜK SINIRI", "FREEBOARD"]):
+        return "Yük Sınırı (LL)"
+    elif any(x in c for x in ["BWM", "BALLAST WATER", "BALAST SUYU"]):
+        return "Balast Suyu Yönetimi (BWM)"
+    elif any(x in c for x in ["AFS", "ANTI-FOULING", "KARIŞIK BOYA", "ZEHİRLİ BOYA"]):
+        return "Zehirli Boya Sistemleri (AFS)"
+    elif any(x in c for x in ["SMC", "DOC", "SAFETY MANAGEMENT", "ISM"]):
+        return "Emniyetli Yönetim (ISM/SMC)"
+    elif any(x in c for x in ["ISSC", "SECURITY", "GÜVENLİK"]):
+        return "Gemi Güvenlik (ISSC)"
+    elif any(x in c for x in ["MLC", "LABOUR", "DENİZ İŞ"]):
+        return "Denizcilik Çalışma (MLC)"
+    else:
+        return "Diğer Emniyet Sertifikaları"
+
 # --- YEREL ANALİZ/RAPOR ÖZETİ ÜRETİCİ ---
 def generate_local_evaluation(findings, vessel_name, vessel_type):
     total = len(findings)
@@ -872,22 +907,28 @@ elif st.session_state.active_view == "PHRS Certs":
         # Categorize by expiry status and month
         today = datetime.now()
         
-        # 1. Expired ones at the very top (Süresi Geçenler en üstte)
+        # 1. Expired ones at the very top (Süresi Geçenler en üstte) - Grouped by Category inside expander
         expired_df = cert_df[cert_df['DaysLeft'] < 0]
         if not expired_df.empty:
-            st.markdown("### 🚨 SÜRESİ GEÇMİŞ SERTİFİKALAR (Acil Aksiyon Gerekenler)")
-            rows_html = []
-            for _, r in expired_df.iterrows():
-                rows_html.append(f"<tr><td style='padding: 10px; font-weight: 700; color: #991b1b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px; font-weight: 600;'>{r['Certificate']}</td><td style='padding: 10px; color: #ef4444; font-weight: 700;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill status-critical'>{abs(r['DaysLeft'])} Gün Önce Geçti</span></td></tr>")
+            with st.expander("🚨 SÜRESİ GEÇMİŞ SERTİFİKALAR (Acil Aksiyon Gerekenler)", expanded=True):
+                expired_df = expired_df.copy()
+                expired_df['Category'] = expired_df['Certificate'].apply(get_cert_category_tr)
+                grouped_expired = expired_df.groupby('Category')
                 
-            st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 2rem;">
+                for cat_name, cat_group in sorted(grouped_expired.groups.items()):
+                    st.markdown(f"#### 🏷️ {cat_name}")
+                    rows_html = []
+                    for _, r in expired_df.loc[cat_group].iterrows():
+                        rows_html.append(f"<tr><td style='padding: 10px; font-weight: 700; color: #991b1b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px; font-weight: 600;'>{r['Certificate']}</td><td style='padding: 10px; color: #ef4444; font-weight: 700;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill status-critical'>{abs(r['DaysLeft'])} Gün Önce Geçti</span></td></tr>")
+                    
+                    st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
 <thead>
 <tr style="background: #fee2e2; text-align: left; color: #991b1b;">
-<th style="padding: 12px 10px;">Gemi Adı</th>
-<th style="padding: 12px 10px;">IMO No</th>
-<th style="padding: 12px 10px;">Sertifika</th>
-<th style="padding: 12px 10px;">Bitiş Tarihi</th>
-<th style="padding: 12px 10px;">Kalan Süre</th>
+<th style="padding: 12px 10px; width: 25%;">Gemi Adı</th>
+<th style="padding: 12px 10px; width: 15%;">IMO No</th>
+<th style="padding: 12px 10px; width: 30%;">Sertifika</th>
+<th style="padding: 12px 10px; width: 15%;">Bitiş Tarihi</th>
+<th style="padding: 12px 10px; width: 15%;">Kalan Süre</th>
 </tr>
 </thead>
 <tbody>
@@ -895,32 +936,41 @@ elif st.session_state.active_view == "PHRS Certs":
 </tbody>
 </table>""", unsafe_allow_html=True)
 
-        # 2. Upcoming grouped month by month (Gelecek aylara göre gruplama)
+        # 2. Upcoming grouped month by month and category (Gelecek aylara ve kategorilere göre gruplama)
         future_df = cert_df[cert_df['DaysLeft'] >= 0]
         if not future_df.empty:
-            # Extract month and year keys for grouping
             future_df = future_df.copy()
             future_df['Month'] = future_df['ParsedDate'].dt.month
             future_df['Year'] = future_df['ParsedDate'].dt.year
+            future_df['Category'] = future_df['Certificate'].apply(get_cert_category_tr)
             
-            # Sort by parsed date ascending
-            grouped = future_df.groupby(['Year', 'Month'])
+            grouped_keys = sorted(future_df.groupby(['Year', 'Month']).groups.keys())
             
             st.markdown("### 📅 Gelecek Aylara Göre Sertifika Yenileme Takvimi")
             
-            for (year, month), group in sorted(grouped.groups.items()):
+            tab_labels = []
+            for year, month in grouped_keys:
                 month_name = MONTH_NAMES.get(month, f"Ay: {month}")
-                st.markdown(f"#### 📅 {month_name} {year}")
+                tab_labels.append(f"📅 {month_name} {year}")
                 
-                rows_html = []
-                for _, r in future_df.loc[group].iterrows():
-                    days = r['DaysLeft']
-                    pill_style = "status-warning" if days <= 30 else "status-active"
-                    pill_text = f"{days} Gün Kaldı" if days > 0 else "Bugün Son Gün!"
+            month_tabs = st.tabs(tab_labels)
+            
+            for idx, (year, month) in enumerate(grouped_keys):
+                with month_tabs[idx]:
+                    month_df = future_df[(future_df['Year'] == year) & (future_df['Month'] == month)]
+                    grouped_cat = month_df.groupby('Category')
                     
-                    rows_html.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #1e293b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px;'>{r['Certificate']}</td><td style='padding: 10px; font-weight: 600;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill {pill_style}'>{pill_text}</span></td></tr>")
-                    
-                st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
+                    for cat_name, cat_group in sorted(grouped_cat.groups.items()):
+                        st.markdown(f"#### 🏷️ {cat_name}")
+                        rows_html = []
+                        for _, r in month_df.loc[cat_group].iterrows():
+                            days = r['DaysLeft']
+                            pill_style = "status-warning" if days <= 30 else "status-active"
+                            pill_text = f"{days} Gün Kaldı" if days > 0 else "Bugün Son Gün!"
+                            
+                            rows_html.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #1e293b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px;'>{r['Certificate']}</td><td style='padding: 10px; font-weight: 600;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill {pill_style}'>{pill_text}</span></td></tr>")
+                            
+                        st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
 <thead>
 <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
 <th style="padding: 12px 10px; width: 25%;">Gemi Adı</th>
