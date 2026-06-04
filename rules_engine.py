@@ -141,6 +141,83 @@ REGULATIONS_DB = {
         "satisfactory_condition": "Bilge pumping system, emergency generator, steering gear, and watertight seals are fully functional and tested.",
         "deficiency_action": "Repair or overhaul failing machinery/steering components; verify backup power systems.",
         "applicability": "All Vessels"
+    },
+    "BWM D-2": {
+        "title": "Ballast Water Performance Standard & Record Book",
+        "chapter": "BWM Convention",
+        "category": "Environmental / Pollution",
+        "description": "Requires ships to manage ballast water to meet biological standards (D-2) and maintain a Ballast Water Record Book.",
+        "checklist_keywords": ["ballast", "bwm", "ballast water", "ballast record book", "treatment system", "bwms"],
+        "critical_items": ["bwms", "treatment", "record book", "expired"],
+        "satisfactory_condition": "Ballast Water Management System (BWMS) functional, active substance log maintained, Ballast Water Record Book updated and signed.",
+        "deficiency_action": "Service Ballast Water Treatment System, replace filters, update Ballast Water Record Book entries.",
+        "applicability": "All Vessels"
+    },
+    "AFS Convention": {
+        "title": "Control of Harmful Anti-fouling Systems",
+        "chapter": "AFS Convention",
+        "category": "Environmental / Pollution",
+        "description": "Prohibits the use of harmful organotin compounds in anti-fouling paints. Requires an International Anti-fouling System Certificate or Declaration.",
+        "checklist_keywords": ["anti-fouling", "afs", "organotin", "paint", "tbt", "declaration of anti-fouling"],
+        "critical_items": ["organotin", "tbt", "afs", "certificate"],
+        "satisfactory_condition": "Organotin-free anti-fouling coating applied, International Anti-fouling System Certificate or Declaration available onboard.",
+        "deficiency_action": "Provide organotin-free statement from paint manufacturer, plan hull recoating if non-compliant paint detected.",
+        "applicability": "All Vessels"
+    },
+    "MARPOL Annex IV Reg 9": {
+        "title": "Sewage systems and discharge connections",
+        "chapter": "MARPOL Annex IV",
+        "category": "Environmental / Pollution",
+        "description": "Specifies sewage treatment plants, disinfecting systems, holding tanks, and standard discharge connection flanges.",
+        "checklist_keywords": ["sewage", "sewage treatment", "holding tank", "macerator", "disinfection", "toilet"],
+        "critical_items": ["treatment plant", "macerator", "disinfection", "leak"],
+        "satisfactory_condition": "Sewage treatment plant functioning, chemical disinfection records maintained, standard discharge connection flange available.",
+        "deficiency_action": "Service sewage treatment plant aeration system, replenish chemical dosing, clean holding tank level indicators.",
+        "applicability": "All Vessels >= 400 GT"
+    },
+    "MARPOL Annex V Reg 10": {
+        "title": "Placards, garbage management plans and record keeping",
+        "chapter": "MARPOL Annex V",
+        "category": "Environmental / Pollution",
+        "description": "Requires placards for ships of 12m or more, a Garbage Management Plan for ships of 100 GT and above, and a Garbage Record Book for ships of 400 GT and above.",
+        "checklist_keywords": ["garbage", "garbage record book", "garbage management plan", "placard", "waste", "food waste", "plastics"],
+        "critical_items": ["garbage record book", "plan", "placard", "missing"],
+        "satisfactory_condition": "Garbage Record Book signed up-to-date, Garbage Management Plan implemented, placards displayed in crew languages.",
+        "deficiency_action": "Display missing garbage placards, update Garbage Record Book entries, replenish recycling/waste receptacles.",
+        "applicability": "All Vessels"
+    },
+    "ICLL Art 12": {
+        "title": "Load Line Certificate and marking of draft marks",
+        "chapter": "Load Line Convention",
+        "category": "Draft & Integrity",
+        "description": "Regulates draft marks, load line marks (Plimsoll line), deck line, and freeing ports to ensure adequate reserve buoyancy.",
+        "checklist_keywords": ["load line", "draft mark", "plimsoll", "freeboard", "deck line", "freeing port", "overload"],
+        "critical_items": ["load line", "draft mark", "corroded", "illegible"],
+        "satisfactory_condition": "Load line and draft marks clearly visible, welded and painted, freeing port flaps moving freely.",
+        "deficiency_action": "Repaint weathered draft and load line markings, free stuck freeing port flaps, restore seals on deck openings.",
+        "applicability": "All Vessels"
+    },
+    "AFS Certificate": {
+        "title": "International Anti-Fouling System Certificate",
+        "chapter": "AFS Convention",
+        "category": "Documentation",
+        "description": "Mandates ships of 400 GT and above to carry the International Anti-Fouling System Certificate.",
+        "checklist_keywords": ["afs certificate", "anti-fouling certificate", "declaration on anti-fouling"],
+        "critical_items": ["expired", "missing", "invalid"],
+        "satisfactory_condition": "Valid AFS certificate or Declaration of AFS available onboard.",
+        "deficiency_action": "Request survey from Class to reissue AFS certificate, ensure proper documentation of applied paint systems.",
+        "applicability": "All Vessels >= 400 GT"
+    },
+    "BWM Certificate": {
+        "title": "International Ballast Water Management Certificate",
+        "chapter": "BWM Convention",
+        "category": "Documentation",
+        "description": "Requires ships of 400 GT and above to carry a Ballast Water Management Certificate and an approved BWM Plan.",
+        "checklist_keywords": ["bwm certificate", "ballast water certificate", "ballast water management plan", "bwmp"],
+        "critical_items": ["expired", "missing", "invalid"],
+        "satisfactory_condition": "Valid BWM Certificate and approved Ballast Water Management Plan available onboard.",
+        "deficiency_action": "Liaise with Class to survey BWMS and issue certificate, update BWM plan to current regulations.",
+        "applicability": "All Vessels >= 400 GT"
     }
 }
 

@@ -878,32 +878,22 @@ elif st.session_state.active_view == "PHRS Certs":
             st.markdown("### 🚨 SÜRESİ GEÇMİŞ SERTİFİKALAR (Acil Aksiyon Gerekenler)")
             rows_html = []
             for _, r in expired_df.iterrows():
-                rows_html.append(f"""
-                <tr>
-                    <td style="padding: 10px; font-weight: 700; color: #991b1b;">{r['Vessel']}</td>
-                    <td style="padding: 10px;">{r.get('IMO', 'N/A')}</td>
-                    <td style="padding: 10px; font-weight: 600;">{r['Certificate']}</td>
-                    <td style="padding: 10px; color: #ef4444; font-weight: 700;">{r['DueDate']}</td>
-                    <td style="padding: 10px;"><span class="status-pill status-critical">{abs(r['DaysLeft'])} Gün Önce Geçti</span></td>
-                </tr>
-                """)
+                rows_html.append(f"<tr><td style='padding: 10px; font-weight: 700; color: #991b1b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px; font-weight: 600;'>{r['Certificate']}</td><td style='padding: 10px; color: #ef4444; font-weight: 700;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill status-critical'>{abs(r['DaysLeft'])} Gün Önce Geçti</span></td></tr>")
                 
-            st.markdown(f"""
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 2rem;">
-                <thead>
-                    <tr style="background: #fee2e2; text-align: left; color: #991b1b;">
-                        <th style="padding: 12px 10px;">Gemi Adı</th>
-                        <th style="padding: 12px 10px;">IMO No</th>
-                        <th style="padding: 12px 10px;">Sertifika</th>
-                        <th style="padding: 12px 10px;">Bitiş Tarihi</th>
-                        <th style="padding: 12px 10px;">Kalan Süre</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {"".join(rows_html)}
-                </tbody>
-            </table>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 2rem;">
+<thead>
+<tr style="background: #fee2e2; text-align: left; color: #991b1b;">
+<th style="padding: 12px 10px;">Gemi Adı</th>
+<th style="padding: 12px 10px;">IMO No</th>
+<th style="padding: 12px 10px;">Sertifika</th>
+<th style="padding: 12px 10px;">Bitiş Tarihi</th>
+<th style="padding: 12px 10px;">Kalan Süre</th>
+</tr>
+</thead>
+<tbody>
+{"".join(rows_html)}
+</tbody>
+</table>""", unsafe_allow_html=True)
 
         # 2. Upcoming grouped month by month (Gelecek aylara göre gruplama)
         future_df = cert_df[cert_df['DaysLeft'] >= 0]
@@ -928,32 +918,22 @@ elif st.session_state.active_view == "PHRS Certs":
                     pill_style = "status-warning" if days <= 30 else "status-active"
                     pill_text = f"{days} Gün Kaldı" if days > 0 else "Bugün Son Gün!"
                     
-                    rows_html.append(f"""
-                    <tr>
-                        <td style="padding: 10px; font-weight: 600; color: #1e293b;">{r['Vessel']}</td>
-                        <td style="padding: 10px;">{r.get('IMO', 'N/A')}</td>
-                        <td style="padding: 10px;">{r['Certificate']}</td>
-                        <td style="padding: 10px; font-weight: 600;">{r['DueDate']}</td>
-                        <td style="padding: 10px;"><span class="status-pill {pill_style}">{pill_text}</span></td>
-                    </tr>
-                    """)
+                    rows_html.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #1e293b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px;'>{r['Certificate']}</td><td style='padding: 10px; font-weight: 600;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill {pill_style}'>{pill_text}</span></td></tr>")
                     
-                st.markdown(f"""
-                <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
-                    <thead>
-                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
-                            <th style="padding: 12px 10px; width: 25%;">Gemi Adı</th>
-                            <th style="padding: 12px 10px; width: 15%;">IMO No</th>
-                            <th style="padding: 12px 10px; width: 30%;">Sertifika</th>
-                            <th style="padding: 12px 10px; width: 15%;">Bitiş Tarihi</th>
-                            <th style="padding: 12px 10px; width: 15%;">Kalan Süre</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {"".join(rows_html)}
-                    </tbody>
-                </table>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
+<thead>
+<tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+<th style="padding: 12px 10px; width: 25%;">Gemi Adı</th>
+<th style="padding: 12px 10px; width: 15%;">IMO No</th>
+<th style="padding: 12px 10px; width: 30%;">Sertifika</th>
+<th style="padding: 12px 10px; width: 15%;">Bitiş Tarihi</th>
+<th style="padding: 12px 10px; width: 15%;">Kalan Süre</th>
+</tr>
+</thead>
+<tbody>
+{"".join(rows_html)}
+</tbody>
+</table>""", unsafe_allow_html=True)
 
 
 # ==========================================
