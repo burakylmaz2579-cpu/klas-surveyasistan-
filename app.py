@@ -453,7 +453,11 @@ with st.sidebar:
         
     if st.button("🚢 Gemi Bilgi & Sertifikalar", use_container_width=True, type="primary" if st.session_state.active_view == "Vessel Profile" else "secondary"):
         if st.session_state.selected_vessel_id is None:
-            st.session_state.selected_vessel_id = 1
+            first_vessels, _ = db.search_vessels(limit=1)
+            if first_vessels:
+                st.session_state.selected_vessel_id = first_vessels[0][0]
+            else:
+                st.session_state.selected_vessel_id = 1
         st.session_state.active_view = "Vessel Profile"
         st.rerun()
         
@@ -534,15 +538,25 @@ if st.session_state.active_view == "Fleet Dashboard":
             st.session_state.fleet_page = 0
             st.rerun()
             
+    unique_types = db.get_unique_vessel_types()
+    unique_flags = db.get_unique_flags()
+    
+    if st.session_state.filter_type not in ["All"] + unique_types:
+        st.session_state.filter_type = "All"
+    if st.session_state.filter_flag not in ["All"] + unique_flags:
+        st.session_state.filter_flag = "All"
+
     with col_s2:
-        type_filter = st.selectbox("Gemi Türü Filtresi", ["All"] + db.VESSEL_TYPES, index=(["All"] + db.VESSEL_TYPES).index(st.session_state.filter_type))
+        type_options = ["All"] + unique_types
+        type_filter = st.selectbox("Gemi Türü Filtresi", type_options, index=type_options.index(st.session_state.filter_type))
         if type_filter != st.session_state.filter_type:
             st.session_state.filter_type = type_filter
             st.session_state.fleet_page = 0
             st.rerun()
             
     with col_s3:
-        flag_filter = st.selectbox("Bayrak Devleti Filtresi", ["All"] + db.FLAGS, index=(["All"] + db.FLAGS).index(st.session_state.filter_flag))
+        flag_options = ["All"] + unique_flags
+        flag_filter = st.selectbox("Bayrak Devleti Filtresi", flag_options, index=flag_options.index(st.session_state.filter_flag))
         if flag_filter != st.session_state.filter_flag:
             st.session_state.filter_flag = flag_filter
             st.session_state.fleet_page = 0
@@ -715,30 +729,21 @@ elif st.session_state.active_view == "Vessel Profile":
                 badge_style = "status-active" if c_status == "Valid" else "status-warning" if c_status == "Expiring Soon" else "status-critical"
                 c_status_tr = "Geçerli" if c_status == "Valid" else "Yaklaşıyor (<30 Gün)" if c_status == "Expiring Soon" else "Süresi Dolmuş"
                 
-                cert_rows.append(f"""
-                <tr>
-                    <td style="padding: 10px; font-weight: 600; color: #0f172a;">{cert_name}</td>
-                    <td style="padding: 10px;">{issue_date}</td>
-                    <td style="padding: 10px; font-weight: 600;">{expiry_date}</td>
-                    <td style="padding: 10px;"><span class="status-pill {badge_style}">{c_status_tr}</span></td>
-                </tr>
-                """)
+                cert_rows.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #0f172a;'>{cert_name}</td><td style='padding: 10px;'>{issue_date}</td><td style='padding: 10px; font-weight: 600;'>{expiry_date}</td><td style='padding: 10px;'><span class='status-pill {badge_style}'>{c_status_tr}</span></td></tr>")
                 
-            st.markdown(f"""
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden;">
-                <thead>
-                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
-                        <th style="padding: 12px 10px;">Sertifika Adı</th>
-                        <th style="padding: 12px 10px;">Düzenlenme Tarihi</th>
-                        <th style="padding: 12px 10px;">Son Geçerlilik Tarihi</th>
-                        <th style="padding: 12px 10px;">Geçerlilik Durumu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {"".join(cert_rows)}
-                </tbody>
-            </table>
-            """, unsafe_allow_html=True)
+            st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden;">
+<thead>
+<tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+<th style="padding: 12px 10px;">Sertifika Adı</th>
+<th style="padding: 12px 10px;">Düzenlenme Tarihi</th>
+<th style="padding: 12px 10px;">Son Geçerlilik Tarihi</th>
+<th style="padding: 12px 10px;">Geçerlilik Durumu</th>
+</tr>
+</thead>
+<tbody>
+{"".join(cert_rows)}
+</tbody>
+</table>""", unsafe_allow_html=True)
 
 
 # ==========================================

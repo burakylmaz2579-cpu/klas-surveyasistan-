@@ -42,6 +42,25 @@ def login_and_navigate():
     time.sleep(5)
 
 def scrape_all_vessels():
+    # Load existing vessel info if available to preserve manual Class, GRT, DWT updates
+    existing_vessels = {}
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filename_portal = os.path.join(script_dir, "PHRS_Tüm_Gemiler.xlsx")
+    if os.path.exists(filename_portal):
+        try:
+            df_old = pd.read_excel(filename_portal)
+            for _, r in df_old.iterrows():
+                name_key = str(r.get('Vessel', '')).strip().upper()
+                if name_key:
+                    existing_vessels[name_key] = {
+                        "Class": r.get('Class', 'PHRS'),
+                        "GRT": r.get('GRT', 5000),
+                        "DWT": r.get('DWT', 8000)
+                    }
+            print(f"Loaded {len(existing_vessels)} existing vessels to preserve Class/GRT/DWT.")
+        except Exception as e:
+            print(f"Could not read existing file for preservation: {e}")
+
     all_vessels = []
     sayfa_no = 1
     scraped_names = set() # Track unique vessel names to prevent infinite loop
@@ -89,10 +108,16 @@ def scrape_all_vessels():
                 if not imo or imo == "nan" or not imo.isdigit():
                     imo = ""
                     
-                # Setup defaults for Class, GRT, DWT (which are not in this list)
-                class_soc = "DNV"
-                grt = 5000
-                dwt = 8000
+                # Setup defaults or load preserved manual values for Class, GRT, DWT
+                vessel_key = vessel_name.strip().upper()
+                if vessel_key in existing_vessels:
+                    class_soc = existing_vessels[vessel_key].get("Class", "PHRS")
+                    grt = int(existing_vessels[vessel_key].get("GRT", 5000))
+                    dwt = int(existing_vessels[vessel_key].get("DWT", 8000))
+                else:
+                    class_soc = "PHRS"
+                    grt = 5000
+                    dwt = 8000
                 
                 all_vessels.append({
                     "Vessel": vessel_name,

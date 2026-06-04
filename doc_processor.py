@@ -208,7 +208,7 @@ class SurveyDocumentProcessor:
                     clean_status = "Uygun"
                     severity = "success"
                     
-                notes_text = (item_desc + " " + remarks).lower()
+                notes_text = remarks.lower() if remarks else ""
                 has_contradiction = False
                 
                 if clean_status == "Uygun":

@@ -319,29 +319,12 @@ def init_db():
                 status = "Active"
                 score = 100
                 
-            flag = v_info.get("flag", random.choice(FLAGS))
-            class_soc = v_info.get("class_society", random.choice(CLASS_SOCIETIES))
-            vessel_type = v_info.get("vessel_type", random.choice(VESSEL_TYPES))
+            flag = v_info.get("flag", "Panama")
+            class_soc = v_info.get("class_society", "PHRS")
+            vessel_type = v_info.get("vessel_type", "General Cargo")
             grt = v_info.get("grt", 5000)
             dwt = v_info.get("dwt", 8000)
             
-            if grt == 5000 and dwt == 8000:
-                if "Tanker" in vessel_type:
-                    grt = random.randint(20000, 160000)
-                    dwt = int(grt * random.uniform(1.6, 2.0))
-                elif "Bulk" in vessel_type or "Dökme" in vessel_type:
-                    grt = random.randint(15000, 90000)
-                    dwt = int(grt * random.uniform(1.5, 1.8))
-                elif "Konteyner" in vessel_type:
-                    grt = random.randint(10000, 220000)
-                    dwt = int(grt * random.uniform(0.9, 1.2))
-                elif "Yolcu" in vessel_type:
-                    grt = random.randint(5000, 150000)
-                    dwt = int(grt * random.uniform(0.1, 0.25))
-                else:
-                    grt = random.randint(2000, 30000)
-                    dwt = int(grt * random.uniform(1.2, 1.5))
-                    
             vessels_to_insert.append((v_name, imo, grt, dwt, vessel_type, flag, class_soc, status, score))
             vessels_certs_map[imo] = v_info["certs"]
             
@@ -363,39 +346,6 @@ def init_db():
                 real_certs = vessels_certs_map[v_imo]
                 for rc in real_certs:
                     certs_to_insert.append((v_id, rc["name"], rc["issue_date"], rc["expiry_date"], rc["status"]))
-                
-                existing_names = [c["name"].lower() for c in real_certs]
-                other_certs = [name for name in CERTIFICATE_NAMES if name.lower() not in existing_names]
-                if other_certs:
-                    num_add = random.randint(1, min(3, len(other_certs)))
-                    for cert_name in random.sample(other_certs, num_add):
-                        days_to_expiry = random.randint(90, 1000)
-                        expiry_dt = today + timedelta(days=days_to_expiry)
-                        issue_dt = expiry_dt - timedelta(days=365*5)
-                        certs_to_insert.append((v_id, cert_name, issue_dt.strftime("%Y-%m-%d"), expiry_dt.strftime("%Y-%m-%d"), "Valid"))
-            else:
-                num_certs = random.randint(4, 6)
-                selected_certs = random.sample(CERTIFICATE_NAMES, num_certs)
-                
-                for cert_name in selected_certs:
-                    if v_status == "Active":
-                        days_to_expiry = random.randint(90, 1000)
-                    elif v_status == "Warning":
-                        days_to_expiry = random.randint(-5, 60)
-                    else:
-                        days_to_expiry = random.randint(-90, 5)
-                        
-                    expiry_dt = today + timedelta(days=days_to_expiry)
-                    issue_dt = expiry_dt - timedelta(days=365*5)
-                    
-                    if days_to_expiry < 0:
-                        c_status = "Expired"
-                    elif days_to_expiry < 30:
-                        c_status = "Expiring Soon"
-                    else:
-                        c_status = "Valid"
-                        
-                    certs_to_insert.append((v_id, cert_name, issue_dt.strftime("%Y-%m-%d"), expiry_dt.strftime("%Y-%m-%d"), c_status))
                     
         chunk_size = 1000
         for i in range(0, len(certs_to_insert), chunk_size):
@@ -434,12 +384,28 @@ def search_vessels(query="", filter_type="All", filter_flag="All", filter_status
     cursor.execute(count_sql, params)
     total_count = cursor.fetchone()[0]
     
-    sql += " ORDER BY compliance_score ASC, name ASC LIMIT ? OFFSET ?"
+    sql += " ORDER BY name ASC LIMIT ? OFFSET ?"
     params.extend([limit, offset])
     cursor.execute(sql, params)
     vessels = cursor.fetchall()
     conn.close()
     return vessels, total_count
+
+def get_unique_vessel_types():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT vessel_type FROM vessels WHERE vessel_type IS NOT NULL AND vessel_type != '' ORDER BY vessel_type ASC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+def get_unique_flags():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT flag FROM vessels WHERE flag IS NOT NULL AND flag != '' ORDER BY flag ASC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [r[0] for r in rows]
 
 def get_vessel_by_imo(imo):
     conn = get_db_connection()
