@@ -109,24 +109,31 @@ class SurveyDocumentProcessor:
                     remarks_idx = i
             
             if status_idx == -1:
-                for col_idx in range(len(header)):
-                    column_cells = [str(r[col_idx]).lower() for r in table_data[1:] if len(r) > col_idx]
-                    status_words = ["satisfactory", "deficiency", "uygun", "uygunsuz", "☑", "☐", "☒", "satisfy", "y / n", "yes", "no"]
-                    if any(any(sw in cell for sw in status_words) for cell in column_cells):
-                        status_idx = col_idx
-                        break
-            
-            if status_idx == -1:
-                continue
-                
-            if desc_idx == -1:
-                desc_idx = 0 if status_idx != 0 else 1
-                
-            if remarks_idx == -1 and len(header) > 2:
-                for col_idx in range(len(header)):
-                    if col_idx != desc_idx and col_idx != status_idx:
-                        remarks_idx = col_idx
-                        break
+                # Fallback based on column count
+                cols_count = len(header)
+                if cols_count == 3:
+                    desc_idx = 0
+                    status_idx = 1
+                    remarks_idx = 2
+                elif cols_count == 4:
+                    desc_idx = 1
+                    status_idx = 2
+                    remarks_idx = 3
+                elif cols_count == 2:
+                    desc_idx = 0
+                    status_idx = 1
+                    remarks_idx = -1
+                else:
+                    continue
+            else:
+                if desc_idx == -1:
+                    desc_idx = 0 if status_idx != 0 else 1
+                    
+                if remarks_idx == -1 and len(header) > 2:
+                    for col_idx in range(len(header)):
+                        if col_idx != desc_idx and col_idx != status_idx:
+                            remarks_idx = col_idx
+                            break
                 
             for row in table_data[1:]:
                 if len(row) <= max(desc_idx, status_idx):
@@ -319,6 +326,71 @@ class SurveyDocumentProcessor:
                 if h_num is None:
                     item_counter += 1
                     
+        if not findings and self.raw_text:
+            # Try text-based line-by-line regex parsing as a fallback
+            lines = self.raw_text.splitlines()
+            for idx, line in enumerate(lines):
+                line = line.strip()
+                # Find line that starts with item numbering like 1.1 or 1.1.1
+                match = re.match(r'^(\d+(?:\.\d+)+)\.?\s+(.+)$', line)
+                if match:
+                    item_no = match.group(1)
+                    rest = match.group(2).strip()
+                    
+                    status_str = "Uygun"
+                    status_match = re.search(r'\b(satisfactory|deficiency|uygun|uygunsuz|yes|no)\b', rest, re.IGNORECASE)
+                    if status_match:
+                        s_word = status_match.group(1).lower()
+                        if s_word in ["deficiency", "uygunsuz", "no"]:
+                            status_str = "Uygun Değil"
+                        rest = rest[:status_match.start()].strip()
+                    
+                    # See if there are remarks in next line
+                    remarks = ""
+                    if idx + 1 < len(lines):
+                        next_line = lines[idx+1].strip()
+                        if len(next_line) > 5 and not re.match(r'^\d', next_line):
+                            remarks = next_line
+                            
+                    rule_code = get_rule_by_keyword(rest)
+                    
+                    final_desc = rest
+                    recommendation = ""
+                    severity = "success"
+                    
+                    rule_title = ""
+                    rule_desc = ""
+                    satisfactory_condition = ""
+                    if rule_code != "N/A" and rule_code in REGULATIONS_DB:
+                        rule_info = REGULATIONS_DB[rule_code]
+                        rule_title = rule_info["title"]
+                        rule_desc = rule_info["description"]
+                        satisfactory_condition = rule_info["satisfactory_condition"]
+                        recommendation = rule_info["deficiency_action"]
+                        
+                    if status_str == "Uygun Değil":
+                        severity = "error"
+                        if rule_code != "N/A":
+                            final_desc = f"İlgili Kural: {rule_code} ({rule_title})\n\nNeden: Kural ihlali tespit edilmiştir: {rest}\n\n{rule_code} kuralı gereğince '{satisfactory_condition}' koşulunun sağlanması zorunludur."
+                        else:
+                            final_desc = f"Neden: Uygunsuzluk tespit edilmiştir: {rest}"
+                            recommendation = "Eksikliğin giderilmesi gerekmektedir."
+                    else:
+                        severity = "success"
+                        if rule_code != "N/A":
+                            final_desc = f"İlgili Kural: {rule_code} ({rule_title})\n\nNeden: {rule_code} kuralına uygunluk doğrulanmıştır. {rest}"
+                        else:
+                            final_desc = f"Maddenin durumu uygundur: {rest}"
+                            
+                    findings.append({
+                        "item_no": item_no,
+                        "title": rest[:60] if len(rest) > 60 else rest,
+                        "rule": rule_code,
+                        "status": status_str,
+                        "severity": severity,
+                        "description": final_desc,
+                        "recommendation": recommendation
+                    })
         return findings
 
 class BytesIO_wrapper:

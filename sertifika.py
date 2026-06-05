@@ -162,8 +162,8 @@ def main():
                     
         print(f"Toplam {len(all_certs)} sertifika kaydı başarıyla indirildi.")
         
-        # 4. Filter expired and expiring (< 30 days) certificates
-        warning_date = datetime.now() + timedelta(days=30)
+        # 4. Filter expired and expiring (< 365 days) certificates
+        warning_date = datetime.now() + timedelta(days=365)
         today = datetime.now()
         critical_ships = []
         
@@ -177,15 +177,14 @@ def main():
                 except:
                     continue
                     
-            if expiry_date <= warning_date:
-                status = "Süresi Doldu!" if expiry_date < today else "Süresi Yaklaşıyor"
-                critical_ships.append({
-                    "Gemi Adı": c["Gemi Adı"],
-                    "IMO": c["IMO"],
-                    "Sertifika": c["Sertifika"],
-                    "Bitiş Tarihi": date_str,
-                    "Durum": status
-                })
+            status = "Süresi Doldu!" if expiry_date < today else "Süresi Yaklaşıyor"
+            critical_ships.append({
+                "Gemi Adı": c["Gemi Adı"],
+                "IMO": c["IMO"],
+                "Sertifika": c["Sertifika"],
+                "Bitiş Tarihi": date_str,
+                "Durum": status
+            })
                 
         # 5. Export results to Excel
         if not critical_ships:

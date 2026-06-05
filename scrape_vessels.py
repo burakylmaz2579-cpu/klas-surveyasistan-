@@ -235,15 +235,29 @@ def main():
             # Check if we have valid non-default particulars cached
             if v_key in existing_vessels:
                 cached = existing_vessels[v_key]
-                # Default values check
-                if (cached.get("Class") in ["PHRS", "DNV"]) and (cached.get("GRT") == 5000) and (cached.get("DWT") == 8000):
-                    # We want to re-scrape to verify if there's real data
+                try:
+                    grt_int = int(cached.get("GRT", 0))
+                except:
+                    grt_int = 0
+                try:
+                    dwt_int = int(cached.get("DWT", 0))
+                except:
+                    dwt_int = 0
+                
+                # Scrape if GRT or DWT are 0, missing, default (5000/8000), or Class is missing
+                is_default_or_invalid = (
+                    grt_int <= 0 or 
+                    dwt_int <= 0 or 
+                    (grt_int == 5000 and dwt_int == 8000) or 
+                    not cached.get("Class")
+                )
+                if is_default_or_invalid:
                     vessels_to_scrape_details.append(v)
                 else:
                     # Keep cached
                     v["Class"] = cached.get("Class", "PHRS")
-                    v["GRT"] = cached.get("GRT", 5000)
-                    v["DWT"] = cached.get("DWT", 8000)
+                    v["GRT"] = grt_int
+                    v["DWT"] = dwt_int
             else:
                 # Completely new vessel
                 vessels_to_scrape_details.append(v)
