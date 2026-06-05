@@ -284,7 +284,7 @@ def load_phrs_certificates():
     f1 = os.path.join(os.path.dirname(__file__), "PHRS_Acil_Sertifikalar.xlsx")
     f2 = os.path.join(os.path.dirname(__file__), "PHRS_CERT_DUE_DATE.xlsx")
     
-    df = None
+    dfs = []
     today = datetime.now()
     
     def parse_date(d):
@@ -300,43 +300,44 @@ def load_phrs_certificates():
 
     if os.path.exists(f1):
         try:
-            df = pd.read_excel(f1)
-            df = normalize_excel_columns(df)
+            df1 = pd.read_excel(f1)
+            df1 = normalize_excel_columns(df1)
             
-            if 'Vessel' not in df.columns or 'Certificate' not in df.columns or 'DueDate' not in df.columns:
-                df = None
-            else:
-                df['ParsedDate'] = df['DueDate'].apply(parse_date)
-                df = df.dropna(subset=['ParsedDate'])
-                if 'IMO' not in df.columns:
-                    df['IMO'] = "N/A"
-                if 'Status' not in df.columns:
-                    df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
-                if 'Flag' in df.columns:
-                    df = df[~df['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+            if 'Vessel' in df1.columns and 'Certificate' in df1.columns and 'DueDate' in df1.columns:
+                df1['ParsedDate'] = df1['DueDate'].apply(parse_date)
+                df1 = df1.dropna(subset=['ParsedDate'])
+                if 'IMO' not in df1.columns:
+                    df1['IMO'] = "N/A"
+                if 'Status' not in df1.columns:
+                    df1['Status'] = df1['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
+                if 'Flag' in df1.columns:
+                    df1 = df1[~df1['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+                dfs.append(df1[['Vessel', 'Certificate', 'DueDate', 'ParsedDate', 'Status', 'IMO']])
         except Exception as e:
-            df = None
+            print("Error loading f1:", e)
             
-    if (df is None or df.empty) and os.path.exists(f2):
+    if os.path.exists(f2):
         try:
-            df = pd.read_excel(f2)
-            df = normalize_excel_columns(df)
-            df = df[df['Vessel'].astype(str).str.strip().str.lower() != 'company/vessel']
+            df2 = pd.read_excel(f2)
+            df2 = normalize_excel_columns(df2)
+            df2 = df2[df2['Vessel'].astype(str).str.strip().str.lower() != 'company/vessel']
             
-            if 'Vessel' not in df.columns or 'Certificate' not in df.columns or 'DueDate' not in df.columns:
-                df = None
-            else:
-                df['ParsedDate'] = pd.to_datetime(df['DueDate'])
-                df['DueDate'] = df['ParsedDate'].dt.strftime("%d/%m/%Y")
-                df['Status'] = df['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
-                if 'IMO' not in df.columns:
-                    df['IMO'] = "N/A"
-                if 'Flag' in df.columns:
-                    df = df[~df['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+            if 'Vessel' in df2.columns and 'Certificate' in df2.columns and 'DueDate' in df2.columns:
+                df2['ParsedDate'] = df2['DueDate'].apply(parse_date)
+                df2 = df2.dropna(subset=['ParsedDate'])
+                df2['DueDate'] = df2['ParsedDate'].dt.strftime("%d/%m/%Y")
+                df2['Status'] = df2['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
+                if 'IMO' not in df2.columns:
+                    df2['IMO'] = "N/A"
+                if 'Flag' in df2.columns:
+                    df2 = df2[~df2['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+                dfs.append(df2[['Vessel', 'Certificate', 'DueDate', 'ParsedDate', 'Status', 'IMO']])
         except Exception as e:
-            df = None
+            print("Error loading f2:", e)
             
-    if df is not None and not df.empty:
+    if dfs:
+        df = pd.concat(dfs, ignore_index=True)
+        df = df.drop_duplicates(subset=['Vessel', 'Certificate', 'DueDate'])
         df['DaysLeft'] = (df['ParsedDate'] - today).dt.days
         df = df.sort_values(by=['DaysLeft', 'Vessel'])
         return df
@@ -960,6 +961,80 @@ elif st.session_state.active_view == "Audit Console":
     st.subheader("🔍 Sörvey Denetim ve Çapraz Kontrol Konsolu")
     st.markdown("Yüklediğiniz sörvey formları ve sertifika PDF'lerini analiz ederek kural uyumluluğunu denetler.")
     
+    # -------------------------------------------------------------
+    # AUTO-EXTRACT VESSEL INFO FROM UPLOADED PDF ON THE FLY
+    # -------------------------------------------------------------
+    uploaded_files_state = st.session_state.get("audit_file_uploader")
+    if uploaded_files_state:
+        uploaded_keys = ",".join(sorted([f.name for f in uploaded_files_state]))
+        if st.session_state.get('last_uploaded_keys') != uploaded_keys:
+            st.session_state.last_uploaded_keys = uploaded_keys
+            try:
+                # Process the first uploaded file to auto-detect particulars
+                f = uploaded_files_state[0]
+                pdf_bytes = f.getvalue()
+                
+                # Use SurveyDocumentProcessor to parse details
+                proc = SurveyDocumentProcessor(pdf_bytes)
+                
+                extracted_imo = None
+                extracted_name = None
+                extracted_type = "Seçiniz"
+                extracted_grt_dwt = ""
+                
+                if proc.doc_type == "certificate" and proc.certificate_info:
+                    extracted_imo = proc.certificate_info.get("imo")
+                    extracted_name = proc.certificate_info.get("vessel_name")
+                    grt = proc.certificate_info.get("grt", "")
+                    dwt = proc.certificate_info.get("dwt", "")
+                    if grt or dwt:
+                        extracted_grt_dwt = f"{grt} / {dwt}"
+                else:
+                    extracted_imo = proc.vessel_info.get("imo")
+                    extracted_name = proc.vessel_info.get("name")
+                    extracted_grt_dwt = proc.vessel_info.get("grt_dwt", "")
+                    extracted_type = proc.vessel_info.get("vessel_type", "Seçiniz")
+                
+                if extracted_imo:
+                    extracted_imo = str(extracted_imo).strip()
+                if extracted_name:
+                    extracted_name = str(extracted_name).strip().upper()
+                
+                found_in_db = False
+                if extracted_imo:
+                    v_db = db.get_vessel_by_imo(extracted_imo)
+                    if v_db:
+                        st.session_state.selected_vessel_id = v_db[0]
+                        found_in_db = True
+                        st.toast(f"🚢 IMO '{extracted_imo}' tespit edildi ve filo eşleştirmesi yapıldı: {v_db[1]}", icon="✅")
+                        st.rerun()
+                        
+                if not found_in_db and extracted_name:
+                    conn = db.get_db_connection()
+                    c = conn.cursor()
+                    c.execute("SELECT id, name FROM vessels")
+                    all_v = c.fetchall()
+                    conn.close()
+                    for v_id, v_name in all_v:
+                        if extracted_name == v_name.upper():
+                            st.session_state.selected_vessel_id = v_id
+                            found_in_db = True
+                            st.toast(f"🚢 Gemi adı '{extracted_name}' tespit edildi ve filo eşleştirmesi yapıldı.", icon="✅")
+                            st.rerun()
+                            break
+                            
+                if not found_in_db:
+                    st.session_state.uploaded_vessel_info = {
+                        "name": extracted_name or "",
+                        "imo": extracted_imo or "",
+                        "grt_dwt": extracted_grt_dwt or "",
+                        "vessel_type": extracted_type or "Seçiniz"
+                    }
+                    st.toast("📝 Yeni gemi bilgileri belgeden okunarak form alanlarına yerleştirildi.", icon="ℹ️")
+                    st.rerun()
+            except Exception as ex:
+                print("Error extracting uploaded vessel info:", ex)
+
     col_a1, col_a2 = st.columns([1.2, 1])
     
     with col_a1:
@@ -1001,6 +1076,13 @@ elif st.session_state.active_view == "Audit Console":
                 v_imo_val = v_row[1]
                 v_type_val = v_row[2]
                 v_grt_dwt_val = f"{v_row[3]:,} / {v_row[4]:,}"
+        elif st.session_state.get("uploaded_vessel_info") is not None:
+            # Auto-populate from uploaded PDF if manual entry is active
+            info = st.session_state.uploaded_vessel_info
+            v_name_val = info.get("name", "")
+            v_imo_val = info.get("imo", "")
+            v_type_val = info.get("vessel_type", "Seçiniz")
+            v_grt_dwt_val = info.get("grt_dwt", "")
         
         vessel_name = st.text_input("Gemi Adı (Reference)", value=v_name_val)
         
@@ -1020,7 +1102,8 @@ elif st.session_state.active_view == "Audit Console":
         uploaded_files = st.file_uploader(
             "Çoklu PDF Dosyaları Yükleme (Rapor + Sertifika)",
             type=["pdf"],
-            accept_multiple_files=True
+            accept_multiple_files=True,
+            key="audit_file_uploader"
         )
         
         st.write("---")
@@ -1055,6 +1138,11 @@ elif st.session_state.active_view == "Audit Console":
         if st.button("🔄 Ekranı Temizle", use_container_width=True):
             st.session_state.analysis_data = None
             st.session_state.analysis_vessel_name = ""
+            st.session_state.selected_vessel_id = None
+            st.session_state.uploaded_vessel_info = None
+            st.session_state.last_uploaded_keys = None
+            if "audit_file_uploader" in st.session_state:
+                del st.session_state["audit_file_uploader"]
             st.rerun()
     with col_b2:
         analyze_btn = st.button("🚀 Belgeleri Oku ve Denetimi Başlat", type="primary", use_container_width=True)

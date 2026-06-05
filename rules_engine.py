@@ -218,6 +218,94 @@ REGULATIONS_DB = {
         "satisfactory_condition": "Valid BWM Certificate and approved Ballast Water Management Plan available onboard.",
         "deficiency_action": "Liaise with Class to survey BWMS and issue certificate, update BWM plan to current regulations.",
         "applicability": "All Vessels >= 400 GT"
+    },
+    "SOLAS Ch III Reg 35": {
+        "title": "Training manual and onboard training aids",
+        "chapter": "SOLAS Chapter III",
+        "category": "LSA (Life Saving Appliances)",
+        "description": "Requires a training manual to be provided in each crew mess room and recreation room or in each crew cabin. It must contain instructions and information on the life-saving appliances provided in the ship.",
+        "checklist_keywords": ["training manual", "solas training manual", "eğitim el kitabı", "training aids"],
+        "critical_items": ["training manual"],
+        "satisfactory_condition": "Training manual available in crew mess/cabins, containing up-to-date instructions.",
+        "deficiency_action": "Provide or update the SOLAS training manual on board in appropriate crew spaces.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch III Reg 36": {
+        "title": "Instructions for onboard maintenance",
+        "chapter": "SOLAS Chapter III",
+        "category": "LSA (Life Saving Appliances)",
+        "description": "Requires instructions for onboard maintenance of life-saving appliances to be provided and maintenance to be carried out accordingly.",
+        "checklist_keywords": ["maintenance instructions", "lsa maintenance manual", "bakım talimatları", "onboard maintenance"],
+        "critical_items": ["maintenance instructions"],
+        "satisfactory_condition": "Maintenance manuals available, weekly/monthly checks documented.",
+        "deficiency_action": "Implement LSA maintenance logbook and provide instructions on board.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch III Reg 19": {
+        "title": "Emergency training and drills",
+        "chapter": "SOLAS Chapter III",
+        "category": "LSA (Life Saving Appliances)",
+        "description": "Mandates monthly abandon ship and fire drills. Requires records of drills to be maintained in the official logbook.",
+        "checklist_keywords": ["abandon ship drill", "fire drill", "drill records", "yangın talimi", "talim kayıtları", "abandon ship", "muster list drill"],
+        "critical_items": ["drill", "drill record"],
+        "satisfactory_condition": "Abandon ship and fire drills conducted monthly, records maintained in logbook.",
+        "deficiency_action": "Conduct required drills under surveyor observation and record in logbook.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch III Reg 8": {
+        "title": "Muster list and emergency instructions",
+        "chapter": "SOLAS Chapter III",
+        "category": "LSA (Life Saving Appliances)",
+        "description": "Requires clear instructions to be provided for every person on board, to be followed in the event of an emergency. Muster lists must be exhibited in conspicuous places.",
+        "checklist_keywords": ["muster list", "emergency instructions", "role table", "görev cetveli", "acil durum talimatı"],
+        "critical_items": ["muster list"],
+        "satisfactory_condition": "Muster lists posted in conspicuous places, showing duties of crew members.",
+        "deficiency_action": "Update and post muster lists at bridge, engine room, and accommodation spaces.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch V Reg 23": {
+        "title": "Pilot transfer arrangements",
+        "chapter": "SOLAS Chapter V",
+        "category": "Navigation",
+        "description": "Specifies requirements for pilot ladders, accommodation ladders, and associated equipment to ensure safe transfer of pilots.",
+        "checklist_keywords": ["pilot ladder", "pilot transfer", "accommodation ladder", "klavuz çarmıhı", "pilot ladder certificate", "pilot hoist"],
+        "critical_items": ["pilot ladder", "shackle", "step"],
+        "satisfactory_condition": "Pilot ladder clean, steps in good condition, certificated manropes, warning signs posted.",
+        "deficiency_action": "Replace worn steps or ropes, use certified pilot ladder, ensure proper securing.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch II-1 Reg 13-1": {
+        "title": "Openings in watertight bulkheads and internal doors",
+        "chapter": "SOLAS Chapter II-1",
+        "category": "Machinery & Hull",
+        "description": "Requires watertight doors in passenger and cargo ships to be kept closed during navigation, except when authorized. Requires daily testing.",
+        "checklist_keywords": ["watertight door", "internal door", "su geçirmez kapı", "bulkhead door", "watertight bulkheads"],
+        "critical_items": ["watertight", "seal", "gasket"],
+        "satisfactory_condition": "Watertight door seals intact, local/remote alarms and indicators operational.",
+        "deficiency_action": "Replace damaged rubber gaskets, adjust door locking mechanism, test remote indication.",
+        "applicability": "All Vessels"
+    },
+    "SOLAS Ch II-1 Reg 29": {
+        "title": "Steering gear",
+        "chapter": "SOLAS Chapter II-1",
+        "category": "Machinery & Hull",
+        "description": "Requires main and auxiliary steering gears to be tested within 12 hours before departure. Specifies performance and redundancy standards.",
+        "checklist_keywords": ["steering gear", "rudder carrier", "dümen makinesi", "telemetric", "hydraulic steering"],
+        "critical_items": ["steering gear", "oil leak", "auxiliary steering"],
+        "satisfactory_condition": "Main and auxiliary steering systems fully operational, no hydraulic leaks, alarm tests passed.",
+        "deficiency_action": "Repair hydraulic pump leaks, top up oil levels, verify auxiliary steering time limit compliance.",
+        "applicability": "All Vessels"
+    },
+    "ILO 152": {
+        "title": "Occupational Safety and Health (Dock Work) Convention (Cargo Gear)",
+        "chapter": "ILO Convention 152",
+        "category": "Machinery & Hull",
+        "description": "Requires lifting appliances and loose gear to be tested and examined periodically, with records kept in the Register of Lifting Appliances (Cargo Gear Booklet).",
+        "checklist_keywords": ["cargo gear", "lifting appliance", "crane", "winch", "loose gear", "cargo gear booklet", "derrick", "wire rope certificate"],
+        "critical_items": ["crane", "cargo gear booklet", "wire rope", "loose gear"],
+        "satisfactory_condition": "Register of Lifting Appliances updated, annual examination completed, wires within wear limits.",
+        "deficiency_action": "Renew hoisting/luffing wire ropes, service crane limit switches, update Cargo Gear Register.",
+        "applicability": "All Vessels"
     }
 }
 

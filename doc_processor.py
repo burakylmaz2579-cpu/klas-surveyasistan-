@@ -51,6 +51,8 @@ class SurveyDocumentProcessor:
 
     def _classify_document(self):
         text_lower = self.raw_text.lower()
+        
+        # 1. Certificate Indicators
         cert_keywords = [
             "this is to certify", 
             "issued under the provisions", 
@@ -62,15 +64,23 @@ class SurveyDocumentProcessor:
             "safety equipment certificate",
             "safety radio certificate",
             "safety construction certificate",
-            "tonnage certificate"
+            "tonnage certificate",
+            "this certificate is valid"
         ]
         
         is_cert = any(kw in text_lower for kw in cert_keywords)
         
-        # Count checkboxes in document
-        checkbox_count = len(re.findall(r'[☐☒☑\[\s]\]', self.raw_text)) + self.raw_text.count("☐") + self.raw_text.count("☒") + self.raw_text.count("☑")
+        # Count checkboxes
+        checkbox_count = self.raw_text.count("☐") + self.raw_text.count("☒") + self.raw_text.count("☑")
+        checkbox_count += len(re.findall(r'\[\s*[xX✓✔]\s*\]', self.raw_text))
+        checkbox_count += len(re.findall(r'\[\s*\]', self.raw_text))
         
-        if is_cert and checkbox_count < 5:
+        # Check if it has explicit checklist indicators
+        checklist_indicators = ["checklist", "check list", "survey report", "inspection report", "survey checklist", "sörvey raporu", "kontrol listesi", "denetim raporu"]
+        has_checklist_indicator = any(kw in text_lower for kw in checklist_indicators)
+        
+        # We classify as certificate if it has cert phrases and low checkbox density
+        if is_cert and checkbox_count < 15 and not (has_checklist_indicator and checkbox_count >= 5):
             self.doc_type = "certificate"
             self._extract_certificate_info()
         else:
@@ -102,6 +112,7 @@ class SurveyDocumentProcessor:
 
     def _extract_certificate_info(self):
         text = self.raw_text
+        text_upper = text.upper()
         text_lower = text.lower()
         
         # Determine Certificate Type
@@ -132,51 +143,86 @@ class SurveyDocumentProcessor:
             cert_type = "International Tonnage Certificate"
         elif "classification certificate" in text_lower or "class certificate" in text_lower:
             cert_type = "Classification Certificate"
+
+        # 1. DB-Assisted Extraction
+        found_name = None
+        found_imo = None
+        found_grt = None
+        found_dwt = None
+        
+        try:
+            import vessel_db as db
+            conn = db.get_db_connection()
+            c = conn.cursor()
+            c.execute("SELECT imo, name, grt, dwt FROM vessels")
+            db_rows = c.fetchall()
+            conn.close()
             
-        # Extract Vessel Name
-        vessel_name = ""
-        v_match = re.search(r'(?:name of ship|name of vessel|gemi adı|gemi adi)\s*:?\s*([a-zA-Z0-9\s\-_]+)', text_lower)
-        if v_match:
-            vessel_name = v_match.group(1).strip().upper()
-        else:
-            lines = text.splitlines()
-            for line in lines:
-                if "name of ship" in line.lower() or "name of vessel" in line.lower():
-                    parts = re.split(r'[:\s]{2,}', line)
-                    if len(parts) > 1:
-                        vessel_name = parts[-1].strip().upper()
-                        break
-        if not vessel_name:
-            for line in lines[:15]:
-                if any(x in line.upper() for x in ["M/V", "M.V.", "M/T", "M.T."]):
-                    vessel_name = line.strip().upper()
+            # Search for known IMOs first (exact 7-digit check in raw text)
+            for db_imo, db_name, db_grt, db_dwt in db_rows:
+                if db_imo and len(db_imo) == 7 and db_imo in text_upper:
+                    found_imo = db_imo
+                    found_name = db_name
+                    found_grt = str(db_grt)
+                    found_dwt = str(db_dwt)
                     break
                     
-        # Extract IMO Number
-        imo = ""
-        imo_match = re.search(r'(?:imo number|imo no|imo|ımo)\s*:?\s*(\d{7})', text_lower)
-        if imo_match:
-            imo = imo_match.group(1).strip()
-        else:
-            digit_matches = re.findall(r'\b\d{7}\b', text)
-            if digit_matches:
-                imo = digit_matches[0]
+            # If IMO not matched, search for known Names (matching word boundaries)
+            if not found_name:
+                db_rows_sorted = sorted(db_rows, key=lambda x: len(x[1]), reverse=True)
+                for db_imo, db_name, db_grt, db_dwt in db_rows_sorted:
+                    if len(db_name) > 3:
+                        pattern = r'\b' + re.escape(db_name) + r'\b'
+                        if re.search(pattern, text_upper):
+                            found_name = db_name
+                            found_imo = db_imo
+                            found_grt = str(db_grt)
+                            found_dwt = str(db_dwt)
+                            break
+        except Exception as e:
+            print("DB-assisted extraction error:", e)
+
+        # 2. Fallbacks for completely new vessels
+        vessel_name = found_name
+        if not vessel_name:
+            v_match = re.search(r'(?:name of ship|name of vessel|gemi adı|gemi adi)\s*[:\s]\s*([^\n\r]+)', text_lower)
+            if v_match:
+                val = v_match.group(1).strip()
+                val = re.split(r'\b(imo|port|distinctive|official|call|gross|gt|dwt|flag|class|type)\b', val)[0].strip()
+                val = re.sub(r'[^a-zA-Z0-9\s\-_]', '', val).strip().upper()
+                if val and val not in ["IMO", "IMO NO", "IMO NUMBER"]:
+                    vessel_name = val
+            if not vessel_name:
+                lines = text.splitlines()
+                for line in lines[:15]:
+                    if any(x in line.upper() for x in ["M/V", "M.V.", "M/T", "M.T."]):
+                        vessel_name = line.strip().upper()
+                        break
+                        
+        imo = found_imo
+        if not imo:
+            imo_match = re.search(r'(?:imo number|imo no|imo|ımo)\s*:?\s*(\d{7})', text_lower)
+            if imo_match:
+                imo = imo_match.group(1).strip()
+            else:
+                digit_matches = re.findall(r'\b\d{7}\b', text)
+                if digit_matches:
+                    imo = digit_matches[0]
+                    
+        grt = found_grt
+        if not grt:
+            grt_match = re.search(r'(?:gross tonnage|gross weight|grt|gt)\s*:?\s*([\d\s,\.]+)', text_lower)
+            if grt_match:
+                grt = grt_match.group(1).strip()
+                grt = re.sub(r'[^\d]', '', grt.split('.')[0].split(',')[0])
                 
-        # Extract Gross Tonnage (GRT)
-        grt = ""
-        grt_match = re.search(r'(?:gross tonnage|gross weight|grt|gt)\s*:?\s*([\d\s,\.]+)', text_lower)
-        if grt_match:
-            grt = grt_match.group(1).strip()
-            grt = re.sub(r'[^\d]', '', grt.split('.')[0].split(',')[0])
+        dwt = found_dwt
+        if not dwt:
+            dwt_match = re.search(r'(?:deadweight|dwt)\s*:?\s*([\d\s,\.]+)', text_lower)
+            if dwt_match:
+                dwt = dwt_match.group(1).strip()
+                dwt = re.sub(r'[^\d]', '', dwt.split('.')[0].split(',')[0])
             
-        # Extract Deadweight (DWT)
-        dwt = ""
-        dwt_match = re.search(r'(?:deadweight|dwt)\s*:?\s*([\d\s,\.]+)', text_lower)
-        if dwt_match:
-            dwt = dwt_match.group(1).strip()
-            dwt = re.sub(r'[^\d]', '', dwt.split('.')[0].split(',')[0])
-            
-        # Extract Date of Expiry
         expiry_date = ""
         exp_match = re.search(r'(?:expiry date|expires on|valid until|valid to|gecerlilik tarihi|until|bitis tarihi|bitiş tarihi)\s*:?\s*([\d\-\/a-zA-Z\s]{8,15})', text_lower)
         if exp_match:
@@ -188,13 +234,11 @@ class SurveyDocumentProcessor:
             elif len(date_matches) == 1:
                 expiry_date = date_matches[0]
                 
-        # Extract Issue Date
         issue_date = ""
         iss_match = re.search(r'(?:date of issue|issued at|issued on|düzenleme tarihi|duzenleme tarihi)\s*:?\s*([\d\-\/a-zA-Z\s]{8,15})', text_lower)
         if iss_match:
             issue_date = iss_match.group(1).strip()
             
-        # Extract Certificate Number
         cert_number = ""
         num_match = re.search(r'(?:certificate number|cert\.? no|sertifika no|certificate no)\s*:?\s*([a-zA-Z0-9\-_]+)', text_lower)
         if num_match:
@@ -226,6 +270,94 @@ class SurveyDocumentProcessor:
                         "data": cleaned_table
                     })
 
+    def _analyze_table_columns(self, table_data):
+        if not table_data:
+            return -1, -1, -1
+            
+        num_cols = len(table_data[0])
+        col_scores = []
+        for col_idx in range(num_cols):
+            item_no_score = 0
+            status_score = 0
+            desc_score = 0
+            empty_count = 0
+            
+            sample_rows = table_data[1:] if len(table_data) > 1 else table_data
+            total_sampled = len(sample_rows)
+            
+            for row in sample_rows:
+                if col_idx >= len(row):
+                    continue
+                val = str(row[col_idx]).strip()
+                if not val:
+                    empty_count += 1
+                    continue
+                    
+                if re.match(r'^\d+(\.\d+)*\.?$', val):
+                    item_no_score += 1
+                    
+                val_lower = val.lower()
+                if val in ["☐", "☒", "☑", "☒", "☑", "✓", "✔"] or val_lower in ["y", "n", "x", "yes", "no", "n/a", "na", "satisfactory", "uygun", "uygunsuz", "durum"]:
+                    status_score += 2
+                elif len(val) <= 4:
+                    status_score += 0.5
+                    
+                if len(val) > 15:
+                    desc_score += 1
+                    
+            non_empty = total_sampled - empty_count
+            col_scores.append({
+                "idx": col_idx,
+                "item_no": item_no_score / max(1, non_empty),
+                "status": status_score / max(1, non_empty),
+                "desc": desc_score / max(1, non_empty),
+                "empty_ratio": empty_count / max(1, total_sampled)
+            })
+            
+        desc_idx = -1
+        status_idx = -1
+        remarks_idx = -1
+        item_idx = -1
+        
+        best_item_score = 0.3
+        for col in col_scores:
+            if col["item_no"] > best_item_score:
+                best_item_score = col["item_no"]
+                item_idx = col["idx"]
+                
+        best_status_score = 0.3
+        for col in col_scores:
+            if col["idx"] == item_idx:
+                continue
+            if col["status"] > best_status_score:
+                best_status_score = col["status"]
+                status_idx = col["idx"]
+                
+        best_desc_score = 0.2
+        for col in col_scores:
+            if col["idx"] in [item_idx, status_idx]:
+                continue
+            if col["desc"] > best_desc_score:
+                best_desc_score = col["desc"]
+                desc_idx = col["idx"]
+                
+        if desc_idx == -1:
+            max_len = -1
+            for col in col_scores:
+                if col["idx"] in [item_idx, status_idx]:
+                    continue
+                avg_len = sum(len(str(r[col["idx"]])) for r in sample_rows if col["idx"] < len(r)) / max(1, total_sampled)
+                if avg_len > max_len:
+                    max_len = avg_len
+                    desc_idx = col["idx"]
+                    
+        for col in col_scores:
+            if col["idx"] not in [item_idx, status_idx, desc_idx]:
+                remarks_idx = col["idx"]
+                break
+                
+        return desc_idx, status_idx, remarks_idx
+
     def process_findings(self, vessel_type=None, grt=None):
         if self.doc_type == "certificate":
             return []  # Certificates don't have checklist findings
@@ -246,14 +378,26 @@ class SurveyDocumentProcessor:
             status_idx = -1
             remarks_idx = -1
             
+            # 1. Try to find column indices using header keywords
             for i, h in enumerate(header):
-                if any(x in h for x in ["item", "description", "madd", "konu", "tanım"]):
+                if any(x in h for x in ["description", "konu", "tanım"]):
                     desc_idx = i
                 elif any(x in h for x in ["status", "durum", "check", "onay", "uygunluk"]):
                     status_idx = i
                 elif any(x in h for x in ["remark", "deficiency", "açıklama", "not", "bulgu", "düşünce"]):
                     remarks_idx = i
             
+            # 2. If header mapping failed or is incomplete, use dynamic column profile analyzer
+            if desc_idx == -1 or status_idx == -1:
+                anal_desc, anal_status, anal_remarks = self._analyze_table_columns(table_data)
+                if desc_idx == -1:
+                    desc_idx = anal_desc
+                if status_idx == -1:
+                    status_idx = anal_status
+                if remarks_idx == -1:
+                    remarks_idx = anal_remarks
+                    
+            # 3. Fallbacks if still not found
             if status_idx == -1:
                 cols_count = len(header)
                 if cols_count == 3:
@@ -533,9 +677,11 @@ class SurveyDocumentProcessor:
 def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_info, checklist_findings=None):
     cross_findings = []
     
+    # Standardize names for comparison
     def clean_name(n):
         return re.sub(r'[^A-Z0-9]', '', str(n).upper())
 
+    # Standardize tonnage comparison
     def clean_ton(t):
         if not t or t == "N/A":
             return None
@@ -586,6 +732,7 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
             cert_dwt_cleaned = clean_ton(cert_dwt)
             
             if ui_grt and cert_grt_cleaned and ui_grt != cert_grt_cleaned:
+                # Allow a small discrepancy margin of 5% in tonnage representations, otherwise flag
                 if abs(int(ui_grt) - int(cert_grt_cleaned)) / int(cert_grt_cleaned) > 0.05:
                     cross_findings.append({
                         "item_no": "C-3",
@@ -600,6 +747,7 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
         # 4. Validity & Expiry Check
         if expiry_date_str != "N/A":
             try:
+                # Find date using flexible parsing
                 exp_date = None
                 for fmt in ["%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"]:
                     try:
@@ -608,7 +756,6 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
                     except:
                         continue
                 if not exp_date:
-                    import pandas as pd
                     exp_date = pd.to_datetime(expiry_date_str)
                     
                 if exp_date:
@@ -636,11 +783,14 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
                             "recommendation": "30 gün içerisinde yenileme veya yıllık ara sörveyin tamamlanmasını sağlayın."
                         })
             except Exception as e:
+                # If date format is text-based or could not be parsed, skip date comparison
                 pass
 
         # 5. Cross-Check Certificate validity against checklist findings (Contradictions)
         if checklist_findings:
+            # Check for specific rules based on certificate type
             if "IOPP" in cert_type or "Oil Pollution" in cert_type:
+                # Search if there is a critical OWS failure in the checklist
                 ows_failures = [f for f in checklist_findings if f["rule"] == "MARPOL Annex I Reg 14" and f["status"] == "Uygun Değil"]
                 if ows_failures:
                     cross_findings.append({
