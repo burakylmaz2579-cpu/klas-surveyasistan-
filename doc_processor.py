@@ -147,7 +147,6 @@ class SurveyDocumentProcessor:
                         vessel_name = parts[-1].strip().upper()
                         break
         if not vessel_name:
-            # Try to grab first line with uppercase letters that looks like a ship name
             for line in lines[:15]:
                 if any(x in line.upper() for x in ["M/V", "M.V.", "M/T", "M.T."]):
                     vessel_name = line.strip().upper()
@@ -534,11 +533,9 @@ class SurveyDocumentProcessor:
 def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_info, checklist_findings=None):
     cross_findings = []
     
-    # Standardize names for comparison
     def clean_name(n):
         return re.sub(r'[^A-Z0-9]', '', str(n).upper())
 
-    # Standardize tonnage comparison
     def clean_ton(t):
         if not t or t == "N/A":
             return None
@@ -589,7 +586,6 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
             cert_dwt_cleaned = clean_ton(cert_dwt)
             
             if ui_grt and cert_grt_cleaned and ui_grt != cert_grt_cleaned:
-                # Allow a small discrepancy margin of 5% in tonnage representations, otherwise flag
                 if abs(int(ui_grt) - int(cert_grt_cleaned)) / int(cert_grt_cleaned) > 0.05:
                     cross_findings.append({
                         "item_no": "C-3",
@@ -604,7 +600,6 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
         # 4. Validity & Expiry Check
         if expiry_date_str != "N/A":
             try:
-                # Find date using flexible parsing
                 exp_date = None
                 for fmt in ["%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"]:
                     try:
@@ -613,6 +608,7 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
                     except:
                         continue
                 if not exp_date:
+                    import pandas as pd
                     exp_date = pd.to_datetime(expiry_date_str)
                     
                 if exp_date:
@@ -640,14 +636,11 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
                             "recommendation": "30 gün içerisinde yenileme veya yıllık ara sörveyin tamamlanmasını sağlayın."
                         })
             except Exception as e:
-                # If date format is text-based or could not be parsed, skip date comparison
                 pass
 
         # 5. Cross-Check Certificate validity against checklist findings (Contradictions)
         if checklist_findings:
-            # Check for specific rules based on certificate type
             if "IOPP" in cert_type or "Oil Pollution" in cert_type:
-                # Search if there is a critical OWS failure in the checklist
                 ows_failures = [f for f in checklist_findings if f["rule"] == "MARPOL Annex I Reg 14" and f["status"] == "Uygun Değil"]
                 if ows_failures:
                     cross_findings.append({
