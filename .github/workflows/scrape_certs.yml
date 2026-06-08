@@ -1,0 +1,55 @@
+name: Auto Scrape B2B Certificates
+
+on:
+  schedule:
+    # Her gün UTC ile 01:00'da çalışır (Türkiye Saati ile 04:00)
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    # GitHub Actions sekmesinden manuel olarak tetiklemeye izin verir
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pandas openpyxl cryptography
+
+    - name: Run Scraper
+      env:
+        CLIENT_CERT: ${{ secrets.CLIENT_CERT_PEM }}
+        CLIENT_KEY: ${{ secrets.CLIENT_KEY_PEM }}
+      run: |
+        # Eğer GitHub Secrets üzerinden sertifikalar geldiyse geçici dosya olarak oluştur
+        if [ ! -z "$CLIENT_CERT" ] && [ ! -z "$CLIENT_KEY" ]; then
+          echo "$CLIENT_CERT" > temp_cert_certs.pem
+          echo "$CLIENT_KEY" > temp_key_certs.pem
+          echo "Client certificates loaded from GitHub Secrets."
+        fi
+        python sertifika.py
+
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Dosyanın değişip değişmediğini kontrol et
+        git add PHRS_Acil_Sertifikalar.xlsx
+        
+        # Yalnızca değişiklik varsa commit ve push yap
+        if git diff --cached --quiet; then
+          echo "No changes in certificates."
+        else
+          git commit -m "Auto-update B2B certificates database [skip ci]"
+          git push
+        fi
