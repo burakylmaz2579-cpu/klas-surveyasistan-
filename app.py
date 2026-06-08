@@ -1168,10 +1168,13 @@ elif st.session_state.active_view == "Audit Console":
                 findings_all = []
                 checklists_processed = []
                 certificates_extracted = []
+                scanned_files_detected = []
                 
                 with st.spinner("📥 PDF belgeleri sınıflandırılıyor ve okunuyor..."):
                     for filename, pdf_bytes in target_bytes_list:
-                        processor = SurveyDocumentProcessor(pdf_bytes)
+                        processor = SurveyDocumentProcessor(pdf_bytes, filename=filename)
+                        if len(processor.raw_text.strip()) < 100:
+                            scanned_files_detected.append(filename)
                         if processor.doc_type == "certificate":
                             certificates_extracted.append(processor.certificate_info)
                         else:
@@ -1212,7 +1215,8 @@ elif st.session_state.active_view == "Audit Console":
                     "compliance_score": compliance_score,
                     "findings": findings_all,
                     "vessel_evaluation": vessel_evaluation,
-                    "certificates": certificates_extracted
+                    "certificates": certificates_extracted,
+                    "scanned_files": scanned_files_detected
                 }
                 
                 st.session_state.analysis_data = structured_data
@@ -1223,6 +1227,12 @@ elif st.session_state.active_view == "Audit Console":
 
     if st.session_state.analysis_data:
         data = st.session_state.analysis_data
+        
+        # Display scanned files warning if any are present
+        scanned_files = data.get("scanned_files", [])
+        if scanned_files:
+            st.warning(f"⚠️ **Taranmış (Görsel) Belge Uyarısı:** Aşağıdaki dosyalar taranmış PDF formatındadır ve dijital metin içermemektedir. Bu nedenle sistem bu belgelerdeki maddeleri otomatik kontrol edemez. Lütfen manuel inceleyin veya aranabilir (searchable) PDF formatında yükleyin:\n\n" + "\n".join([f"- `{f}`" for f in scanned_files]))
+
         findings = data["findings"]
         current_vessel = st.session_state.analysis_vessel_name
         comp_score = data.get("compliance_score", 100)

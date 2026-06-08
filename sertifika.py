@@ -177,7 +177,11 @@ def main():
     print("PHRS B2B Sertifika Tarihleri Scraper başlatılıyor...")
     
     try:
-        cert_path, key_path = extract_cert_key()
+        if os.path.exists(TEMP_CERT) and os.path.exists(TEMP_KEY):
+            print("Using existing temp PEM certificates.")
+            cert_path, key_path = TEMP_CERT, TEMP_KEY
+        else:
+            cert_path, key_path = extract_cert_key()
     except Exception as e:
         print(f"Hata: İstemci sertifikası yüklenemedi: {e}")
         sys.exit(1)

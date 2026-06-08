@@ -14,8 +14,9 @@ CONTRADICTION_KEYWORDS = [
 ]
 
 class SurveyDocumentProcessor:
-    def __init__(self, file_path_or_bytes):
+    def __init__(self, file_path_or_bytes, filename=None):
         self.file_path_or_bytes = file_path_or_bytes
+        self.filename = filename
         self.raw_text = ""
         self.pages_count = 0
         self.tables = []
@@ -28,13 +29,13 @@ class SurveyDocumentProcessor:
 
     def _load_document(self):
         if isinstance(self.file_path_or_bytes, bytes):
-            doc = fitz.open(stream=self.file_path_or_bytes, filetype="pdf")
+            self.doc = fitz.open(stream=self.file_path_or_bytes, filetype="pdf")
         else:
-            doc = fitz.open(self.file_path_or_bytes)
+            self.doc = fitz.open(self.file_path_or_bytes)
             
-        self.pages_count = len(doc)
+        self.pages_count = len(self.doc)
         text_list = []
-        for page in doc:
+        for page in self.doc:
             text_list.append(page.get_text())
         self.raw_text = "\n".join(text_list)
         
@@ -52,39 +53,49 @@ class SurveyDocumentProcessor:
     def _classify_document(self):
         text_lower = self.raw_text.lower()
         
-        # 1. Certificate Indicators
-        cert_keywords = [
-            "this is to certify", 
-            "issued under the provisions", 
-            "certify that", 
-            "sertifikası", 
-            "certificate of", 
-            "load line certificate", 
-            "pollution prevention certificate",
-            "safety equipment certificate",
-            "safety radio certificate",
-            "safety construction certificate",
-            "tonnage certificate",
-            "this certificate is valid"
+        # Fallback for scanned/non-searchable PDFs based on filename
+        filename = self.filename
+        if not filename and not isinstance(self.file_path_or_bytes, bytes):
+            filename = os.path.basename(self.file_path_or_bytes)
+            
+        if filename:
+            filename = filename.lower()
+            
+        if len(self.raw_text.strip()) < 100 and filename:
+            if "_ft" in filename or "cert" in filename or "certificate" in filename:
+                self.doc_type = "certificate"
+                self._extract_certificate_info()
+            else:
+                self.doc_type = "checklist"
+            return
+            
+        # 1. Check for explicit checklist indicators
+        checklist_indicators = [
+            "checklist", "check list", "survey report", "inspection report", 
+            "survey checklist", "sörvey raporu", "kontrol listesi", "denetim raporu",
+            "instructions for filling", "to enter in all boxes", "item no.", "description",
+            "project no.", "project number", "examinaƟon", "examination of"
         ]
+        has_checklist_indicator = any(kw in text_lower for kw in checklist_indicators)
         
-        is_cert = any(kw in text_lower for kw in cert_keywords)
+        # 2. Check for status codes inside the text
+        has_text_status_codes = (
+            "- y -" in text_lower or "- n -" in text_lower or "- n/a -" in text_lower or
+            "-y-" in text_lower or "-n-" in text_lower or "-n/a-" in text_lower
+        )
         
-        # Count checkboxes
+        # 3. Checkboxes count
         checkbox_count = self.raw_text.count("☐") + self.raw_text.count("☒") + self.raw_text.count("☑")
         checkbox_count += len(re.findall(r'\[\s*[xX✓✔]\s*\]', self.raw_text))
         checkbox_count += len(re.findall(r'\[\s*\]', self.raw_text))
         
-        # Check if it has explicit checklist indicators
-        checklist_indicators = ["checklist", "check list", "survey report", "inspection report", "survey checklist", "sörvey raporu", "kontrol listesi", "denetim raporu"]
-        has_checklist_indicator = any(kw in text_lower for kw in checklist_indicators)
+        is_checklist = (has_checklist_indicator or has_text_status_codes) or (checkbox_count >= 15)
         
-        # We classify as certificate if it has cert phrases and low checkbox density
-        if is_cert and checkbox_count < 15 and not (has_checklist_indicator and checkbox_count >= 5):
+        if is_checklist:
+            self.doc_type = "checklist"
+        else:
             self.doc_type = "certificate"
             self._extract_certificate_info()
-        else:
-            self.doc_type = "checklist"
 
     def _extract_vessel_info(self):
         vessel_name_match = re.search(r"Vessel Name\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
@@ -255,15 +266,97 @@ class SurveyDocumentProcessor:
             "expiry_date": expiry_date if expiry_date else "N/A"
         }
 
+    def _resolve_cell_text_with_ticks(self, cell_text, cell_bbox, page_ticks):
+        if not page_ticks:
+            return cell_text
+            
+        cx0, cy0, cx1, cy1 = cell_bbox
+        cell_w = cx1 - cx0
+        
+        ticks_in_cell = []
+        for tr in page_ticks:
+            tx = (tr.x0 + tr.x1) / 2
+            ty = (tr.y0 + tr.y1) / 2
+            # Check if tick center is inside cell boundaries with a tiny margin
+            if cx0 - 2 <= tx <= cx1 + 2 and cy0 - 2 <= ty <= cy1 + 2:
+                ticks_in_cell.append(tx)
+                
+        if not ticks_in_cell:
+            return cell_text
+            
+        t_clean = cell_text.strip()
+        if not t_clean:
+            return "☑"
+            
+        t_lower = t_clean.lower()
+        tick_x = ticks_in_cell[0]
+        rel_x = (tick_x - cx0) / max(1.0, cell_w)
+        
+        if "yes" in t_lower and "no" in t_lower:
+            if rel_x < 0.5:
+                return "Yes"
+            else:
+                return "No"
+        elif "y" in t_lower and "n" in t_lower:
+            if "n/a" in t_lower or "na" in t_lower:
+                if rel_x < 0.33:
+                    return "Y"
+                elif rel_x < 0.66:
+                    return "N"
+                else:
+                    return "N/A"
+            else:
+                if rel_x < 0.5:
+                    return "Y"
+                else:
+                    return "N"
+                    
+        return cell_text
+
     def _extract_tables(self, pdf_obj):
         for page_idx, page in enumerate(pdf_obj.pages):
-            extracted_tables = page.extract_tables()
-            for t in extracted_tables:
+            # Extract ticks/checkmarks for this page using PyMuPDF drawings
+            page_ticks = []
+            if hasattr(self, "doc") and self.doc and page_idx < len(self.doc):
+                pymupdf_page = self.doc[page_idx]
+                try:
+                    drawings = pymupdf_page.get_drawings()
+                    for d in drawings:
+                        rect = d["rect"]
+                        w = rect.x1 - rect.x0
+                        h = rect.y1 - rect.y0
+                        if 2 <= w <= 20 and 2 <= h <= 20:
+                            items = d.get("items", [])
+                            has_lines = any(item[0] == 'l' for item in items)
+                            if has_lines:
+                                page_ticks.append(rect)
+                except Exception as e:
+                    print("Error extracting vector drawings:", e)
+                    
+            tables = page.find_tables()
+            for table in tables:
                 cleaned_table = []
-                for row in t:
-                    cleaned_row = [str(cell).strip() if cell is not None else "" for cell in row]
+                for row in table.rows:
+                    cleaned_row = []
+                    for cell_bbox in row.cells:
+                        if cell_bbox is None:
+                            cleaned_row.append("")
+                            continue
+                            
+                        # Extract cell text
+                        cell_text = page.crop(cell_bbox).extract_text()
+                        if cell_text is None:
+                            cell_text = ""
+                        else:
+                            cell_text = str(cell_text).strip()
+                            
+                        # Resolve with ticks
+                        resolved_text = self._resolve_cell_text_with_ticks(cell_text, cell_bbox, page_ticks)
+                        cleaned_row.append(resolved_text)
+                        
                     if any(cleaned_row):
                         cleaned_table.append(cleaned_row)
+                        
                 if len(cleaned_table) > 1:
                     self.tables.append({
                         "page": page_idx + 1,
@@ -297,7 +390,11 @@ class SurveyDocumentProcessor:
                     item_no_score += 1
                     
                 val_lower = val.lower()
-                if val in ["☐", "☒", "☑", "☒", "☑", "✓", "✔"] or val_lower in ["y", "n", "x", "yes", "no", "n/a", "na", "satisfactory", "uygun", "uygunsuz", "durum"]:
+                val_clean = val_lower.replace("-", "").replace(" ", "").replace("/", "")
+                
+                if val in ["☐", "☒", "☑", "✓", "✔"] or val_clean in ["y", "n", "x", "yes", "no", "na", "satisfactory", "uygun", "uygunsuz", "durum"]:
+                    status_score += 2
+                elif len(val) <= 6 and val_clean in ["y", "n", "na", "yes", "no", "yc", "nc", "nac", "ok"]:
                     status_score += 2
                 elif len(val) <= 4:
                     status_score += 0.5
@@ -372,6 +469,22 @@ class SurveyDocumentProcessor:
         
         for table_dict in self.tables:
             table_data = table_dict["data"]
+            
+            # Skip reference matrices / dangerous goods class tables (cols > 5)
+            if len(table_data[0]) > 5:
+                continue
+                
+            # Skip title blocks / vessel particulars tables
+            first_row_str = " ".join([str(cell).lower() for cell in table_data[0] if cell])
+            particulars_kws = ["name of ship", "gemi adı", "gemi adi", "imo no", "imo number", "nameofship", "imono", "gross tonnage", "gros tonaj"]
+            if any(kw in first_row_str for kw in particulars_kws):
+                continue
+                
+            # Skip equipment lists / inventories (e.g. fire extinguishers or lifeboats lists)
+            header_str = " ".join([str(h).lower() for h in table_data[0] if h])
+            if any(kw in header_str for kw in ["capacity", "space protected", "hydraulic test", "date serviced", "date of last hydraulic"]):
+                continue
+                
             header = [h.lower() for h in table_data[0]]
             
             desc_idx = -1
@@ -379,12 +492,15 @@ class SurveyDocumentProcessor:
             remarks_idx = -1
             
             # 1. Try to find column indices using header keywords
-            for i, h in enumerate(header):
-                if any(x in h for x in ["description", "konu", "tanım"]):
+            for i, h in enumerate(table_data[0]):
+                if h is None:
+                    continue
+                h_lower = str(h).lower()
+                if any(x in h_lower for x in ["description", "descrip", "konu", "tanım", "madde açıklaması"]):
                     desc_idx = i
-                elif any(x in h for x in ["status", "durum", "check", "onay", "uygunluk"]):
+                elif any(x in h_lower for x in ["status", "durum", "check", "onay", "uygunluk", "kod"]):
                     status_idx = i
-                elif any(x in h for x in ["remark", "deficiency", "açıklama", "not", "bulgu", "düşünce"]):
+                elif any(x in h_lower for x in ["remark", "deficiency", "açıklama", "not", "bulgu", "düşünce"]):
                     remarks_idx = i
             
             # 2. If header mapping failed or is incomplete, use dynamic column profile analyzer
@@ -399,12 +515,14 @@ class SurveyDocumentProcessor:
                     
             # 3. Fallbacks if still not found
             if status_idx == -1:
-                cols_count = len(header)
+                cols_count = len(table_data[0])
                 if cols_count == 3:
-                    desc_idx = 0
-                    status_idx = 1
-                    remarks_idx = 2
-                elif cols_count == 4:
+                    # Item No, Description, Status
+                    desc_idx = 1
+                    status_idx = 2
+                    remarks_idx = -1
+                elif cols_count >= 4:
+                    # Item No, Description, Status, Remarks
                     desc_idx = 1
                     status_idx = 2
                     remarks_idx = 3
@@ -418,13 +536,23 @@ class SurveyDocumentProcessor:
                 if desc_idx == -1:
                     desc_idx = 0 if status_idx != 0 else 1
                     
-                if remarks_idx == -1 and len(header) > 2:
-                    for col_idx in range(len(header)):
+                if remarks_idx == -1 and len(table_data[0]) > 2:
+                    for col_idx in range(len(table_data[0])):
                         if col_idx != desc_idx and col_idx != status_idx:
                             remarks_idx = col_idx
                             break
                 
-            for row in table_data[1:]:
+            start_row_idx = 1
+            # Check if first row is a header row
+            first_row_str = " ".join([str(cell).lower() for cell in table_data[0] if cell])
+            header_keywords = [
+                "item", "description", "descrip", "status", "remark", "comment", "check", 
+                "konu", "tanım", "durum", "onay", "uygunluk", "açıklama", "not", "bulgu"
+            ]
+            if not any(kw in first_row_str for kw in header_keywords):
+                start_row_idx = 0
+                
+            for row in table_data[start_row_idx:]:
                 if len(row) <= max(desc_idx, status_idx):
                     continue
                 
@@ -475,13 +603,34 @@ class SurveyDocumentProcessor:
                 rule_code = get_rule_by_keyword(item_desc)
                 is_applicable, app_reason = check_rule_applicability(rule_code, vessel_type, grt)
                 
-                status_lower = reported_status.lower()
+                status_lower = reported_status.lower().strip()
+                s_clean = status_lower.replace("-", "").replace(" ", "").replace("/", "")
+                
                 clean_status = "Uygun"
                 severity = "success"
                 
-                is_empty_box = "☐" in reported_status or status_lower in ["", "none", "nan", "[ ]"]
-                is_deficiency = "deficiency" in status_lower or "uygunsuz" in status_lower or "no" == status_lower or "n" == status_lower or "☒" in reported_status
-                is_na = "n/a" in status_lower or "na" == status_lower or "not applicable" in status_lower or "geçersiz" in status_lower
+                is_empty_box = "☐" in reported_status or s_clean in ["", "none", "nan", "[]"]
+                is_deficiency = (
+                    "deficiency" in status_lower or 
+                    "uygunsuz" in status_lower or 
+                    s_clean in ["n", "no", "notincompliance"] or 
+                    "☒" in reported_status or 
+                    "✗" in reported_status or 
+                    "✘" in reported_status or 
+                    status_lower == "x"
+                )
+                is_na = (
+                    "n/a" in status_lower or 
+                    s_clean in ["na", "notapplicable", "gecersiz"]
+                )
+                is_success = (
+                    "satisfactory" in status_lower or 
+                    "uygun" in status_lower or 
+                    s_clean in ["y", "yes", "incompliance"] or 
+                    "☑" in reported_status or 
+                    "✔" in reported_status or 
+                    "✓" in reported_status
+                )
                 
                 if is_deficiency:
                     clean_status = "Uygun Değil"
@@ -492,7 +641,7 @@ class SurveyDocumentProcessor:
                 elif is_empty_box:
                     clean_status = "Düzeltilmeli"
                     severity = "warning"
-                elif "satisfactory" in status_lower or "uygun" in status_lower or "yes" in status_lower or "y" == status_lower or "☑" in reported_status:
+                elif is_success:
                     clean_status = "Uygun"
                     severity = "success"
                 else:
