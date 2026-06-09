@@ -2,14 +2,16 @@ name: Auto Scrape B2B Certificates
 
 on:
   schedule:
-    # Her gün UTC ile 01:00'da çalışır (Türkiye Saati ile 04:00)
+    # Her gün Türkiye saati ile 04:00'te otomatik çalışır (01:00 UTC)
     - cron: '0 1 * * *'
   workflow_dispatch:
-    # GitHub Actions sekmesinden manuel olarak tetiklemeye izin verir
+    # GitHub Actions sekmesinden manuel olarak başlatabilmeyi sağlar
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
@@ -30,7 +32,7 @@ jobs:
         CLIENT_CERT: ${{ secrets.CLIENT_CERT_PEM }}
         CLIENT_KEY: ${{ secrets.CLIENT_KEY_PEM }}
       run: |
-        # Eğer GitHub Secrets üzerinden sertifikalar geldiyse geçici dosya olarak oluştur
+        # Secrets yüklüyse geçici pem dosyalarını oluşturur
         if [ ! -z "$CLIENT_CERT" ] && [ ! -z "$CLIENT_KEY" ]; then
           echo "$CLIENT_CERT" > temp_cert_certs.pem
           echo "$CLIENT_KEY" > temp_key_certs.pem
@@ -43,10 +45,10 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Dosyanın değişip değişmediğini kontrol et
+        # Değişen Excel dosyasını git'e ekle
         git add PHRS_Acil_Sertifikalar.xlsx
         
-        # Yalnızca değişiklik varsa commit ve push yap
+        # Sadece değişiklik varsa commit et ve pushla
         if git diff --cached --quiet; then
           echo "No changes in certificates."
         else
