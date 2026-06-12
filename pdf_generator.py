@@ -20,7 +20,7 @@ def get_official_title(checklist_type):
     else:
         return f"EXAMINATION REPORT FOR {checklist_type.upper()}"
 
-def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, items_data, surveyor_name, survey_date_str):
+def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, items_data, surveyor_name, survey_date_str, custom_metadata=None):
     # Setup document
     doc = SimpleDocTemplate(
         filepath,
@@ -126,6 +126,47 @@ def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, 
         ('TOPPADDING', (0,0), (-1,-1), 4),
     ]))
     story.append(part_table)
+    
+    # 2.5. Additional Particulars Table
+    if custom_metadata:
+        # Filter fields that are actually filled out
+        filled_meta = {k: v for k, v in custom_metadata.items() if v.strip()}
+        if filled_meta:
+            story.append(Spacer(1, 8))
+            story.append(Paragraph("<b>ADDITIONAL PARTICULARS</b>", body_bold_style))
+            story.append(Spacer(1, 4))
+            
+            extra_rows = []
+            keys = list(filled_meta.keys())
+            for i in range(0, len(keys), 2):
+                row = []
+                # Col 1: Key 1
+                k1 = keys[i]
+                v1 = filled_meta[k1]
+                row.append(Paragraph(f"<b>{k1}</b>", body_style))
+                row.append(Paragraph(v1, body_style))
+                # Col 3: Key 2
+                if i + 1 < len(keys):
+                    k2 = keys[i+1]
+                    v2 = filled_meta[k2]
+                    row.append(Paragraph(f"<b>{k2}</b>", body_style))
+                    row.append(Paragraph(v2, body_style))
+                else:
+                    row.append(Paragraph("", body_style))
+                    row.append(Paragraph("", body_style))
+                extra_rows.append(row)
+                
+            meta_table = Table(extra_rows, colWidths=[140, 120, 140, 135])
+            meta_table.setStyle(TableStyle([
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('GRID', (0,0), (-1,-1), 0.5, LINE_COLOR),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+                ('TOPPADDING', (0,0), (-1,-1), 4),
+                ('BACKGROUND', (0,0), (0,-1), BG_LIGHT),
+                ('BACKGROUND', (2,0), (2,-1), BG_LIGHT),
+            ]))
+            story.append(meta_table)
+            
     story.append(Spacer(1, 10))
     
     # 3. Instructions block

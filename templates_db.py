@@ -125,8 +125,11 @@ STATIC_TEMPLATES = {
 }
 
 CHECKLIST_TEMPLATES = {}
+TEMPLATE_METADATA_FIELDS = {}
+
 for k, v in STATIC_TEMPLATES.items():
     CHECKLIST_TEMPLATES[k] = []
+    TEMPLATE_METADATA_FIELDS[k] = []
     for x in v:
         CHECKLIST_TEMPLATES[k].append({
             "id": x.get("id"),
@@ -158,9 +161,20 @@ if os.path.exists(json_path):
             }
             for k, val in extracted.items():
                 mapped_name = mapping.get(k, k)  # fallback to the key itself (e.g. ISM)
-                if mapped_name and val:
+                
+                # Support both the new dictionary format and legacy list format
+                if isinstance(val, dict):
+                    items_list = val.get("items", [])
+                    metadata_fields = val.get("metadata_fields", [])
+                else:
+                    items_list = val
+                    metadata_fields = []
+                
+                if mapped_name and items_list:
                     CHECKLIST_TEMPLATES[mapped_name] = []
-                    for item in val:
+                    TEMPLATE_METADATA_FIELDS[mapped_name] = metadata_fields
+                    
+                    for item in items_list:
                         item_no = item.get("item_no", "")
                         desc = item.get("description", "")
                         status = item.get("default_status", "Y")
@@ -192,3 +206,47 @@ if os.path.exists(json_path):
                         })
     except Exception as e:
         print("Error loading checklists_extracted.json:", e)
+
+def get_clean_metadata_fields(template_name):
+    fields = TEMPLATE_METADATA_FIELDS.get(template_name, [])
+    clean_fields = []
+    
+    ignore_lower = {
+        "ref no", "ref no.", "type (c/r)", "comments (c) / remarks (r)", "comments", "remarks", 
+        "name and signature of phrs surveyor", "date / place of verification", "date / place of issuance", 
+        "signature of phrs surveyor", "signature of master", "signature", "date", "place", "page", "phrs", 
+        "surveyor", "master", "vessel", "ship", "imo", "gross tonnage", "deadweight", "port of registry", 
+        "call sign", "class", "flag", "results", "item", "description", "rule", "status", "recommendation",
+        "item no.", "item no", "description of item", "guidelines", "satisfactory", "yes", "no", "n/a", "na",
+        "date of survey", "place of survey", "survey date", "surveyor name", "project no.", "project no", "project number",
+        "gemi adı", "gemi adi", "imo numarası", "bayrak devleti", "klas kuruluşu", "gemi türü", "brüt tonaj", "detveyt tonaj",
+        "y", "n", "c", "r", "c/r", "name of ship", "imo number", "gross tonnage (grt)", "deadweight (dwt)", "call sign",
+        "port of registry / flag", "port of registry", "vessel type", "class", "stamp", "maker", "type",
+        "satisfactory (1)", "very good (1)", "poor (1), (2)", "mark with", "comments (c)", "remarks (r)", "type (c/r/nc)",
+        "type of ship", "names / imo number of ship(s) to be managed", "names", "place/date"
+    }
+    
+    for f in fields:
+        f_strip = str(f).strip()
+        f_lower = f_strip.lower()
+        if not f_strip:
+            continue
+        if f_lower in ignore_lower:
+            continue
+        if len(f_strip) <= 2:
+            continue
+        if re.match(r'^[\d\.\s\-\/\,]+$', f_strip):
+            continue
+        if f_strip.startswith('.') or re.match(r'^\d+\.', f_strip):
+            continue
+        if "regulation" in f_lower:
+            continue
+        if "mark with" in f_lower or "*" in f_lower:
+            continue
+        if any(x in f_lower for x in ["poor", "very good", "satisfactory", "signature", "stamp", "sign"]):
+            continue
+            
+        clean_fields.append(f_strip)
+        
+    return clean_fields
+

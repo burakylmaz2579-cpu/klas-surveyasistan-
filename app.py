@@ -1506,7 +1506,7 @@ elif st.session_state.active_view == "Report Writer":
             except Exception:
                 pass
 
-    from templates_db import CHECKLIST_TEMPLATES
+    from templates_db import CHECKLIST_TEMPLATES, get_clean_metadata_fields
     
     with col3:
         template_name = st.selectbox("Sörvey Rapor Şablonu", list(CHECKLIST_TEMPLATES.keys()))
@@ -1557,6 +1557,23 @@ elif st.session_state.active_view == "Report Writer":
             output_pdf_name = st.text_input("Dosya Adı (.pdf)", value=selected_pdf_option)
 
     st.write("---")
+    
+    # Dynamic Metadata/Particulars Prompts
+    clean_meta_fields = get_clean_metadata_fields(template_name)
+    custom_metadata_vals = {}
+    if clean_meta_fields:
+        st.markdown("### 📋 Ek Rapor Bilgileri (Additional Particulars)")
+        st.info("Bu rapor şablonu için lütfen aşağıdaki ek bilgileri giriniz:")
+        cols = st.columns(2)
+        for idx, field in enumerate(clean_meta_fields):
+            col = cols[idx % 2]
+            with col:
+                custom_metadata_vals[field] = st.text_input(
+                    f"Lütfen '{field}' bilgisini giriniz:",
+                    value="",
+                    key=f"meta_{template_name}_{field}"
+                )
+        st.write("---")
     
     # Step 3: Run Automatic Checklist Population
     st.markdown("### 3. Otomatik Doldurma Sistemi (Auto-Fill Engine)")
@@ -1818,7 +1835,8 @@ elif st.session_state.active_view == "Report Writer":
                     template_name, 
                     filled_items, 
                     surveyor_name, 
-                    survey_date.strftime("%d/%m/%Y")
+                    survey_date.strftime("%d/%m/%Y"),
+                    custom_metadata=custom_metadata_vals
                 )
                 
                 st.success(f"🎉 Sörvey Raporu başarıyla oluşturuldu ve kaydedildi!\n\nYerel Dosya Yolu: `{pdf_path}`")
