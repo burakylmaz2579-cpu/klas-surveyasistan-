@@ -202,7 +202,7 @@ if os.path.exists(json_path):
                             "id": item_no,
                             "item": desc,
                             "rule": rule,
-                            "default_status": status
+                            "default_status": "Y"  # Force default status to "Y" to prevent fake deficiencies from template placeholders
                         })
     except Exception as e:
         print("Error loading checklists_extracted.json:", e)
