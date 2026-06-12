@@ -73,9 +73,8 @@ def load_excel_vessels():
                 v_name = normalize_vessel_name(r['Vessel'])
                 flag = str(r.get('Flag', 'Panama')).strip()
                 
-                # Exclude Comoros and Malta vessels
-                if flag.upper() in ["COMOROS", "MALTA"]:
-                    continue
+                # Keep Malta and Comoros vessels
+                pass
                     
                 imo = str(r.get('IMO', '')).strip().split('.')[0]
                 if not imo or imo == 'nan' or not imo.isdigit():
@@ -119,9 +118,8 @@ def load_excel_vessels():
                 v_name = normalize_vessel_name(r['Vessel'])
                 flag = str(r.get('Flag', 'Panama')).strip() if 'Flag' in df2.columns else 'Panama'
                 
-                # Exclude Comoros and Malta vessels
-                if flag.upper() in ["COMOROS", "MALTA"]:
-                    continue
+                # Keep Malta and Comoros vessels
+                pass
                     
                 cert_name = str(r['Certificate']).strip()
                 due_date_raw = r['DueDate']
@@ -178,8 +176,8 @@ def load_excel_vessels():
                 
                 # Check status/flag if present in df1 (usually not present, but let's check)
                 flag = str(r.get('Flag', 'Panama')).strip() if 'Flag' in df1.columns else 'Panama'
-                if flag.upper() in ["COMOROS", "MALTA"]:
-                    continue
+                # Keep Malta and Comoros vessels
+                pass
                     
                 cert_name = str(r['Certificate']).strip()
                 due_date_raw = r['DueDate']
@@ -228,13 +226,7 @@ def load_excel_vessels():
         except Exception as e:
             print(f"Error loading {f1} in db initialization: {e}")
             
-    # Final filter: make sure no leftover Comoros/Malta vessels exist in vessels_data
-    filtered_data = {}
-    for name, info in vessels_data.items():
-        if info["flag"].upper() not in ["COMOROS", "MALTA"]:
-            filtered_data[name] = info
-            
-    return filtered_data
+    return vessels_data
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)

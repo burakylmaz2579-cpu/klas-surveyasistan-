@@ -4675,6 +4675,1028 @@
       "default_status": "N/A"
     }
   ],
+  "SR_0203": [
+    {
+      "item_no": "1.1",
+      "description": "Sea areas in which vessel is certified to operate (Reg. IV/2.15 - 2.18) - N/A - A1 - Y - A1 + A2 - N/A - A1 + A2 + A3 - N/A - A1 + A2 + A3 + A4 For a ship certified to operate in sea area A3, indicate the recognized satellite service:",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.2",
+      "description": "Methods of maintenance (Reg. IV/15) (at least one method for sea areas A1 and A2; at least two methods for sea areas A3 and A4) - N/A - Duplication of equipment - Y - Shore-based maintenance - N/A - At sea maintenance 2. Radio Certification",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1",
+      "description": "Previous Safety Radio Certificate issued by - Y - Full term - N/A - Short term 27 MAY 2023 27 MAY 2028 Issue date Expiry date",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.2",
+      "description": "Short term Certificate now issued Issue date Expiry date - Y - Without conditions - N/A - With conditions",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3",
+      "description": "The full term Safety Radio Certificate has been endorsed for periodical survey - Y - 3. It is recommended that:",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "3.1",
+      "description": "A full term Cargo Ship Safety Radio Certificate may be issued valid for a period of not exceeding 5 years",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "3.2",
+      "description": "No full term Certificate to be issued until the survey is completed",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "3.3",
+      "description": "List the outstanding items to complete the survey:",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "3.4",
+      "description": "Repairs and/or changes of equipment (changes to be recorded in “Record of Approved GMDSS Radio Installation”) - Y - UGUR TINMAZ Stamp Name and Signature of PhRS Surveyor",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "17.07.2025",
+      "description": "- ISTANBUL, TURKIYE Berat YILMAZ Place/Date Stamp Name and Signature of Competent Radio Technician Section B Date issued: 10/2024 Page 1 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1",
+      "description": "Statutory and Class Certificates were valid at the date of survey",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.2",
+      "description": "Radio station license 27 OCT 2025 REP. OF PANAMA Validity Issuing flag Administration",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.3",
+      "description": "Radio personnel (Reg. IV/16) Class of certificate Number of crew-members holding the according certificate 1st class radio electronic certificate 2nd class radio electronic certificate General operator's certificate AT LEAST TWO DECK OFFICER TO HOLD GMDSS G.O.C OR A DEDICATED GMDSS G.O.C Restricted operator's certificate Is in passenger ships one person assigned to perform only radio communication duties during - N/A - distress incidents?",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.4",
+      "description": "Radio records available on board (Reg. IV/17)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.5",
+      "description": "Are up-to-date editions of ITU documents on board - Y - - Y - List of Coast Stations (List IV) - Y - List of Ship Stations (List V) - N/A - List of Call Signs and Numerical Identities of Stations Used by the Maritime Mobile and Maritime - N/A - Mobile-Satellite Services (List VII A) - Y - Manual for Use by the Maritime Mobile and Maritime Mobile-Satellite Services",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.6",
+      "description": "Are operating manuals for all equipment on board",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.7",
+      "description": "Are adequate information to enable the equipment to be properly maintained on board (Reg. - Y - IV/15.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.8",
+      "description": "Are adequate spares and service manuals available, if at-sea maintenance is declared (Reg. IV/15.4)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "1.9",
+      "description": "Are new equipment properly approved before installation",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "1.10",
+      "description": "Examined position, physical and electromagnetic protection and illumination of each radio - Y - installation 2. Radio Equipment (Basic)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1",
+      "description": "VHF receiver / transmitter (radiotelephony) (Reg. IV/7.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.2",
+      "description": "Checked operation on channels 6, 13 and 16 (Reg. IV/7.1.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.3",
+      "description": "Checked frequency tolerance, transmission line quality and RF power output (Reg. IV/14) - Y - Date issued: 10/2024 Page 2 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.4",
+      "description": "Checked correct operation of controls, incl. priority of control units (Reg. IV/14)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.5",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - Y - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.6",
+      "description": "Checked operation of the VHF control unit for navigational safety (Reg. IV/6.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.1.7",
+      "description": "Checked correct operation by on-air contact with a coast station or other ship",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.2",
+      "description": "VHF DSC controller (Reg. IV/7.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.2.1",
+      "description": "Performed an off-air check confirming the correct MMSI is programmed",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.2.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - Y - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3",
+      "description": "VHF channel 70 DSC watch receiver (Reg. IV/ 7.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.1",
+      "description": "Part of 2.1 (if not, check also 2.3.6)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.2",
+      "description": "Checked that a continuous watch is being maintained whilst keying VHF",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.3",
+      "description": "Checked the correct operation",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.4",
+      "description": "Checked audibility of VHF DSC alarm",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.5",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - Y - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.3.6",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.4",
+      "description": "MSI receiver (Reg. IV/7.1.4)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.4.1",
+      "description": "Checked correct operation",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.4.2",
+      "description": "Running self-test program, if provided",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.4.3",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5",
+      "description": "EPIRB1(Reg. IV/7.1.5), annual test and shore-based maintenance (Reg. IV/ 15.9, MSC/Circ. 1040 and 1039)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.1",
+      "description": "Checked position and mounting for float-free operation - Y - STB WING Location",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.2",
+      "description": "Verified that firmly attached lanyard is in good condition, neatly stowed and not tied to the vessel - Y - or mounting bracket",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.3",
+      "description": "Carried out visual inspection for defects - Y - Date issued: 10/2024 Page 3 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.4",
+      "description": "Carried out self-test routine - Y - 1 If in passenger ships the satellite EPIRB is used as the secondary means of distress alerting and is not remotely activated, it shall be acceptable to have an additional EPIRB installed in the wheelhouse near the conning position.",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.5",
+      "description": "Checked that EPIRB ID and other information is clearly marked on the outside of the EPIRB",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.6",
+      "description": "Decoding EPIRB ID and other information from the transmitted signal (to be compared with 2.7.6)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.7",
+      "description": "Checked battery expiry date",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.8",
+      "description": "Checked hydrostatic release, if provided, and its expiry date",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.9",
+      "description": "Checked emission on operational frequency without transmission of a distress call to the satellites",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.10",
+      "description": "Checked emission on 121,5 MHz, if possible respectively applicable, without activating the satellite - Y - system",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.11",
+      "description": "Checked, after remounting EPIRB in its bracket, that no transmission has been started",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.12",
+      "description": "Checked that float-free EPIRBs (frequency 406 MHz) 1. if installed on or after 1 July 2022, conform to performance standards and type-approval - Y - standards resolution MSC.471(101)24 ; 2. if installed before 1 July 2022, conform to performance standards IMO Res. A.810(19), as amended by resolutions MSC.56(66) and MSC.120(74), and type-approval standards not - Y - less than IMO Res. A.696(17);",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.5.13",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.6",
+      "description": "Two-way on-scene communication facility operating on 121.5 MHz and 123.1 MHz (Reg. IV/7.6) (Only required for passenger ships) Location",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.6.1",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.7",
+      "description": "Distress panel (Regs. IV/6.4 and 6.6) (Only required for passenger ships) Location",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.8",
+      "description": "Position updating",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.8.1",
+      "description": "Checked that information on ship’s position is provided continuously and automatically to all two- - Y - way communication equipment (Reg. IV/6.4 and 18)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.8.2",
+      "description": "Checked that equipment according to 2.10 operates from main, emergency and reserve source of - Y - energy (Reg. IV/13.8)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.9",
+      "description": "Two-way VHF radiotelephone apparatus (Reg. IV/7.2, 7.3)2, 3 WH Location",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.9.1",
+      "description": "Checked correct operation on channel 16 and one other",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.9.2",
+      "description": "Checked battery charging arrangements",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.9.3",
+      "description": "Checked expiry date of primary batteries - Y - Date issued: 10/2024 Page 4 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.9.4",
+      "description": "Checked fixed installation in a survival craft, where appropriate",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "2.9.5",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.10",
+      "description": "Search and rescue locating device (Reg. IV/7.1.3, 7.2, 7.3) [ - Y - SART - N/A - AIS-SART ]4",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.10.1",
+      "description": "Checked satisfactory, position and mounting5",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.10.2",
+      "description": "Checked response on ship’s 9 GHz radar or AIS installation respectively",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.10.3",
+      "description": "Checked battery expiry date Date(s): (1) JAN 2027 , (2) FEB 2027",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.10.4",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.11",
+      "description": "Ship Security Alert System - SSAS (Reg.XI-2/6)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.11.1",
+      "description": "Performance test",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12",
+      "description": "Long Range Identification and Tracking of Ships – LRIT (Reg.V/19-1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.1",
+      "description": "Performance test",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.2",
+      "description": "Please specify type of equipment: Inmarsat-C - Y - Inmarsat Mini-C - N/A - Inmarsat -D (D+ /IsatM2M) - N/A - Iridium - N/A -",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.3",
+      "description": "Is the equipment used for transmitting LRIT information part of the GMDSS installation?",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.4",
+      "description": "Checked that the equipment, installed for transmitting LRIT information, is supplied from both the - Y - main source and the emergency source of electrical energy.",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.5",
+      "description": "Is a valid LRIT conformance test report available on board?",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.6",
+      "description": "Conformance test report issued on behalf of the Government of: REP. OF PANAMA",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.12.7",
+      "description": "Conformance test report issued by: ASP : POLESTAR / Government: - Y -, issued on: 24 SEP 2024",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.13",
+      "description": "Voyage (or Simplified) Data Recorder – VDR (Reg. V/20)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.13.1",
+      "description": "Annual test report (12-monthly) onboard (done by service supplier authorized by the - Y - manufacturer)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.13.2",
+      "description": "Verified that firmly attached capsule is in good condition - Y - Date issued: 10/2024 Page 5 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.13.3",
+      "description": "Carried out visual inspection for defects",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.13.4",
+      "description": "Carried out self-test routine - Y - 4 At least one (1) radar SART or AIS-SART for every cargo ship between 300 and 500 GT and one (1) radar SART or AIS-SART on each side of the ship for every passenger ship, every cargo ship of 500GT and above, every passenger high-speed craft and every cargo high-speed craft of 500GT and above.",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.14",
+      "description": "Automatic Identification System – AIS (Reg. V/19.2.4)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.14.1",
+      "description": "AIS has been tested according to IMO SN / Circ. 227 and resolution MSC.74 (69), Annex 3 and - Y - MSC.1 / Circ. 1252",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.14.2",
+      "description": "Checked for satisfactory display and carried out self-test routine",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "2.14.3",
+      "description": "AIS test report was issued and left on board - Y - 3. Radio Equipment (Basic) - Sea Area A1",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "3.1",
+      "description": "Secondary means of alerting (Reg. IV/8.1) Equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "3.2",
+      "description": "VHF EPIRB for DSC channel 70 and locating by SART (Reg. IV/8.3) (in lieu of the satellite EPIRB) Location",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "3.3",
+      "description": "Equipment changed (if yes, manufacturer, type approval data and serial No to be recorded in - N/A - “Record of Approved GMDSS Radio Installation”) 4. Radio Equipment (Basic) - Sea Areas A1 + A2",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1",
+      "description": "MF receiver / transmitter (radiotelephony) (Reg. IV/9.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - Y - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.2",
+      "description": "Checked antenna tuning",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.3",
+      "description": "Checked frequency tolerance, transmission line quality and RF power output (Reg. IV/14)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.4",
+      "description": "Checked receiver performance by monitoring known stations",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.5",
+      "description": "Checked that control units on the bridge has first priority for the purpose of initiating distress alerts, - N/A - if control units are provided outside the navigating bridge",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.1.6",
+      "description": "Checked that equipment is capable of transmitting and receiving general communications (Reg. - Y - IV/9.3) Date issued: 10/2024 Page 6 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.2",
+      "description": "MF DSC controller (Reg. IV/9.1.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.2.1",
+      "description": "Performed an off-air check confirming the correct MMSI is programmed",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.2.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - Y - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3",
+      "description": "MF DSC watch receiver (Reg. IV/9.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.1",
+      "description": "Part of 4.1 (if not, check also 4.3.7)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.2",
+      "description": "Confirmed that only DSC channel indicated in Reg. IV/9 is being monitored",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.3",
+      "description": "Checked that a continuous watch is being maintained whilst keying MF radio transmitter",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.4",
+      "description": "Checked the correct operation",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.5",
+      "description": "Checked audibility of MF DSC alarm",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.3.6",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - Y - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.4",
+      "description": "Secondary means of alerting (Reg. IV/9.1.3) COSPAS-SARSAT EPIRB Equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "4.5",
+      "description": "Checked that VHF, MF, MF/HF and INM-C complying with new performance standards - SOLAS Chapter IV on GMDSS requirements (MSC.496(105)) (Compliance required at first Radio Survey on or after - N/A - 01/01/2024 - Extended to 1 January 2028. upon flag’s confirmation, when required) 5. Radio Equipment (Basic) - Sea Areas A1 + A2 + A3 (INMARSAT)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.1",
+      "description": "INMARSAT Ship Earth Station (SES) (Reg. IV/10.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.1.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.1.2",
+      "description": "Checked distress function by means of an approved test procedure, where possible",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.1.3",
+      "description": "Checked correct operation",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.1.4",
+      "description": "Checked that equipment is capable of transmitting and receiving general communications (Reg. - N/A - IV/10.1.1.4)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.2",
+      "description": "Connected to gyro compass for heading information (if yes, insert manufacturer and type) - N/A - Manufacturer Type Date issued: 10/2024 Page 7 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.2.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.8)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.3",
+      "description": "MF receiver / transmitter (radiotelephony) (Reg. IV/10.1.2.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.3.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.3.2",
+      "description": "Checked antenna tuning",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.3.3",
+      "description": "Checked frequency tolerance, transmission line quality and RF power output (Reg. IV/14)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.3.4",
+      "description": "Checked receiver performance by monitoring known stations",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.3.5",
+      "description": "Checked that control units on the bridge has first priority for the purpose of initiating distress - N/A - alerts, if control units are provided outside the navigating bridge",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.4",
+      "description": "MF DSC controller (Reg. IV/10.1.2.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.4.1",
+      "description": "Performed an off-air check confirming the correct MMSI is programmed",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.4.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - N/A - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.5",
+      "description": "MF DSC watch receiver (Reg. IV/10.1.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.5.1",
+      "description": "Part of 5.3 (if not, check also 5.5.7)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.5.2",
+      "description": "Confirmed that only DSC channel indicated in Reg. IV/10.1.3 is being monitored",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.5.3",
+      "description": "Checked that a continuous watch is being maintained whilst keying MF radio transmitter",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.5.4",
+      "description": "Checked the correct operation",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.5.5",
+      "description": "Checked audibility of MF DSC alarm",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "5.5.6",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.6",
+      "description": "Secondary means of alerting (Reg. IV/10.1.4) Equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "5.7",
+      "description": "Checked that VHF, MF, MF/HF and INM-C complying with new performance standards - SOLAS Chapter IV on GMDSS requirements (MSC.496(105)) - N/A - (Compliance required at first Radio Survey on or after 01/01/2024 - Extended to 1 January 2028. upon flag’s confirmation, when required) Date issued: 10/2024 Page 8 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.1",
+      "description": "MF/HF receiver / transmitter (radiotelephony) (Reg. IV/10.2.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.1.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.1.2",
+      "description": "Checked antenna tuning in all appropriate bands",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.1.3",
+      "description": "Checked frequency tolerance on all appropriate bands, transmission line quality and RF power - N/A - output (Reg. IV/14)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.1.4",
+      "description": "Checked receiver performance by monitoring known stations on all appropriate bands",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.1.5",
+      "description": "Checked that control units on the bridge has first priority for the purpose of initiating distress alerts, - N/A - if control units are provided outside the navigating bridge",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.1.6",
+      "description": "Checked that equipment is capable of transmitting and receiving general communications (Reg. - N/A - IV/10.2.4)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.2",
+      "description": "MF/HF DSC controller (Reg. IV/9.1.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.2.1",
+      "description": "Performed an off-air check confirming the correct MMSI is programmed",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.2.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - N/A - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.3",
+      "description": "MF/HF direct-printing telegraphy (Reg. IV/10.2.1.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.3.1",
+      "description": "Checked that the correct selective calling number is programmed",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.3.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - N/A - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.4",
+      "description": "MF/HF DSC watch receiver (Reg. IV/9.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.4.1",
+      "description": "Part of 6.1 (if not, check also 6.4.7)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.4.2",
+      "description": "Confirmed that only DSC channels indicated in Reg. IV/10.2 is being monitored",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.4.3",
+      "description": "Checked that a continuous watch is being maintained whilst keying MF radio transmitter",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.4.4",
+      "description": "Checked the correct operation",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.4.5",
+      "description": "Checked audibility of MF/HF DSC alarm",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "6.4.6",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.5",
+      "description": "Secondary means of alerting (Reg. IV/9.1.3) Equipment Date issued: 10/2024 Page 9 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "6.6",
+      "description": "Checked that VHF, MF, MF/HF and INM-C complying with new performance standards - SOLAS Chapter IV on GMDSS requirements (MSC.496(105)) - N/A - (Compliance required at first Radio Survey on or after 01/01/2024 - Extended to 1 January 2028. upon flag’s confirmation, when required) 7. Radio Equipment (Basic) - Sea Areas A1 + A2 + A3 + A4",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.1",
+      "description": "MF/HF receiver / transmitter (radiotelephony) (Reg. IV/11 and 10.1.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.1.1",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.1.2",
+      "description": "Checked antenna tuning in all appropriate bands",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.1.3",
+      "description": "Checked frequency tolerance on all appropriate bands, transmission line quality and RF power - N/A - output (Reg. IV/14)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.1.4",
+      "description": "Checked receiver performance by monitoring known stations on all appropriate bands",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.1.5",
+      "description": "Checked that control units on the bridge has first priority for the purpose of initiating distress - N/A - alerts, if control units are provided outside the navigating bridge",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.1.6",
+      "description": "Checked that equipment is capable of transmitting and receiving general communications (Reg. - N/A - IV/10.2.4)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.2",
+      "description": "MF/HF DSC controller (Reg. IV/10.2.1.1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.2.1",
+      "description": "Performed an off-air check confirming the correct MMSI is programmed",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.2.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - N/A - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.3",
+      "description": "MF/HF direct-printing telegraphy (Reg. IV/10.2.1.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.3.1",
+      "description": "Checked that the correct selective calling number is programmed",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.3.2",
+      "description": "Checked correct transmission and reception by means of routine or test call to a station or by test - N/A - equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.4",
+      "description": "MF/HF DSC watch receiver (Reg. IV/10.2.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.4.1",
+      "description": "Part of 7.1 (if not, check also 7.4.7)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.4.2",
+      "description": "Confirmed that only DSC channels indicated in Reg. IV/10.2.2 is being monitored",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.4.3",
+      "description": "Checked that a continuous watch is being maintained whilst keying MF radio transmitter",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.4.4",
+      "description": "Checked the correct operation",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.4.5",
+      "description": "Checked audibility of MF DSC alarm",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "7.4.6",
+      "description": "Checked that equipment operates from main, emergency and reserve source of energy (Reg. - N/A - IV/13.1) Date issued: 10/2024 Page 10 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.5",
+      "description": "Secondary means of alerting (Ch. IV Reg. 10.2.3.1) Equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "7.6",
+      "description": "Checked that VHF, MF, MF/HF and INM-C complying with new performance standards - SOLAS Chapter IV on GMDSS requirements (MSC.496(105)) - N/A - (Compliance required at first Radio Survey on or after 01/01/2024 - Extended to 1 January 2028. upon flag’s confirmation, when required) 8. Reserve sources of energy (Reg. IV/13.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.1",
+      "description": "Checked that capacity is sufficient to operate basic and duplicated equipment",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.2",
+      "description": "Checked sitting and installation (Reg. IV/13.7)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.3",
+      "description": "Checked condition of battery by specific measurement (Reg. IV/13.6.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.4",
+      "description": "Checked the independency of the propelling power of the ship and the ship's electrical system - Y - (Reg. IV/13.3)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.5",
+      "description": "Checked that electrical lighting is connected to reserve source of energy (Reg. IV/13.5)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.1.6",
+      "description": "Checked that the capacity of the battery was checked within the last 12 months (Reg. IV/13.6.2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.2",
+      "description": "Automatic charging equipment (Reg. IV/13.6)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "8.2.1",
+      "description": "Checked that charger is capable of re-charging the battery within 10 hours (Reg. IV/13.6.1) - Y - 9. Antennas",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "9.1",
+      "description": "Checked visually all antennas and feeders for satisfactory sitting and absence of defects",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "9.2",
+      "description": "Checked insulation and safety of all antennas - Y - 10. Maintenance Requirements (Reg. IV/15.6 and 15.7) (in sea areas A1 and A2 - at least one; in sea areas A3 and A4 - at least two)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "10.1",
+      "description": "Duplication of equipment",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "10.1.1",
+      "description": "VHF receiver / transmitter (DSC and radiotelephony)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "10.1.2",
+      "description": "MF receiver / transmitter (DSC and radiotelephony)",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "10.1.3",
+      "description": "INMARSAT Ship Earth Station",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "10.1.4",
+      "description": "MF/HF receiver / transmitter (DSC, radiotelephony and direct-printing telegraphy (NBDP))",
+      "default_status": "N/A"
+    },
+    {
+      "item_no": "10.2",
+      "description": "Shore - based maintenance - Y - SAVROS MARINE SERVICE LTD. 04.07.2025 - 04.07.2026 Name of the firm for maintenance Date of contract / validity Date issued: 10/2024 Page 11 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "10.3",
+      "description": "At - sea electronic maintenance capability - N/A - Name of maintainer Qualification 11. Additional Radio Equipment No. Equipment Maker Type Approved by / Cert. No./ Reserve Serial No source - N/A - - N/A - - N/A - - N/A - - N/A - 12. Service Supplier’s Evaluation (To be filled in by PhRS Surveyor) (In case that more than one service suppliers, approved by PhRS, are involved, please insert and fill in accordingly additional fields from 1.1.1 to 1.1.4) 1. Is service supplier used for the scope of survey, approved by PhRS - Y - (1) - N/A - (1)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1",
+      "description": "If “Yes”:",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1.1",
+      "description": "Type of service provided:",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1.2",
+      "description": "Company’s (service supplier) Name: SAVROS MARINE SERVICES",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1.3",
+      "description": "1.1.3 Evaluate and state accordingly the performance of service supplier in way of implementation according to suppliers’ procedures (for safety precautions and measures, used equipment, calibrations, workflow etc.): Very Good: - Y - (1) Satisfactory: - N/A - (1) Poor: - N/A - (1), (2)",
+      "default_status": "Y"
+    },
+    {
+      "item_no": "1.1.4",
+      "description": "In case “Poor” is selected, please state in short the fields of failure: 1) Mark with “X” as appropriate (2) Additional measures may arise upon relevant consideration from PhRS HO Date issued: 10/2024 Page 12 of 12 Form No: PHRS/SR Report/Issue:2-Rev.:3",
+      "default_status": "Y"
+    }
+  ],
   "SR_0300": [
     {
       "item_no": "1",

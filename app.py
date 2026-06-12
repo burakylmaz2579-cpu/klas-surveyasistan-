@@ -259,6 +259,26 @@ if 'filter_status' not in st.session_state:
 if 'fleet_page' not in st.session_state:
     st.session_state['fleet_page'] = 0
 
+# --- QUERY PARAMS ROUTING ---
+qp = st.query_params
+if "active_view" in qp:
+    st.session_state['active_view'] = qp["active_view"]
+    st.query_params.clear()
+    st.rerun()
+
+if "selected_vessel_name" in qp:
+    v_name_qp = qp["selected_vessel_name"].strip().upper()
+    conn = db.get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT id FROM vessels WHERE name = ?", (v_name_qp,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        st.session_state['selected_vessel_id'] = row[0]
+        st.session_state['active_view'] = "Vessel Profile"
+    st.query_params.clear()
+    st.rerun()
+
 # --- COLUMN NORMALIZATION HELPER ---
 def normalize_excel_columns(df):
     mapping = {}
@@ -280,6 +300,25 @@ def normalize_excel_columns(df):
     return df.rename(columns=mapping)
 
 # --- DATA LOADERS ---
+def clean_certificate_name(cert):
+    if not cert:
+        return ""
+    c = str(cert).strip()
+    # Remove HTML tags completely
+    c = re.sub(r'<[^>]+>', ' ', c)
+    # Decode escaped HTML
+    c = c.replace("&lt;br/&gt;", " ").replace("&lt;br&gt;", " ").replace("<br/>", " ").replace("<br>", " ")
+    # Replace multiple spaces with a single space
+    c = " ".join(c.split())
+    # Format if it includes a note after a colon
+    if ":" in c:
+        parts = c.split(":", 1)
+        name = parts[0].strip()
+        note = parts[1].strip()
+        note = note.lstrip("*").strip()
+        c = f"{name} (Not: {note})"
+    return c
+
 def load_phrs_certificates():
     f1 = os.path.join(os.path.dirname(__file__), "PHRS_Acil_Sertifikalar.xlsx")
     f2 = os.path.join(os.path.dirname(__file__), "PHRS_CERT_DUE_DATE.xlsx")
@@ -310,8 +349,8 @@ def load_phrs_certificates():
                     df1['IMO'] = "N/A"
                 if 'Status' not in df1.columns:
                     df1['Status'] = df1['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
-                if 'Flag' in df1.columns:
-                    df1 = df1[~df1['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+                # Keep Comoros and Malta
+                df1['Certificate'] = df1['Certificate'].apply(clean_certificate_name)
                 dfs.append(df1[['Vessel', 'Certificate', 'DueDate', 'ParsedDate', 'Status', 'IMO']])
         except Exception as e:
             print("Error loading f1:", e)
@@ -329,8 +368,8 @@ def load_phrs_certificates():
                 df2['Status'] = df2['ParsedDate'].apply(lambda d: "Süresi Doldu!" if d < today else "Süresi Yaklaşıyor")
                 if 'IMO' not in df2.columns:
                     df2['IMO'] = "N/A"
-                if 'Flag' in df2.columns:
-                    df2 = df2[~df2['Flag'].astype(str).str.upper().isin(["COMOROS", "MALTA"])]
+                # Keep Comoros and Malta
+                df2['Certificate'] = df2['Certificate'].apply(clean_certificate_name)
                 dfs.append(df2[['Vessel', 'Certificate', 'DueDate', 'ParsedDate', 'Status', 'IMO']])
         except Exception as e:
             print("Error loading f2:", e)
@@ -519,15 +558,21 @@ with st.sidebar:
     st.caption("Motor: **Advanced Audit Engine**")
 
 # --- HEADER RENDERING ---
-st.markdown(f"""
-<div class="premium-header">
-    <div class="header-title-container">
-        <h1 class="header-main-title">🚢 Klas Sörveyörü Asistanı</h1>
-        <span class="header-badge">YeniDeneyi V2 Refactored</span>
+col_h1, col_h2 = st.columns([3, 1])
+with col_h1:
+    st.markdown(f"""
+    <div class="premium-header" style="height: 100%; margin-bottom: 0px; padding: 2rem;">
+        <div class="header-title-container">
+            <h1 class="header-main-title">🚢 Klas Sörveyörü Asistanı</h1>
+            <span class="header-badge">YeniDeneyi V2 Refactored</span>
+        </div>
+        <div class="premium-subtitle">SOLAS, MARPOL, BWM, AFS ve ICLL Uyum & Çapraz Kontrol Portalı</div>
     </div>
-    <div class="premium-subtitle">SOLAS, MARPOL, BWM, AFS ve ICLL Uyum & Çapraz Kontrol Portalı</div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+with col_h2:
+    if os.path.exists("vessel_header_bg.png"):
+        st.image("vessel_header_bg.png", use_container_width=True)
+st.write("")
 
 # ==========================================
 # VIEW 1: FLEET SUMMARY & DASHBOARD
@@ -538,10 +583,12 @@ if st.session_state.active_view == "Fleet Dashboard":
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""
-        <div class="metric-panel">
-            <div class="metric-label">Takip Edilen Gemi</div>
-            <div class="metric-value">🚢 {metrics['total_vessels']} Adet</div>
-        </div>
+        <a href="?active_view=Fleet Dashboard" target="_self" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div class="metric-panel">
+                <div class="metric-label">Takip Edilen Gemi</div>
+                <div class="metric-value">🚢 {metrics['total_vessels']} Adet</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
     with c2:
         st.markdown(f"""
@@ -552,17 +599,21 @@ if st.session_state.active_view == "Fleet Dashboard":
         """, unsafe_allow_html=True)
     with c3:
         st.markdown(f"""
-        <div class="metric-panel">
-            <div class="metric-label">Süresi Geçmiş Sertifikalar</div>
-            <div class="metric-value" style="color: #ef4444;">🚨 {metrics['expired_certificates']} Adet</div>
-        </div>
+        <a href="?active_view=PHRS Certs" target="_self" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div class="metric-panel">
+                <div class="metric-label">Süresi Geçmiş Sertifikalar</div>
+                <div class="metric-value" style="color: #ef4444;">🚨 {metrics['expired_certificates']} Adet</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
     with c4:
         st.markdown(f"""
-        <div class="metric-panel">
-            <div class="metric-label">Yaklaşan Yenilemeler (<30 Gün)</div>
-            <div class="metric-value" style="color: #f59e0b;">⏳ {metrics['expiring_certificates']} Adet</div>
-        </div>
+        <a href="?active_view=PHRS Certs" target="_self" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div class="metric-panel">
+                <div class="metric-label">Yaklaşan Yenilemeler (<30 Gün)</div>
+                <div class="metric-value" style="color: #f59e0b;">⏳ {metrics['expiring_certificates']} Adet</div>
+            </div>
+        </a>
         """, unsafe_allow_html=True)
         
     st.write("---")
@@ -891,7 +942,7 @@ elif st.session_state.active_view == "PHRS Certs":
                     st.markdown(f"#### 🏷️ {cat_name}")
                     rows_html = []
                     for _, r in expired_df.loc[cat_group].iterrows():
-                        rows_html.append(f"<tr><td style='padding: 10px; font-weight: 700; color: #991b1b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px; font-weight: 600;'>{r['Certificate']}</td><td style='padding: 10px; color: #ef4444; font-weight: 700;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill status-critical'>{abs(r['DaysLeft'])} Gün Önce Geçti</span></td></tr>")
+                        rows_html.append(f"<tr><td style='padding: 10px; font-weight: 700; color: #991b1b;'><a href='?selected_vessel_name={r['Vessel']}' target='_self' style='color: #991b1b; text-decoration: underline; cursor: pointer;'>{r['Vessel']}</a></td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px; font-weight: 600;'>{r['Certificate']}</td><td style='padding: 10px; color: #ef4444; font-weight: 700;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill status-critical'>{abs(r['DaysLeft'])} Gün Önce Geçti</span></td></tr>")
                     
                     st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #fee2e2; background: #fff5f5; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
 <thead>
@@ -940,7 +991,7 @@ elif st.session_state.active_view == "PHRS Certs":
                             pill_style = "status-warning" if days <= 30 else "status-active"
                             pill_text = f"{days} Gün Kaldı" if days > 0 else "Bugün Son Gün!"
                             
-                            rows_html.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #1e293b;'>{r['Vessel']}</td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px;'>{r['Certificate']}</td><td style='padding: 10px; font-weight: 600;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill {pill_style}'>{pill_text}</span></td></tr>")
+                            rows_html.append(f"<tr><td style='padding: 10px; font-weight: 600; color: #1e293b;'><a href='?selected_vessel_name={r['Vessel']}' target='_self' style='color: #1e293b; text-decoration: underline; cursor: pointer;'>{r['Vessel']}</a></td><td style='padding: 10px;'>{r.get('IMO', 'N/A')}</td><td style='padding: 10px;'>{r['Certificate']}</td><td style='padding: 10px; font-weight: 600;'>{r['DueDate']}</td><td style='padding: 10px;'><span class='status-pill {pill_style}'>{pill_text}</span></td></tr>")
                             
                         st.markdown(f"""<table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem;">
 <thead>
@@ -1487,6 +1538,10 @@ elif st.session_state.active_view == "Report Writer":
                 default_pdf_name = "SC_0200.pdf"
             elif "SE" in template_name:
                 default_pdf_name = "SE_0200.pdf"
+            elif "0203" in template_name:
+                default_pdf_name = "SR 0203 - OSAD.pdf"
+            elif "0300" in template_name:
+                default_pdf_name = "SR 0300 - OSAD.pdf"
             elif "SR" in template_name:
                 default_pdf_name = "SR 0300 - OSAD.pdf"
             elif "MLC" in template_name:
