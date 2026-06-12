@@ -1376,7 +1376,7 @@ elif st.session_state.active_view == "Audit Console":
 # VIEW 4.5: REPORT WRITER / CHECKLIST GENERATOR
 # ==========================================
 elif st.session_state.active_view == "Report Writer":
-    st.subheader("\u270d\ufe0f Rapor Yazma Konsolu")
+    st.subheader("✍️ Rapor Yazma Konsolu")
     st.markdown("Seçilen gemi, proje kodu ve rapora göre sörvey kontrol raporu (PDF) oluşturma ve yerel arşive kaydetme paneli.")
 
     # Step 1: Vessel selection
@@ -1385,7 +1385,7 @@ elif st.session_state.active_view == "Report Writer":
     
     conn = db.get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT id, name, imo, grt, dwt, vessel_type FROM vessels ORDER BY name ASC")
+    c.execute("SELECT id, name, imo, grt, dwt, vessel_type, flag FROM vessels ORDER BY name ASC")
     db_vessels = c.fetchall()
     conn.close()
     
@@ -1394,7 +1394,7 @@ elif st.session_state.active_view == "Report Writer":
     with col1:
         selected_v = st.selectbox("Gemi Seçin", v_options)
         
-    v_info = {"name": "", "imo": "", "grt_dwt": "", "vessel_type": ""}
+    v_info = {"id": None, "name": "", "imo": "", "grt_dwt": "", "vessel_type": "", "grt": 5000, "dwt": 8000, "flag": "Panama"}
     
     if selected_v != "Manuel Bilgi Girişi / Yeni Gemi":
         v_name = selected_v.split(" (IMO:")[0]
@@ -1402,10 +1402,14 @@ elif st.session_state.active_view == "Report Writer":
         for row in db_vessels:
             if row[1] == v_name:
                 v_info = {
+                    "id": row[0],
                     "name": row[1],
                     "imo": row[2],
                     "grt_dwt": f"{row[3]:,} / {row[4]:,}",
-                    "vessel_type": row[5]
+                    "vessel_type": row[5],
+                    "grt": row[3],
+                    "dwt": row[4],
+                    "flag": row[6]
                 }
                 break
     
@@ -1420,7 +1424,15 @@ elif st.session_state.active_view == "Report Writer":
             v_info["imo"] = st.text_input("IMO No (Manuel)", value="")
         with c2:
             v_info["vessel_type"] = st.selectbox("Gemi Sınıfı / Türü (Manuel)", db.VESSEL_TYPES)
-            v_info["grt_dwt"] = st.text_input("GRT / DWT (Manuel)", value="")
+            v_info["grt_dwt"] = st.text_input("GRT / DWT (Manuel)", value="5000 / 8000")
+            # Parse grt and dwt from manual input
+            try:
+                parts = v_info["grt_dwt"].split("/")
+                v_info["grt"] = int(parts[0].strip().replace(",", ""))
+                v_info["dwt"] = int(parts[1].strip().replace(",", ""))
+            except:
+                v_info["grt"] = 5000
+                v_info["dwt"] = 8000
 
     st.write("---")
     
@@ -1440,7 +1452,7 @@ elif st.session_state.active_view == "Report Writer":
         if os.path.exists(target_folder):
             try:
                 existing_pdfs = [f for f in os.listdir(target_folder) if f.lower().endswith(".pdf")]
-            except Exception as e:
+            except Exception:
                 pass
 
     from templates_db import CHECKLIST_TEMPLATES
@@ -1455,47 +1467,262 @@ elif st.session_state.active_view == "Report Writer":
         selected_pdf_option = st.selectbox("Mevcut Rapor Adını Kullan (İsteğe Bağlı)", pdf_options)
         
         if selected_pdf_option == "Yeni Rapor Oluştur (Manuel Dosya Adı)":
-            default_pdf_name = template_name.split(" (")[0].replace(" ", "_") + ".pdf"
+            # Map standard name format
+            clean_name = template_name.split(" (")[0].replace(" ", "_")
+            if "IOPP" in template_name:
+                default_pdf_name = "ANNEX I IOPP_2-0.pdf"
+            elif "SPP" in template_name:
+                default_pdf_name = "ANNEX IV SPP_2-0.pdf"
+            elif "IAPPC" in template_name:
+                default_pdf_name = "ANNEX VI_0400.pdf"
+            elif "BWM" in template_name:
+                default_pdf_name = "BWM_0200.pdf"
+            elif "LL" in template_name:
+                default_pdf_name = "LL_0200.pdf"
+            elif "DG" in template_name:
+                default_pdf_name = "DG_0200.pdf"
+            elif "IMSBC" in template_name:
+                default_pdf_name = "IMSBC_2-0.pdf"
+            elif "SC" in template_name:
+                default_pdf_name = "SC_0200.pdf"
+            elif "SE" in template_name:
+                default_pdf_name = "SE_0200.pdf"
+            elif "SR" in template_name:
+                default_pdf_name = "SR 0300 - OSAD.pdf"
+            elif "MLC" in template_name:
+                default_pdf_name = "MLC 0206 - MMSC.pdf"
+            elif "SMC" in template_name:
+                default_pdf_name = "SMC - P 0102 - OSAD.pdf"
+            elif "ISSC" in template_name:
+                default_pdf_name = "ISSC-P 0107 - MMSC.pdf"
+            else:
+                default_pdf_name = f"{clean_name}.pdf"
             output_pdf_name = st.text_input("Dosya Adı (.pdf)", value=default_pdf_name)
         else:
             output_pdf_name = st.text_input("Dosya Adı (.pdf)", value=selected_pdf_option)
 
     st.write("---")
     
-    # Step 3: Fill Checklist Items
-    st.markdown(f"### 3. {template_name} Sörvey Kontrol Listesi")
+    # Step 3: Run Automatic Checklist Population
+    st.markdown("### 3. Otomatik Doldurma Sistemi (Auto-Fill Engine)")
     
-    items = CHECKLIST_TEMPLATES[template_name]
+    # Logic to prefill items based on database & historical findings
+    checklist_items = CHECKLIST_TEMPLATES[template_name]
+    
+    # 3.1: Load certificates and findings
+    certs_dict = {}
+    if v_info["id"] is not None:
+        certs = db.get_vessel_certificates(v_info["id"])
+        for name, issue_date, expiry_date, status in certs:
+            certs_dict[name.lower()] = {
+                "expiry_date": expiry_date,
+                "status": status,
+                "issue_date": issue_date
+            }
+            
+    historical_findings = {}
+    if v_info["name"]:
+        v_folder = os.path.join(base_dir, v_info["name"].strip().upper())
+        if os.path.exists(v_folder):
+            from doc_processor import SurveyDocumentProcessor
+            # Search for historical checklists fast
+            for root_d, dirs_d, files_d in os.walk(v_folder):
+                if any(x in root_d.lower() for x in ["cert", "photo", "drawing", "manual", "supp"]):
+                    continue
+                for file_d in files_d:
+                    if file_d.lower().endswith(".pdf") and not any(x in file_d.lower() for x in ["cert", "photo", "drawing", "manual", "narrative", "supp"]):
+                        try:
+                            proc = SurveyDocumentProcessor(os.path.join(root_d, file_d))
+                            if proc.doc_type == "checklist":
+                                findings = proc.process_findings()
+                                for f in findings:
+                                    item_no = str(f.get("item_no", "")).strip()
+                                    if item_no.endswith("."):
+                                        item_no = item_no[:-1]
+                                    if item_no and f.get("status") == "Uygun Değil":
+                                        historical_findings[item_no] = f.get("description", "")
+                        except Exception:
+                            pass
+
+    # 3.2: Perform Auto-fill calculations
     filled_items = []
     
-    for i, item in enumerate(items):
-        st.markdown(f"**{item['id']}: {item['item']}** (Referans Kural: `{item['rule']}`)")
+    cert_keywords = {
+        "load line": "International Load Line Certificate",
+        "oil pollution": "International Oil Pollution Prevention (IOPP) Certificate",
+        "sewage": "International Sewage Pollution Prevention Certificate",
+        "air pollution": "International Air Pollution Prevention (IAPP) Certificate",
+        "ballast water": "International Ballast Water Management Certificate",
+        "anti-fouling": "International Anti-Fouling System Certificate",
+        "safety equipment": "Cargo Ship Safety Equipment Certificate",
+        "safety radio": "Cargo Ship Safety Radio Certificate",
+        "safety construction": "Cargo Ship Safety Construction Certificate",
+        "safety management": "Safety Management Certificate (SMC)",
+        "ship security": "International Ship Security Certificate",
+        "tonnage": "International Tonnage Certificate",
+        "class": "Classification Certificate",
+        "stcw": "Crew Certificate / STCW",
+        "manning": "Minimum Safe Manning Document",
+        "document of compliance": "Document of Compliance (DOC)"
+    }
+
+    for item in checklist_items:
+        item_id = str(item["id"]).strip()
+        clean_item_id = item_id[:-1] if item_id.endswith(".") else item_id
         
-        # Radio group for Y/N/NA
-        status_col, action_col = st.columns([1.2, 3])
-        with status_col:
-            status = st.radio("Durum", ["Y (Üst Düzey/Uygun)", "N (Bulgu/Uygun Değil)", "N/A (İlgisiz)"], key=f"status_{template_name}_{item['id']}", horizontal=False)
-            if "Y (" in status:
+        desc = item["item"]
+        desc_lower = desc.lower()
+        rule = item["rule"]
+        
+        status_code = "Y"
+        comment = ""
+        
+        # A. Certificate Check Items
+        is_cert_item = False
+        matched_cert = None
+        
+        if any(x in desc_lower for x in ["validity", "checking", "confirming", "availability", "certificate"]):
+            for kw, cert_name in cert_keywords.items():
+                if kw in desc_lower:
+                    is_cert_item = True
+                    matched_cert = cert_name
+                    break
+                    
+        if is_cert_item and matched_cert:
+            cert_info = None
+            for name_in_db, info in certs_dict.items():
+                if matched_cert.lower() in name_in_db or name_in_db in matched_cert.lower():
+                    cert_info = info
+                    break
+            if cert_info:
+                if cert_info["status"] == "Expired":
+                    status_code = "N"
+                    comment = f"{matched_cert} sertifikasının süresi dolmuştur (Geçerlilik tarihi: {cert_info['expiry_date']})."
+                elif cert_info["status"] == "Expiring Soon":
+                    status_code = "Y"
+                    comment = f"Not: {matched_cert} sertifikasının süresi yakında dolacaktır (Geçerlilik: {cert_info['expiry_date']})."
+            else:
                 status_code = "Y"
-            elif "N (" in status:
-                status_code = "N"
-            else:
-                status_code = "N/A"
                 
-        with action_col:
-            if status_code == "N":
-                def_action = st.text_area("Bulgu & Düzeltici Aksiyon Açıklaması", value="Bulgu tespit edildi. Sörveyör uyarısı doğrultusunda eksiklik giderilmelidir.", key=f"def_{template_name}_{item['id']}", height=68)
-            else:
-                def_action = ""
+        # B. Tonnage & Vessel Type Applicability Rules
+        is_applicable = True
+        
+        # Tanker specific rules:
+        tanker_kws = ["tanker", "cargo pump room", "slop tank", "segregated ballast", "oil tanker", "double hull", "crude oil washing", "sts operations"]
+        if any(kw in desc_lower for kw in tanker_kws):
+            if "tanker" not in str(v_info["vessel_type"]).lower():
+                is_applicable = False
                 
+        # Tonnage specific rules:
+        if "400 gross tonnage" in desc_lower or "400 gt" in desc_lower or "400 tonnes" in desc_lower:
+            if v_info["grt"] and v_info["grt"] < 400:
+                is_applicable = False
+                
+        if "150 gross tonnage" in desc_lower or "150 gt" in desc_lower:
+            if v_info["grt"] and v_info["grt"] < 150:
+                is_applicable = False
+                
+        if "5,000 tonnes deadweight" in desc_lower or "5000 dwt" in desc_lower or "5000 deadweight" in desc_lower:
+            if v_info["dwt"] and v_info["dwt"] < 5000:
+                is_applicable = False
+                
+        if "passenger ship" in desc_lower or "passenger space" in desc_lower or "passengers" in desc_lower:
+            if "yolcu" not in str(v_info["vessel_type"]).lower() and "passenger" not in str(v_info["vessel_type"]).lower():
+                is_applicable = False
+
+        if not is_applicable:
+            status_code = "N/A"
+            comment = "Bu gemi tipi veya tonajı için geçerli değildir (Muaf)."
+            
+        # C. Historical deficiency checks
+        if status_code == "Y" and clean_item_id in historical_findings:
+            status_code = "N"
+            comment = f"Önceki denetim bulgusu: {historical_findings[clean_item_id]}"
+            
         filled_items.append({
-            "id": item["id"],
-            "item": item["item"],
-            "rule": item["rule"],
+            "id": item_id,
+            "item": desc,
+            "rule": rule,
             "status": status_code,
-            "deficiency_action": def_action
+            "deficiency_action": comment
         })
-        st.markdown("<hr style='margin: 0.5em 0; border: 0.5px solid #f1f5f9;'/>", unsafe_allow_html=True)
+
+    # 3.3 Display auto-fill metrics
+    c_y = sum(1 for x in filled_items if x["status"] == "Y")
+    c_n = sum(1 for x in filled_items if x["status"] == "N")
+    c_na = sum(1 for x in filled_items if x["status"] == "N/A")
+    
+    m_col1, m_col2, m_col3 = st.columns(3)
+    with m_col1:
+        st.metric("✅ Uygun Maddeler (Y)", c_y)
+    with m_col2:
+        st.metric("❌ Uygunsuzluk / Bulgular (N)", c_n, delta=f"{c_n} bulgu tespit edildi" if c_n > 0 else None, delta_color="inverse")
+    with m_col3:
+        st.metric("➖ İlgisiz / Muaf Maddeler (N/A)", c_na)
+        
+    st.write("")
+    
+    # 3.4 Display and edit detected deficiencies (N)
+    if c_n > 0:
+        st.warning("⚠️ Otomatik olarak tespit edilen uygunsuzluklar (Bulgular) aşağıda listelenmiştir. Lütfen düzeltici aksiyon ve bulgu açıklamalarını sörveyör bulgularına göre güncelleyin:")
+        for idx, item in enumerate(filled_items):
+            if item["status"] == "N":
+                with st.container():
+                    st.markdown(f"**Madde {item['id']}:** {item['item']} (Kural: `{item['rule']}`)")
+                    new_comment = st.text_area(
+                        f"Bulgu Açıklaması & Düzeltici Aksiyon",
+                        value=item["deficiency_action"],
+                        key=f"def_edit_{template_name}_{item['id']}_{idx}",
+                        height=68
+                    )
+                    item["deficiency_action"] = new_comment
+                    st.markdown("<hr style='margin:0.2em 0; border:0.5px solid #f1f5f9;'/>", unsafe_allow_html=True)
+                    
+    # 3.5 Expandable details to edit ALL items
+    with st.expander("🔍 Tüm Kontrol Listesi Maddelerini Göster & Düzenle (Tüm Liste)"):
+        st.info("Aşağıdaki arama kutusunu kullanarak arama yapabilir veya tüm maddelerin durumunu (Y/N/NA) değiştirebilirsiniz.")
+        search_query = st.text_input("Maddelerde Arama Yapın (ID veya Kriter)", value="", key=f"search_all_{template_name}")
+        
+        filtered_to_show = []
+        for item in filled_items:
+            if search_query:
+                if search_query.lower() not in item["id"].lower() and search_query.lower() not in item["item"].lower():
+                    continue
+            filtered_to_show.append(item)
+            
+        st.write(f"Gösterilen Madde Sayısı: {len(filtered_to_show)} / {len(filled_items)}")
+        
+        for idx, item in enumerate(filtered_to_show):
+            st.markdown(f"**{item['id']}:** {item['item']} (Referans: `{item['rule']}`)")
+            
+            st_c, act_c = st.columns([1.5, 3])
+            with st_c:
+                default_idx = 0 if item["status"] == "Y" else 1 if item["status"] == "N" else 2
+                status_sel = st.radio(
+                    f"Durum (Madde {item['id']})", 
+                    ["Y (Uygun)", "N (Bulgu)", "N/A (Geçersiz)"], 
+                    index=default_idx, 
+                    key=f"item_status_{template_name}_{item['id']}_{idx}",
+                    horizontal=True
+                )
+                if "(Uygun)" in status_sel:
+                    item["status"] = "Y"
+                elif "(Bulgu)" in status_sel:
+                    item["status"] = "N"
+                else:
+                    item["status"] = "N/A"
+                    
+            with act_c:
+                if item["status"] == "N":
+                    item["deficiency_action"] = st.text_area(
+                        f"Bulgu/Aksiyon (Madde {item['id']})",
+                        value=item["deficiency_action"] if item["deficiency_action"] else "Eksiklik tespit edildi. Sörveyör uyarısı doğrultusunda giderilmelidir.",
+                        key=f"item_comment_{template_name}_{item['id']}_{idx}",
+                        height=68
+                    )
+                else:
+                    pass
+            st.markdown("<hr style='margin: 0.3em 0; border: 0.5px solid #f8fafc;'/>", unsafe_allow_html=True)
 
     # Step 4: Metadata and Run
     st.write("---")
