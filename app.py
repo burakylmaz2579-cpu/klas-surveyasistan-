@@ -498,6 +498,10 @@ with st.sidebar:
         st.session_state.active_view = "Audit Console"
         st.rerun()
         
+    if st.button("✍️ Rapor Yazma Konsolu (Yeni)", use_container_width=True, type="primary" if st.session_state.active_view == "Report Writer" else "secondary"):
+        st.session_state.active_view = "Report Writer"
+        st.rerun()
+        
     if st.button("📚 SOLAS / MARPOL Kütüphanesi", use_container_width=True, type="primary" if st.session_state.active_view == "Reg Library" else "secondary"):
         st.session_state.active_view = "Reg Library"
         st.rerun()
@@ -1363,6 +1367,201 @@ elif st.session_state.active_view == "Audit Console":
             render_findings_list([f for f in findings if f.get("status") == "Düzeltilmeli"])
         with tab4:
             render_findings_list([f for f in findings if f.get("status") == "Uygun"])
+
+
+
+
+
+# ==========================================
+# VIEW 4.5: REPORT WRITER / CHECKLIST GENERATOR
+# ==========================================
+elif st.session_state.active_view == "Report Writer":
+    st.subheader("\u270d\ufe0f Rapor Yazma Konsolu")
+    st.markdown("Seçilen gemi, proje kodu ve rapora göre sörvey kontrol raporu (PDF) oluşturma ve yerel arşive kaydetme paneli.")
+
+    # Step 1: Vessel selection
+    st.markdown("### 1. Gemi ve Proje Bilgileri")
+    col1, col2 = st.columns(2)
+    
+    conn = db.get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT id, name, imo, grt, dwt, vessel_type FROM vessels ORDER BY name ASC")
+    db_vessels = c.fetchall()
+    conn.close()
+    
+    v_options = ["Manuel Bilgi Girişi / Yeni Gemi"] + [f"{row[1]} (IMO: {row[2]})" for row in db_vessels]
+    
+    with col1:
+        selected_v = st.selectbox("Gemi Seçin", v_options)
+        
+    v_info = {"name": "", "imo": "", "grt_dwt": "", "vessel_type": ""}
+    
+    if selected_v != "Manuel Bilgi Girişi / Yeni Gemi":
+        v_name = selected_v.split(" (IMO:")[0]
+        # find in db_vessels
+        for row in db_vessels:
+            if row[1] == v_name:
+                v_info = {
+                    "name": row[1],
+                    "imo": row[2],
+                    "grt_dwt": f"{row[3]:,} / {row[4]:,}",
+                    "vessel_type": row[5]
+                }
+                break
+    
+    with col2:
+        # Enter project code manually (starts with PRJ-)
+        project_code = st.text_input("Proje Kodu (Reference)", value="PRJ-")
+        
+    if selected_v == "Manuel Bilgi Girişi / Yeni Gemi":
+        c1, c2 = st.columns(2)
+        with c1:
+            v_info["name"] = st.text_input("Gemi Adı (Manuel)", value="").upper()
+            v_info["imo"] = st.text_input("IMO No (Manuel)", value="")
+        with c2:
+            v_info["vessel_type"] = st.selectbox("Gemi Sınıfı / Türü (Manuel)", db.VESSEL_TYPES)
+            v_info["grt_dwt"] = st.text_input("GRT / DWT (Manuel)", value="")
+
+    st.write("---")
+    
+    # Step 2: Output PDF Filename and Template Selection
+    st.markdown("### 2. Rapor Dosya Adı ve Şablon Seçimi")
+    col3, col4 = st.columns(2)
+    
+    # Check existing PDFs in the local folder
+    existing_pdfs = []
+    base_dir = r"C:\Users\LIVAPC8\Desktop\VESSELS & REPORT"
+    vessel_folder_name = v_info["name"].strip().upper()
+    proj_folder_name = project_code.strip()
+    
+    target_folder = ""
+    if vessel_folder_name and proj_folder_name and proj_folder_name != "PRJ-":
+        target_folder = os.path.join(base_dir, vessel_folder_name, proj_folder_name)
+        if os.path.exists(target_folder):
+            try:
+                existing_pdfs = [f for f in os.listdir(target_folder) if f.lower().endswith(".pdf")]
+            except Exception as e:
+                pass
+
+    from templates_db import CHECKLIST_TEMPLATES
+    
+    with col3:
+        template_name = st.selectbox("Sörvey Rapor Şablonu", list(CHECKLIST_TEMPLATES.keys()))
+        
+    with col4:
+        # If there are existing PDFs in that project folder, let them select one to overwrite,
+        # or type a new one
+        pdf_options = ["Yeni Rapor Oluştur (Manuel Dosya Adı)"] + existing_pdfs
+        selected_pdf_option = st.selectbox("Mevcut Rapor Adını Kullan (İsteğe Bağlı)", pdf_options)
+        
+        if selected_pdf_option == "Yeni Rapor Oluştur (Manuel Dosya Adı)":
+            default_pdf_name = template_name.split(" (")[0].replace(" ", "_") + ".pdf"
+            output_pdf_name = st.text_input("Dosya Adı (.pdf)", value=default_pdf_name)
+        else:
+            output_pdf_name = st.text_input("Dosya Adı (.pdf)", value=selected_pdf_option)
+
+    st.write("---")
+    
+    # Step 3: Fill Checklist Items
+    st.markdown(f"### 3. {template_name} Sörvey Kontrol Listesi")
+    
+    items = CHECKLIST_TEMPLATES[template_name]
+    filled_items = []
+    
+    for i, item in enumerate(items):
+        st.markdown(f"**{item['id']}: {item['item']}** (Referans Kural: `{item['rule']}`)")
+        
+        # Radio group for Y/N/NA
+        status_col, action_col = st.columns([1.2, 3])
+        with status_col:
+            status = st.radio("Durum", ["Y (Üst Düzey/Uygun)", "N (Bulgu/Uygun Değil)", "N/A (İlgisiz)"], key=f"status_{template_name}_{item['id']}", horizontal=False)
+            if "Y (" in status:
+                status_code = "Y"
+            elif "N (" in status:
+                status_code = "N"
+            else:
+                status_code = "N/A"
+                
+        with action_col:
+            if status_code == "N":
+                def_action = st.text_area("Bulgu & Düzeltici Aksiyon Açıklaması", value="Bulgu tespit edildi. Sörveyör uyarısı doğrultusunda eksiklik giderilmelidir.", key=f"def_{template_name}_{item['id']}", height=68)
+            else:
+                def_action = ""
+                
+        filled_items.append({
+            "id": item["id"],
+            "item": item["item"],
+            "rule": item["rule"],
+            "status": status_code,
+            "deficiency_action": def_action
+        })
+        st.markdown("<hr style='margin: 0.5em 0; border: 0.5px solid #f1f5f9;'/>", unsafe_allow_html=True)
+
+    # Step 4: Metadata and Run
+    st.write("---")
+    st.markdown("### 4. Rapor Yetkilendirme & Rapor Oluştur")
+    col5, col6 = st.columns(2)
+    with col5:
+        surveyor_name = st.text_input("Sörveyör Adı / Soyadı", value="Begüm Yener")
+    with col6:
+        survey_date = st.date_input("Sörvey Tarihi", value=datetime.now())
+        
+    if st.button("🚀 Raporu Oluştur ve Kaydet", use_container_width=True, type="primary"):
+        if not v_info["name"]:
+            st.error("Lütfen gemi adını giriniz!")
+        elif not project_code or project_code.strip() == "PRJ-":
+            st.error("Lütfen geçerli bir Proje Kodu giriniz!")
+        elif not output_pdf_name.lower().endswith(".pdf"):
+            st.error("Dosya adı .pdf ile bitmelidir!")
+        else:
+            # Determine path to save
+            target_dir = os.path.join(base_dir, v_info["name"].strip().upper(), project_code.strip())
+            
+            # Create directories if they do not exist
+            try:
+                os.makedirs(target_dir, exist_ok=True)
+            except Exception as e:
+                st.error(f"Klasör oluşturulamadı: {e}")
+                st.stop()
+                
+            pdf_path = os.path.join(target_dir, output_pdf_name)
+            
+            # Generate the PDF
+            try:
+                from pdf_generator import generate_checklist_pdf
+                generate_checklist_pdf(
+                    pdf_path, 
+                    v_info, 
+                    project_code, 
+                    template_name, 
+                    filled_items, 
+                    surveyor_name, 
+                    survey_date.strftime("%d/%m/%Y")
+                )
+                
+                st.success(f"🎉 Sörvey Raporu başarıyla oluşturuldu ve kaydedildi!\n\nYerel Dosya Yolu: `{pdf_path}`")
+                
+                # Copy to PHRS_Bot/Output directory if applicable
+                bot_dir = r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
+                if os.path.exists(bot_dir):
+                    bot_target = os.path.join(bot_dir, "Raporlar", v_info["name"].strip().upper(), project_code.strip())
+                    os.makedirs(bot_target, exist_ok=True)
+                    import shutil
+                    shutil.copy2(pdf_path, os.path.join(bot_target, output_pdf_name))
+                    st.info(f"PHRS_Bot klasörüne senkronize edildi: `{os.path.join(bot_target, output_pdf_name)}`")
+                
+                # Provide download button in browser
+                with open(pdf_path, "rb") as f:
+                    pdf_bytes = f.read()
+                st.download_button(
+                    label="📥 PDF Raporunu İndir",
+                    data=pdf_bytes,
+                    file_name=output_pdf_name,
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+            except Exception as ex:
+                st.error(f"Rapor oluşturulurken hata oluştu: {ex}")
 
 
 # ==========================================
