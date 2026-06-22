@@ -1638,6 +1638,90 @@ elif st.session_state.active_view == "Report Writer":
         "document of compliance": "Document of Compliance (DOC)"
     }
 
+    # Load equipment status dynamically by scanning vessel's certificates
+    vessel_equipment = {"ows_fitted": True, "bwms_fitted": True}
+    if v_info["name"]:
+        v_folder = os.path.join(base_dir, v_info["name"].strip().upper())
+        if os.path.exists(v_folder):
+            from doc_processor import SurveyDocumentProcessor
+            for root_d, dirs_d, files_d in os.walk(v_folder):
+                for file_d in files_d:
+                    if file_d.lower().endswith(".pdf"):
+                        if "cert" in file_d.lower() or "cert" in root_d.lower() or "_ft" in file_d.lower():
+                            try:
+                                proc = SurveyDocumentProcessor(os.path.join(root_d, file_d))
+                                if proc.doc_type == "certificate":
+                                    if not proc.certificate_info.get("ows_fitted", True):
+                                        vessel_equipment["ows_fitted"] = False
+                                    if not proc.certificate_info.get("bwms_fitted", True):
+                                        vessel_equipment["bwms_fitted"] = False
+                            except Exception:
+                                pass
+
+    def generate_surveyor_comment(desc, status, matched_cert=None, cert_info=None):
+        desc_lower = desc.lower()
+        
+        if status == "N/A":
+            if "tanker" in desc_lower:
+                return "Not applicable as the vessel is not an oil/chemical tanker."
+            if "400 gross tonnage" in desc_lower or "400 gt" in desc_lower or "400 tonnes" in desc_lower:
+                return "Not applicable; vessel gross tonnage is under 400 GT."
+            if "150 gross tonnage" in desc_lower or "150 gt" in desc_lower:
+                return "Not applicable; vessel gross tonnage is under 150 GT."
+            if "passenger ship" in desc_lower or "passenger space" in desc_lower:
+                return "Not applicable; vessel is not a passenger ship."
+            if any(x in desc_lower for x in ["bilge separator", "filtering equipment", "ows", "oily water separator"]):
+                return "Not applicable: 15 ppm OWS filtering equipment is not fitted / exempt as per vessel's IOPP certificate."
+            if any(x in desc_lower for x in ["ballast water", "bwms", "d-2"]):
+                return "Not applicable: D-2 performance standard treatment system is not fitted as per vessel's BWM certificate."
+            return "Not applicable due to vessel type, tonnage parameters, or flag state exemption."
+            
+        if status == "N":
+            if matched_cert:
+                if cert_info:
+                    return f"Required {matched_cert} has expired (Validity date: {cert_info['expiry_date']})."
+                else:
+                    return f"Required {matched_cert} is missing from the vessel database records."
+            if any(x in desc_lower for x in ["bilge", "separator", "ows", "filtering"]):
+                return "Oily water separator / bilge filtering equipment alarm test failed or equipment inoperative."
+            if any(x in desc_lower for x in ["fire", "pump", "extinguisher"]):
+                return "Emergency fire pump pressure inadequate or fire fighting equipment requires service."
+            if any(x in desc_lower for x in ["lifeboat", "liferaft", "survival"]):
+                return "Survival craft equipment missing or launching arrangements require lubrication."
+            if any(x in desc_lower for x in ["radio", "vhf", "gmdss"]):
+                return "Radio equipment / GMDSS reserve source of energy fails to meet battery capacity requirements."
+            return "Deficiency identified during survey; correction required prior to departure."
+            
+        # Status is Y
+        if matched_cert and cert_info:
+            if cert_info["status"] == "Expiring Soon":
+                return f"Verified valid {matched_cert} onboard. Note: Expiry date is soon ({cert_info['expiry_date']})."
+            return f"Verified valid {matched_cert} onboard. Valid until {cert_info['expiry_date']}."
+        
+        if any(x in desc_lower for x in ["bilge", "separator", "ows", "filtering"]):
+            return "Oily water separator and bilge filtering equipment examined and verified in good working order."
+        if any(x in desc_lower for x in ["fire", "pump", "extinguisher", "nozzle"]):
+            return "Emergency fire pump, hydrants, hoses, and extinguishers tested and confirmed fully operational."
+        if any(x in desc_lower for x in ["lifeboat", "liferaft", "survival", "davit"]):
+            return "Survival crafts, launching davits, and visual condition verified satisfactory."
+        if any(x in desc_lower for x in ["radio", "vhf", "gmdss"]):
+            return "Radio equipment and GMDSS installations tested and found in full compliance."
+        if any(x in desc_lower for x in ["load line", "freeboard", "draft"]):
+            return "Load line markings and draft marks verified in position, painted, and legible."
+        if any(x in desc_lower for x in ["hull", "structure", "bulkhead"]):
+            return "Visual examination of accessible hull structure and boundary bulkheads carried out; found sound."
+        
+        # Generic Y comments based on leading verb
+        clean_desc = desc.strip().lower()
+        if clean_desc.startswith("verify"):
+            return "Verified onboard and found in satisfactory condition."
+        if clean_desc.startswith("check"):
+            return "Checked and confirmed to be in good working order."
+        if clean_desc.startswith("confirm"):
+            return "Confirmed compliance with applicable regulations."
+            
+        return "Inspected and found in compliance with requirements."
+
     for item in checklist_items:
         item_id = str(item["id"]).strip()
         clean_item_id = item_id[:-1] if item_id.endswith(".") else item_id
@@ -1660,8 +1744,8 @@ elif st.session_state.active_view == "Report Writer":
                     matched_cert = cert_name
                     break
                     
+        cert_info = None
         if is_cert_item and matched_cert:
-            cert_info = None
             for name_in_db, info in certs_dict.items():
                 if matched_cert.lower() in name_in_db or name_in_db in matched_cert.lower():
                     cert_info = info
@@ -1669,12 +1753,11 @@ elif st.session_state.active_view == "Report Writer":
             if cert_info:
                 if cert_info["status"] == "Expired":
                     status_code = "N"
-                    comment = f"{matched_cert} sertifikasının süresi dolmuştur (Geçerlilik tarihi: {cert_info['expiry_date']})."
                 elif cert_info["status"] == "Expiring Soon":
                     status_code = "Y"
-                    comment = f"Not: {matched_cert} sertifikasının süresi yakında dolacaktır (Geçerlilik: {cert_info['expiry_date']})."
             else:
-                status_code = "Y"
+                # If required certificate is missing from the database, flag as N
+                status_code = "N"
                 
         # B. Tonnage & Vessel Type Applicability Rules
         is_applicable = True
@@ -1704,9 +1787,22 @@ elif st.session_state.active_view == "Report Writer":
 
         if not is_applicable:
             status_code = "N/A"
-            comment = "Bu gemi tipi veya tonajı için geçerli değildir (Muaf)."
             
-        # C. Historical deficiency checks
+        # OWS & BWMS Equipment fitted checks
+        # OWS Check
+        if any(x in desc_lower for x in ["ows", "oily water separator", "15 ppm bilge separator", "oil filtering equipment"]):
+            if not vessel_equipment["ows_fitted"] or (v_info["grt"] and v_info["grt"] < 400):
+                status_code = "N/A"
+                
+        # BWMS Check
+        if any(x in desc_lower for x in ["bwms", "ballast water treatment", "active substances", "d-2 performance"]):
+            if not vessel_equipment["bwms_fitted"]:
+                status_code = "N/A"
+
+        # Generate comment using the professional AI Surveyor Mode comment generator
+        comment = generate_surveyor_comment(desc, status_code, matched_cert, cert_info)
+            
+        # C. Historical deficiency checks (if status is Y, override with past deficiency)
         if status_code == "Y" and clean_item_id in historical_findings:
             status_code = "N"
             comment = f"Önceki denetim bulgusu: {historical_findings[clean_item_id]}"

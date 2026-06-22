@@ -69,32 +69,60 @@ class SurveyDocumentProcessor:
                 self.doc_type = "checklist"
             return
             
-        # 1. Check for explicit checklist indicators
-        checklist_indicators = [
-            "checklist", "check list", "survey report", "inspection report", 
-            "survey checklist", "sörvey raporu", "kontrol listesi", "denetim raporu",
-            "instructions for filling", "to enter in all boxes", "item no.", "description",
-            "project no.", "project number", "examinaƟon", "examination of"
-        ]
-        has_checklist_indicator = any(kw in text_lower for kw in checklist_indicators)
+        # Check first 800 characters for explicit certificate and checklist keywords
+        first_800 = text_lower[:800]
         
-        # 2. Check for status codes inside the text
+        cert_kws = [
+            "certificate", "sertifika", "sertifikası", "certify", "certifies", 
+            "document of compliance", "particulars of ship", "this is to certify", 
+            "issued under the authority", "attest", "attestation", "safety management certificate",
+            "record of equipment"
+        ]
+        checklist_kws = [
+            "examination", "checklist", "check list", "kontrol listesi", 
+            "survey report", "inspection report", "sörvey raporu", "denetim raporu"
+        ]
+        
+        first_cert_idx = -1
+        for kw in cert_kws:
+            idx = first_800.find(kw)
+            if idx != -1:
+                if first_cert_idx == -1 or idx < first_cert_idx:
+                    first_cert_idx = idx
+                    
+        first_checklist_idx = -1
+        for kw in checklist_kws:
+            idx = first_800.find(kw)
+            if idx != -1:
+                if first_checklist_idx == -1 or idx < first_checklist_idx:
+                    first_checklist_idx = idx
+                    
+        # Check for status codes inside the text
         has_text_status_codes = (
             "- y -" in text_lower or "- n -" in text_lower or "- n/a -" in text_lower or
             "-y-" in text_lower or "-n-" in text_lower or "-n/a-" in text_lower
         )
         
-        # 3. Checkboxes count
         checkbox_count = self.raw_text.count("☐") + self.raw_text.count("☒") + self.raw_text.count("☑")
         checkbox_count += len(re.findall(r'\[\s*[xX✓✔]\s*\]', self.raw_text))
         checkbox_count += len(re.findall(r'\[\s*\]', self.raw_text))
         
-        is_checklist = (has_checklist_indicator or has_text_status_codes) or (checkbox_count >= 15)
-        
-        if is_checklist:
+        # Decide type
+        if first_cert_idx != -1:
+            if first_checklist_idx == -1 or first_cert_idx < first_checklist_idx:
+                self.doc_type = "certificate"
+            else:
+                self.doc_type = "checklist"
+        elif has_text_status_codes or checkbox_count >= 10:
             self.doc_type = "checklist"
         else:
-            self.doc_type = "certificate"
+            # Fallback
+            if "certificate" in text_lower or "sertifika" in text_lower:
+                self.doc_type = "certificate"
+            else:
+                self.doc_type = "checklist"
+                
+        if self.doc_type == "certificate":
             self._extract_certificate_info()
 
     def _extract_vessel_info(self):
@@ -255,6 +283,35 @@ class SurveyDocumentProcessor:
         if num_match:
             cert_number = num_match.group(1).strip()
             
+        # Check if OWS is fitted or not based on text keywords
+        ows_fitted = True
+        text_clean_spaces = re.sub(r'\s+', ' ', text_lower)
+        if any(x in text_clean_spaces for x in [
+            "15 ppm bilge separator is not fitted", 
+            "15 ppm bilge separator not fitted", 
+            "oil filtering equipment is not fitted", 
+            "filtering equipment not fitted", 
+            "filtering equipment is not fitted",
+            "oily water separator is not fitted",
+            "oily water separator not fitted",
+            "ows is not fitted",
+            "ows not fitted"
+        ]):
+            ows_fitted = False
+        else:
+            # check regex for "15 ppm bilge separator" followed by "not fitted", "exempt", or "---"
+            ows_match = re.search(r'15\s*ppm\s*(?:bilge|oil)?\s*(?:separator|filtering|equipment)[^.]{0,100}(not fitted|not installed|exemp|\-\-\-|n/a)', text_lower)
+            if ows_match:
+                ows_fitted = False
+                
+        # Check if BWMS is fitted (D-2 performance standard)
+        bwms_fitted = True
+        if "ballast" in text_lower or "bwm" in text_lower:
+            if "d-2" in text_lower and any(x in text_lower for x in ["not fitted", "not approved", "not installed", "not applicable"]):
+                bwms_fitted = False
+            elif "d-1" in text_lower and "d-2" not in text_lower:
+                bwms_fitted = False
+
         self.certificate_info = {
             "cert_type": cert_type,
             "cert_number": cert_number if cert_number else "N/A",
@@ -263,7 +320,9 @@ class SurveyDocumentProcessor:
             "grt": grt if grt else "N/A",
             "dwt": dwt if dwt else "N/A",
             "issue_date": issue_date if issue_date else "N/A",
-            "expiry_date": expiry_date if expiry_date else "N/A"
+            "expiry_date": expiry_date if expiry_date else "N/A",
+            "ows_fitted": ows_fitted,
+            "bwms_fitted": bwms_fitted
         }
 
     def _resolve_cell_text_with_ticks(self, cell_text, cell_bbox, page_ticks):
@@ -937,6 +996,36 @@ def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_inf
 
         # 5. Cross-Check Certificate validity against checklist findings (Contradictions)
         if checklist_findings:
+            # Check OWS presence in checklist
+            if not cert.get("ows_fitted", True):
+                ows_items = [f for f in checklist_findings if "ows" in f["title"].lower() or "oily water separator" in f["title"].lower() or "15 ppm bilge" in f["title"].lower() or "15ppm bilge" in f["title"].lower()]
+                for item in ows_items:
+                    if item["status"] == "Uygun": # marked as Y
+                        cross_findings.append({
+                            "item_no": "C-10",
+                            "title": f"OWS Donanım Uyuşmazlığı ({cert_type})",
+                            "rule": "MARPOL Annex I Reg 14",
+                            "status": "Uygun Değil",
+                            "severity": "critical",
+                            "description": f"Yüklenen {cert_type} sertifikasında 15 ppm Sintine Separatörünün (OWS) kurulu olmadığı / muaf olduğu belirtilmesine rağmen, sörvey checklistinde OWS maddesi ({item['item_no']}) Uygun (Y) olarak işaretlenmiştir! OWS bulunmayan gemide bu maddenin muaf (N/A) veya uygunsuz (N) olması gerekir.",
+                            "recommendation": "Sörvey checklistindeki OWS maddesini N/A (Geçersiz) olarak düzeltin."
+                        })
+                        
+            # Check BWMS presence in checklist
+            if not cert.get("bwms_fitted", True):
+                bwms_items = [f for f in checklist_findings if "bwms" in f["title"].lower() or "ballast water treatment" in f["title"].lower() or "active substances" in f["title"].lower() or "d-2 performance" in f["title"].lower()]
+                for item in bwms_items:
+                    if item["status"] == "Uygun":
+                        cross_findings.append({
+                            "item_no": "C-11",
+                            "title": f"BWMS Donanım Uyuşmazlığı ({cert_type})",
+                            "rule": "BWM D-2",
+                            "status": "Uygun Değil",
+                            "severity": "critical",
+                            "description": f"Yüklenen {cert_type} sertifikasında D-2 Balast Suyu Arıtma Sisteminin (BWMS) kurulu olmadığı (D-1 standardı geçerli olduğu) belirtilmesine rağmen, sörvey checklistinde BWMS arıtma maddesi ({item['item_no']}) Uygun (Y) olarak işaretlenmiştir! Arıtma ünitesi bulunmayan gemide D-2 arıtma maddelerinin N/A (Geçersiz) olması gerekir.",
+                            "recommendation": "Sörvey checklistindeki D-2 arıtma maddelerini N/A (Geçersiz) olarak düzeltin."
+                        })
+
             # Check for specific rules based on certificate type
             if "IOPP" in cert_type or "Oil Pollution" in cert_type:
                 # Search if there is a critical OWS failure in the checklist
