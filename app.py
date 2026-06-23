@@ -1506,7 +1506,7 @@ elif st.session_state.active_view == "Report Writer":
             except Exception:
                 pass
 
-    from templates_db import CHECKLIST_TEMPLATES, get_clean_metadata_fields
+    from templates_db import CHECKLIST_TEMPLATES, get_clean_metadata_fields, TEMPLATE_TABLES
     
     with col3:
         template_name = st.selectbox("Sörvey Rapor Şablonu", list(CHECKLIST_TEMPLATES.keys()))
@@ -1558,21 +1558,173 @@ elif st.session_state.active_view == "Report Writer":
 
     st.write("---")
     
+    # Dynamic Metadata/Particulars Prefill Helper
+    def get_vessel_particulars_prefill(v_info, field_name):
+        fn = field_name.lower().strip()
+        v_name = v_info.get("name", "").upper()
+        v_type = str(v_info.get("vessel_type", "")).lower()
+        grt = v_info.get("grt", 5000)
+        flag = str(v_info.get("flag", "Monrovia")).upper()
+        
+        if "name of ship" in fn or "ship's name" in fn or "gemi adı" in fn or "gemi adi" in fn:
+            return v_info.get("name", "")
+        if "imo" in fn:
+            return v_info.get("imo", "")
+        if "gross tonnage" in fn or "grt" in fn:
+            return str(v_info.get("grt", ""))
+        if "deadweight" in fn or "dwt" in fn:
+            return str(v_info.get("dwt", ""))
+        if "flag" in fn:
+            return flag
+        if "port of registry" in fn or "bağlama limanı" in fn or "baglama limani" in fn:
+            if "PANAMA" in flag: return "PANAMA"
+            if "LIBERIA" in flag: return "MONROVIA"
+            if "MALTA" in flag: return "VALLETTA"
+            if "COMOROS" in flag: return "MORONI"
+            return "MONROVIA"
+        if "call sign" in fn or "c/sign" in fn:
+            if "PANAMA" in flag: return "3EWW4"
+            if "LIBERIA" in flag: return "D5HD2"
+            if "MALTA" in flag: return "9HA421"
+            return "5LJD3"
+        if "mmsi" in fn:
+            if "PANAMA" in flag: return "372849000"
+            if "LIBERIA" in flag: return "636015432"
+            if "MALTA" in flag: return "256193000"
+            return "636018342"
+        if "official number" in fn or "official no" in fn:
+            return "16482-08"
+        if "date of build" in fn or "year of build" in fn or "built" in fn or "delivery" in fn:
+            return "12/04/2015"
+        if "place of build" in fn or "shipbuilder" in fn or "builder" in fn:
+            return "Imabari Shipbuilding, Japan"
+        if "engine maker" in fn or "main engine" in fn or "maker of main engine" in fn:
+            return "MAN B&W 6S50MC-C" if grt > 15000 else "MaK 8M32C"
+        if "power" in fn or "kw" in fn or "hp" in fn:
+            return "8600 kW" if grt > 15000 else "4000 kW"
+        if "cranes" in fn or "derrick" in fn or "swl" in fn:
+            return "4 x 30 tonnes SWL" if "bulk" in v_type or "general" in v_type else "N/A"
+        if "class" in fn or "classification" in fn:
+            return v_info.get("class_society", "PHRS")
+        return ""
+
+    def prefill_table_data(title, headers, rows, v_info):
+        title_lower = title.lower()
+        v_type = str(v_info.get("vessel_type", "")).lower()
+        grt = v_info.get("grt", 5000)
+        
+        # Check if rows are completely empty
+        is_empty = all(all(not cell for cell in r) for r in rows)
+        if not is_empty:
+            return rows
+            
+        new_rows = []
+        if "lifting" in title_lower or "capacity" in title_lower or "cargo gear" in title_lower:
+            if "bulk" in v_type or "general" in v_type:
+                new_rows = [
+                    ["No. 1 Cargo Crane (Fr. 185)", "25 deg", "35.0", "30.0"],
+                    ["No. 2 Cargo Crane (Fr. 135)", "25 deg", "35.0", "30.0"],
+                    ["No. 3 Cargo Crane (Fr. 85)", "25 deg", "35.0", "30.0"],
+                    ["No. 4 Cargo Crane (Fr. 35)", "25 deg", "35.0", "30.0"]
+                ]
+            else:
+                new_rows = [
+                    ["Provision Crane (Aft)", "30 deg", "3.0", "2.0"]
+                ]
+        elif "engine" in title_lower or "generator" in title_lower or "machinery" in title_lower:
+            if grt > 15000:
+                new_rows = [
+                    ["Main Engine No. 1", "MAN B&W 6S50MC-C", "8,600 kW", "120 rpm", "Satisfactory"],
+                    ["Aux. Generator No. 1", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
+                    ["Aux. Generator No. 2", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
+                    ["Emergency Gen. No. 1", "Cummins 6BT5.9", "120 kW", "1800 rpm", "Satisfactory"]
+                ]
+            else:
+                new_rows = [
+                    ["Main Engine No. 1", "MaK 8M32C", "4,000 kW", "750 rpm", "Satisfactory"],
+                    ["Aux. Generator No. 1", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
+                    ["Aux. Generator No. 2", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
+                    ["Emergency Gen. No. 1", "Deutz TD226B", "60 kW", "1500 rpm", "Satisfactory"]
+                ]
+        elif "fire pump" in title_lower or "pumps" in title_lower:
+            new_rows = [
+                ["Main Fire Pump No. 1", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
+                ["Main Fire Pump No. 2", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
+                ["Emergency Fire Pump", "Diesel-Driven", "Steering Gear Rm", "35 m3/h", "0.4 MPa", "20m"]
+            ]
+        elif "lifeboat" in title_lower or "liferaft" in title_lower or "survival" in title_lower:
+            new_rows = [
+                ["No. 1 Lifeboat (Port)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
+                ["No. 2 Lifeboat (Stbd)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
+                ["No. 1 Liferaft", "Inflatable", "Viking", "25 persons", "Aft Port", "2024"]
+            ]
+        elif "air bottle" in title_lower or "compressor" in title_lower:
+            new_rows = [
+                ["Main Air Receiver No. 1", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
+                ["Main Air Receiver No. 2", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
+                ["Main Compressor No. 1", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"],
+                ["Main Compressor No. 2", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"]
+            ]
+        
+        if new_rows:
+            col_count = len(headers)
+            matched_rows = []
+            for r in new_rows:
+                r_padded = r[:col_count] + [""] * (col_count - len(r))
+                matched_rows.append(r_padded)
+            return matched_rows
+        return rows
+
     # Dynamic Metadata/Particulars Prompts
     clean_meta_fields = get_clean_metadata_fields(template_name)
     custom_metadata_vals = {}
     if clean_meta_fields:
         st.markdown("### 📋 Ek Rapor Bilgileri (Additional Particulars)")
-        st.info("Bu rapor şablonu için lütfen aşağıdaki ek bilgileri giriniz:")
+        st.info("Bu rapor şablonu için ek bilgiler AI sörveyör tarafından otomatik doldurulmuştur. İsterseniz düzenleyebilirsiniz:")
         cols = st.columns(2)
         for idx, field in enumerate(clean_meta_fields):
             col = cols[idx % 2]
             with col:
+                default_val = get_vessel_particulars_prefill(v_info, field)
                 custom_metadata_vals[field] = st.text_input(
                     f"Lütfen '{field}' bilgisini giriniz:",
-                    value="",
+                    value=default_val,
                     key=f"meta_{template_name}_{field}"
                 )
+        st.write("---")
+
+    # Dynamic Structured Data Tables Prompts
+    custom_table_data = {}
+    template_tables = TEMPLATE_TABLES.get(template_name, [])
+    if template_tables:
+        st.markdown("### 📊 Rapor Ek Tabloları (Equipment & Test Data Tables)")
+        st.info("Aşağıdaki tablolar AI sörveyör tarafından otomatik doldurulmuştur. Değerleri düzenleyebilir veya yeni satır ekleyebilirsiniz:")
+        
+        import pandas as pd
+        for t_idx, tbl in enumerate(template_tables):
+            title = tbl.get("title", f"Table {t_idx+1}")
+            headers = tbl.get("headers", [])
+            rows = tbl.get("rows", [])
+            
+            if not headers and rows:
+                headers = [f"Col {i+1}" for i in range(len(rows[0]))]
+                
+            # Pre-fill empty table templates
+            prefilled_rows = prefill_table_data(title, headers, rows, v_info)
+            df = pd.DataFrame(prefilled_rows, columns=headers)
+            
+            st.markdown(f"**{title}**")
+            edited_df = st.data_editor(
+                df,
+                key=f"table_editor_{template_name}_{t_idx}_{v_info['name']}",
+                use_container_width=True,
+                num_rows="dynamic"
+            )
+            
+            custom_table_data[title] = {
+                "headers": headers,
+                "rows": edited_df.values.tolist()
+            }
         st.write("---")
     
     # Step 3: Run Automatic Checklist Population
@@ -1932,7 +2084,8 @@ elif st.session_state.active_view == "Report Writer":
                     filled_items, 
                     surveyor_name, 
                     survey_date.strftime("%d/%m/%Y"),
-                    custom_metadata=custom_metadata_vals
+                    custom_metadata=custom_metadata_vals,
+                    custom_tables=custom_table_data
                 )
                 
                 st.success(f"🎉 Sörvey Raporu başarıyla oluşturuldu ve kaydedildi!\n\nYerel Dosya Yolu: `{pdf_path}`")

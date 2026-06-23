@@ -20,7 +20,7 @@ def get_official_title(checklist_type):
     else:
         return f"EXAMINATION REPORT FOR {checklist_type.upper()}"
 
-def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, items_data, surveyor_name, survey_date_str, custom_metadata=None):
+def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, items_data, surveyor_name, survey_date_str, custom_metadata=None, custom_tables=None):
     # Setup document
     doc = SimpleDocTemplate(
         filepath,
@@ -166,6 +166,42 @@ def generate_checklist_pdf(filepath, vessel_info, project_code, checklist_type, 
                 ('BACKGROUND', (2,0), (2,-1), BG_LIGHT),
             ]))
             story.append(meta_table)
+            
+    # 2.6. Custom Report Tables (Data & Equipment Tables)
+    if custom_tables:
+        for title, tbl in custom_tables.items():
+            headers = tbl.get("headers", [])
+            rows = tbl.get("rows", [])
+            
+            if not rows:
+                continue
+                
+            story.append(Spacer(1, 10))
+            story.append(Paragraph(f"<b>{title.upper()}</b>", body_bold_style))
+            story.append(Spacer(1, 4))
+            
+            table_rows = []
+            if headers:
+                table_rows.append([Paragraph(f"<b>{h}</b>", body_bold_style) for h in headers])
+                
+            for r in rows:
+                table_rows.append([Paragraph(str(cell) if cell else "", body_style) for cell in r])
+                
+            col_count = len(table_rows[0])
+            col_width = 535 / col_count if col_count > 0 else 535
+            col_widths = [col_width] * col_count
+            
+            t = Table(table_rows, colWidths=col_widths)
+            t.setStyle(TableStyle([
+                ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                ('GRID', (0,0), (-1,-1), 0.5, LINE_COLOR),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+                ('TOPPADDING', (0,0), (-1,-1), 4),
+                ('LEFTPADDING', (0,0), (-1,-1), 4),
+                ('RIGHTPADDING', (0,0), (-1,-1), 4),
+                ('BACKGROUND', (0,0), (-1,0), BG_LIGHT) if headers else ('BACKGROUND', (0,0), (0,0), colors.white),
+            ]))
+            story.append(t)
             
     story.append(Spacer(1, 10))
     

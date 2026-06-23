@@ -126,10 +126,12 @@ STATIC_TEMPLATES = {
 
 CHECKLIST_TEMPLATES = {}
 TEMPLATE_METADATA_FIELDS = {}
+TEMPLATE_TABLES = {}
 
 for k, v in STATIC_TEMPLATES.items():
     CHECKLIST_TEMPLATES[k] = []
     TEMPLATE_METADATA_FIELDS[k] = []
+    TEMPLATE_TABLES[k] = []
     for x in v:
         CHECKLIST_TEMPLATES[k].append({
             "id": x.get("id"),
@@ -166,13 +168,16 @@ if os.path.exists(json_path):
                 if isinstance(val, dict):
                     items_list = val.get("items", [])
                     metadata_fields = val.get("metadata_fields", [])
+                    tables_list = val.get("tables", [])
                 else:
                     items_list = val
                     metadata_fields = []
+                    tables_list = []
                 
                 if mapped_name and items_list:
                     CHECKLIST_TEMPLATES[mapped_name] = []
                     TEMPLATE_METADATA_FIELDS[mapped_name] = metadata_fields
+                    TEMPLATE_TABLES[mapped_name] = tables_list
                     
                     for item in items_list:
                         item_no = item.get("item_no", "")

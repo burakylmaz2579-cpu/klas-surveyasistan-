@@ -880,7 +880,120 @@ class SurveyDocumentProcessor:
                         "description": final_desc,
                         "recommendation": recommendation
                     })
+                    
+        # Run structured tables audit checks and append to findings
+        table_audit_findings = self.audit_structured_tables()
+        findings.extend(table_audit_findings)
         return findings
+
+    def audit_structured_tables(self):
+        table_findings = []
+        
+        for table_idx, table_dict in enumerate(self.tables):
+            table_data = table_dict["data"]
+            page_num = table_dict["page"]
+            
+            if not table_data or len(table_data) < 2:
+                continue
+                
+            # Determine table title
+            first_row_str = " ".join([str(cell) for cell in table_data[0] if cell])
+            title = f"Table on Page {page_num}"
+            
+            # Check if there is a header or title row
+            if len(table_data[0]) == 1:
+                title = table_data[0][0]
+                headers = table_data[1] if len(table_data) > 1 else []
+                data_rows = table_data[2:] if len(table_data) > 2 else []
+            else:
+                headers = table_data[0]
+                data_rows = table_data[1:]
+                
+            headers_lower = [str(h).lower() for h in headers]
+            
+            # 1. Auditing Empty/Incomplete Fields in Data Tables
+            # Check each data row for empty cells (excluding row label at index 0)
+            for r_idx, row in enumerate(data_rows):
+                if not row or not any(row):
+                    continue # skip completely empty rows
+                    
+                row_label = str(row[0]) if len(row) > 0 else f"Row {r_idx+1}"
+                # Skip if row label looks like column index (e.g. "1", "2") or is empty
+                if row_label.strip() in ["1", "2", "3", "4", "5", "6"]:
+                    continue
+                    
+                empty_cols = []
+                for c_idx, cell in enumerate(row[1:]): # skip the first column which is the label
+                    val = str(cell).strip()
+                    if not val or val == "---" or val == "___" or val == "." or val == "none" or val == "":
+                        # Find header name
+                        h_name = headers[c_idx+1] if c_idx+1 < len(headers) else f"Column {c_idx+2}"
+                        empty_cols.append(h_name)
+                        
+                if empty_cols:
+                    table_findings.append({
+                        "item_no": f"TBL-E-{table_idx+1}-{r_idx+1}",
+                        "title": f"Eksik Veri Girişi ({title})",
+                        "rule": "Survey Report Completeness",
+                        "status": "Uygun Değil",
+                        "severity": "warning",
+                        "description": f"Sayfa {page_num}'deki '{title}' tablosunda, '{row_label}' satırında şu sütunlar boş bırakılmıştır: {', '.join(empty_cols)}. Tüm sörvey değerleri girilmeli veya geçerli değilse çizilmeli/N/A yazılmalıdır.",
+                        "recommendation": "Tablodaki boş hücreleri doldurun veya 'N/A' / '---' yazarak iptal edin."
+                    })
+            
+            # 2. Auditing Crane / Cargo Gear SWL vs Test Load
+            swl_col = -1
+            test_load_col = -1
+            appliance_col = 0 # default first column
+            
+            for c_idx, h in enumerate(headers_lower):
+                if "test load" in h or "test yükü" in h:
+                    test_load_col = c_idx
+                elif "swl" in h or "safe working load" in h or "kapasite" in h or "lifting capacity" in h:
+                    swl_col = c_idx
+                elif "appliance" in h or "situation" in h or "donanım" in h or "tanım" in h:
+                    appliance_col = c_idx
+                    
+            if swl_col != -1 and test_load_col != -1:
+                for r_idx, row in enumerate(data_rows):
+                    if len(row) <= max(swl_col, test_load_col, appliance_col):
+                        continue
+                    appliance = str(row[appliance_col]).strip()
+                    if appliance in ["1", "2", "3", "4", "5", "6", ""]:
+                        continue
+                    
+                    try:
+                        swl_str = re.search(r'(\d+(?:\.\d+)?)', str(row[swl_col]))
+                        test_str = re.search(r'(\d+(?:\.\d+)?)', str(row[test_load_col]))
+                        
+                        if swl_str and test_str:
+                            swl_val = float(swl_str.group(1))
+                            test_val = float(test_str.group(1))
+                            
+                            if swl_val <= 20.0:
+                                min_test = swl_val * 1.25
+                                rule_desc = "SWL + 25%"
+                            elif swl_val <= 50.0:
+                                min_test = swl_val + 5.0
+                                rule_desc = "SWL + 5t"
+                            else:
+                                min_test = swl_val + 10.0
+                                rule_desc = "SWL + 10t"
+                                
+                            if test_val < min_test - 0.1: # small float tolerance
+                                table_findings.append({
+                                    "item_no": f"TBL-VAL-{table_idx+1}-{r_idx+1}",
+                                    "title": f"Yetersiz Test Yükü ({appliance})",
+                                    "rule": "ILO Convention 152 / Cargo Gear Rules",
+                                    "status": "Uygun Değil",
+                                    "severity": "error",
+                                    "description": f"Sayfa {page_num}'deki yük test tablosunda, '{appliance}' donanımı için SWL {swl_val} t iken Test Yükü {test_val} t olarak girilmiştir! Kurallar gereği test yükü en az {min_test:.1f} t ({rule_desc}) olmalıdır.",
+                                    "recommendation": "Yük test değerini düzeltin veya sörveyörü uyararak testi tekrarlatın."
+                                })
+                    except ValueError:
+                        pass
+                        
+        return table_findings
 
 def run_cross_document_checks(vessel_name, imo_number, grt_dwt, certificates_info, checklist_findings=None):
     cross_findings = []
