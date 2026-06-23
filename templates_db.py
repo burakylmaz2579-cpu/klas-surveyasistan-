@@ -148,21 +148,33 @@ if os.path.exists(json_path):
             mapping = {
                 "IOPP": "ANNEX I IOPP (Oil Pollution Prevention)",
                 "SPP": "ANNEX IV SPP (Sewage Pollution Prevention)",
+                "ANNEX VI": "ANNEX VI IAPPC (Air Pollution Prevention)",
                 "IAPPC": "ANNEX VI IAPPC (Air Pollution Prevention)",
-                "BWM": "BWM (Ballast Water Management)",
-                "LL": "LL (International Load Line)",
-                "SE": "SE (Safety Equipment)",
-                "SC": "SC (Safety Construction)",
+                "BWM-AInR": "BWM (Ballast Water Management)",
+                "BWM-I": "BWM (Ballast Water Management)",
+                "LL_0200": "LL (International Load Line)",
+                "SE_0201": "SE (Safety Equipment)",
+                "SC_0200": "SC (Safety Construction)",
+                "SR 0203": "SR (Safety Radio - Form 0203)",
                 "SR_0203": "SR (Safety Radio - Form 0203)",
-                "SR_0300": "SR (Safety Radio - Form 0300)",
-                "DG": "DG (Dangerous Goods)",
+                "SR_R 0300": "SR (Safety Radio - Form 0300)",
+                "SR 0300": "SR (Safety Radio - Form 0300)",
+                "DG_": "DG (Dangerous Goods)",
                 "IMSBC": "IMSBC (Solid Bulk Cargoes)",
-                "MLC": "MLC (Maritime Labour Convention)",
-                "SMC": "SMC (Safety Management Certificate)",
-                "ISSC": "ISSC (International Ship Security)"
+                "MLC 0206": "MLC (Maritime Labour Convention)",
+                "SMC - P 0200": "SMC (Safety Management Certificate)",
+                "ISSC-P 0107": "ISSC (International Ship Security)",
+                "IAFS": "IAFS (Anti-Fouling Systems)",
+                "ITC": "ITC (International Tonnage)",
+                "IHM": "IHM (Inventory of Hazardous Materials)"
             }
             for k, val in extracted.items():
-                mapped_name = mapping.get(k, k)  # fallback to the key itself (e.g. ISM)
+                mapped_names = [k]
+                for map_k, map_val in mapping.items():
+                    if map_k in k:
+                        if map_val not in mapped_names:
+                            mapped_names.append(map_val)
+                        break
                 
                 # Support both the new dictionary format and legacy list format
                 if isinstance(val, dict):
@@ -174,41 +186,42 @@ if os.path.exists(json_path):
                     metadata_fields = []
                     tables_list = []
                 
-                if mapped_name and items_list:
-                    CHECKLIST_TEMPLATES[mapped_name] = []
-                    TEMPLATE_METADATA_FIELDS[mapped_name] = metadata_fields
-                    TEMPLATE_TABLES[mapped_name] = tables_list
-                    
-                    for item in items_list:
-                        item_no = item.get("item_no", "")
-                        desc = item.get("description", "")
-                        status = item.get("default_status", "Y")
+                if items_list:
+                    for mapped_name in mapped_names:
+                        CHECKLIST_TEMPLATES[mapped_name] = []
+                        TEMPLATE_METADATA_FIELDS[mapped_name] = metadata_fields
+                        TEMPLATE_TABLES[mapped_name] = tables_list
                         
-                        rule_match = re.search(r'\(([^)]*(?:MARPOL|SOLAS|BWM|ICLL|reg|regs|ISM|ISPS|MLC|ILO)[^)]*)\)', desc)
-                        rule = rule_match.group(1) if rule_match else ""
-                        if not rule:
-                            if "IOPP" in mapped_name: rule = "MARPOL Annex I"
-                            elif "SPP" in mapped_name: rule = "MARPOL Annex IV"
-                            elif "IAPPC" in mapped_name: rule = "MARPOL Annex VI"
-                            elif "BWM" in mapped_name: rule = "BWM D-2"
-                            elif "LL" in mapped_name: rule = "ICLL 1966"
-                            elif "SE" in mapped_name: rule = "SOLAS Ch II-2 & III"
-                            elif "SC" in mapped_name: rule = "SOLAS Ch II-1"
-                            elif "SR" in mapped_name: rule = "SOLAS Ch IV"
-                            elif "DG" in mapped_name: rule = "SOLAS Ch II-2 Reg 19"
-                            elif "IMSBC" in mapped_name: rule = "IMSBC Code"
-                            elif "MLC" in mapped_name: rule = "MLC 2006"
-                            elif "SMC" in mapped_name: rule = "ISM Code"
-                            elif "ISSC" in mapped_name: rule = "ISPS Code"
-                            elif "ISM" in mapped_name: rule = "ISM Code"
-                            else: rule = "General Provision"
+                        for item in items_list:
+                            item_no = item.get("item_no") or item.get("id") or ""
+                            desc = item.get("description") or item.get("item") or ""
+                            status = item.get("default_status", "Y")
                             
-                        CHECKLIST_TEMPLATES[mapped_name].append({
-                            "id": item_no,
-                            "item": desc,
-                            "rule": rule,
-                            "default_status": "Y"  # Force default status to "Y" to prevent fake deficiencies from template placeholders
-                        })
+                            rule_match = re.search(r'\(([^)]*(?:MARPOL|SOLAS|BWM|ICLL|reg|regs|ISM|ISPS|MLC|ILO)[^)]*)\)', desc)
+                            rule = rule_match.group(1) if rule_match else ""
+                            if not rule:
+                                if "IOPP" in mapped_name: rule = "MARPOL Annex I"
+                                elif "SPP" in mapped_name: rule = "MARPOL Annex IV"
+                                elif "IAPPC" in mapped_name: rule = "MARPOL Annex VI"
+                                elif "BWM" in mapped_name: rule = "BWM D-2"
+                                elif "LL" in mapped_name: rule = "ICLL 1966"
+                                elif "SE" in mapped_name: rule = "SOLAS Ch II-2 & III"
+                                elif "SC" in mapped_name: rule = "SOLAS Ch II-1"
+                                elif "SR" in mapped_name: rule = "SOLAS Ch IV"
+                                elif "DG" in mapped_name: rule = "SOLAS Ch II-2 Reg 19"
+                                elif "IMSBC" in mapped_name: rule = "IMSBC Code"
+                                elif "MLC" in mapped_name: rule = "MLC 2006"
+                                elif "SMC" in mapped_name: rule = "ISM Code"
+                                elif "ISSC" in mapped_name: rule = "ISPS Code"
+                                elif "ISM" in mapped_name: rule = "ISM Code"
+                                else: rule = "General Provision"
+                                
+                            CHECKLIST_TEMPLATES[mapped_name].append({
+                                "id": item_no,
+                                "item": desc,
+                                "rule": rule,
+                                "default_status": "Y"  # Force default status to "Y" to prevent fake deficiencies from template placeholders
+                            })
     except Exception as e:
         print("Error loading checklists_extracted.json:", e)
 
