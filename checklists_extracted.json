@@ -85,7 +85,7 @@
       }
     ]
   },
-  "CICA REC 0101 - OSAD_CICA Record 0101": {
+  "CICA - CICA REC 0101 - OSAD_CICA Record 0101": {
     "items": [
       {
         "id": "1.2",
@@ -929,10 +929,10 @@
       }
     ],
     "metadata_fields": [
-      "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
       "distinctive Number or letters",
-      "DATE OF BUILD",
-      "TYPE OF SHIP"
+      "TYPE OF SHIP",
+      "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
+      "DATE OF BUILD"
     ],
     "tables": [
       {
@@ -1446,7 +1446,7 @@
       }
     ]
   },
-  "CICA SR 0100 - OSAD_CICA Survey Report 0100": {
+  "CICA - CICA SR 0100 - OSAD_CICA Survey Report 0100": {
     "items": [
       {
         "id": "1.6",
@@ -1948,10 +1948,10 @@
       }
     ],
     "metadata_fields": [
-      "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
       "distinctive Number or letters",
-      "DATE OF BUILD",
-      "TYPE OF SHIP"
+      "TYPE OF SHIP",
+      "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
+      "DATE OF BUILD"
     ],
     "tables": [
       {
@@ -2171,7 +2171,7 @@
       }
     ]
   },
-  "CG 0101_Class Cargo Gear Survey Report 0101": {
+  "CLASS - CG 0101_Class Cargo Gear Survey Report 0101": {
     "items": [
       {
         "id": "2",
@@ -2320,7 +2320,7 @@
       }
     ]
   },
-  "CHCK_ VUTM_0100": {
+  "CLASS - CHCK_ VUTM_0100": {
     "items": [
       {
         "id": "1.",
@@ -2473,7 +2473,7 @@
       }
     ]
   },
-  "Class Annual_Intermediate Report for Refrigerating Installation 0100": {
+  "CLASS - Class Annual_Intermediate Report for Refrigerating Installation 0100": {
     "items": [
       {
         "id": "",
@@ -2771,18 +2771,18 @@
       }
     ],
     "metadata_fields": [
-      "Dead Weight (metric tons)",
-      "in dry-dock on slipway afloat",
-      "Survey completed",
-      "Type of Ship",
-      "Length (III/3.10)",
-      "Place of Survey",
-      "Distinctive Letters",
-      "Owner and Address",
-      "IMO Nr.",
-      "Survey commenced",
       "Agent and Address",
-      "Year of Build"
+      "Place of Survey",
+      "Survey commenced",
+      "Dead Weight (metric tons)",
+      "Length (III/3.10)",
+      "Year of Build",
+      "IMO Nr.",
+      "Type of Ship",
+      "Owner and Address",
+      "Survey completed",
+      "Distinctive Letters",
+      "in dry-dock on slipway afloat"
     ],
     "tables": [
       {
@@ -2850,7 +2850,7 @@
       }
     ]
   },
-  "Class Cargo Gear Tackle Survey Report 0100": {
+  "CLASS - Class Cargo Gear Tackle Survey Report 0100": {
     "items": [
       {
         "id": "A.1",
@@ -2987,7 +2987,7 @@
       }
     ]
   },
-  "CL_AT60 0100_CHECKLIST FOR OIL TANKER CARRYING OIL WITH FLASHPOINT 60oC 0100": {
+  "CLASS - CL_AT60 0100_CHECKLIST FOR OIL TANKER CARRYING OIL WITH FLASHPOINT 60oC 0100": {
     "items": [
       {
         "id": "1.",
@@ -4886,7 +4886,7 @@
       }
     ]
   },
-  "CL_A_HULL 0100": {
+  "CLASS - CL_A_HULL 0100": {
     "items": [
       {
         "id": ".1",
@@ -5088,7 +5088,7 @@
       }
     ]
   },
-  "CL_A_MACH 0100": {
+  "CLASS - CL_A_MACH 0100": {
     "items": [
       {
         "id": ".1",
@@ -5302,7 +5302,7 @@
       }
     ]
   },
-  "CL_BC 0100_CLASS CHECKLIST FOR BULK CARRIER 0100": {
+  "CLASS - CL_BC 0100_CLASS CHECKLIST FOR BULK CARRIER 0100": {
     "items": [
       {
         "id": "1.",
@@ -7129,7 +7129,7 @@
       }
     ]
   },
-  "CL_BRG_PTN 0100_CLASS CHECKLIST FOR BARGESPONTOONS 0100": {
+  "CLASS - CL_BRG_PTN 0100_CLASS CHECKLIST FOR BARGESPONTOONS 0100": {
     "items": [
       {
         "id": "1.",
@@ -7990,7 +7990,7 @@
       }
     ]
   },
-  "CL_CHEM 0100_CLASS CHECKLIST FOR CHEMICAL TANKER 0100": {
+  "CLASS - CL_CHEM 0100_CLASS CHECKLIST FOR CHEMICAL TANKER 0100": {
     "items": [
       {
         "id": "1.",
@@ -9973,7 +9973,7 @@
       }
     ]
   },
-  "CL_GAS 0100_CLASS CHECKLIST FOR GAS CARRIER 0100": {
+  "CLASS - CL_GAS 0100_CLASS CHECKLIST FOR GAS CARRIER 0100": {
     "items": [
       {
         "id": "1.",
@@ -12088,7 +12088,7 @@
       }
     ]
   },
-  "CL_LSC 0100_CLASS CHECKLIST FOR LIVESTOCK CARRIERS 0100": {
+  "CLASS - CL_LSC 0100_CLASS CHECKLIST FOR LIVESTOCK CARRIERS 0100": {
     "items": [
       {
         "id": "1.",
@@ -13861,7 +13861,7 @@
       }
     ]
   },
-  "CL_OT 0100_CLASS CHECKLIST FOR OIL TANKER 0100": {
+  "CLASS - CL_OT 0100_CLASS CHECKLIST FOR OIL TANKER 0100": {
     "items": [
       {
         "id": "1.",
@@ -15886,7 +15886,7 @@
       }
     ]
   },
-  "CL_OTH_0100_CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
+  "CLASS - CL_OTH_0100_CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
     "items": [
       {
         "id": "1.",
@@ -17611,7 +17611,7 @@
       }
     ]
   },
-  "CL_OTH_ANX 0100_ANNEX TO CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
+  "CLASS - CL_OTH_ANX 0100_ANNEX TO CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
     "items": [
       {
         "id": "1.",
@@ -18760,7 +18760,7 @@
       }
     ]
   },
-  "CL_SEE 0100": {
+  "CLASS - CL_SEE 0100": {
     "items": [
       {
         "id": "Main",
@@ -18884,7 +18884,7 @@
       }
     ]
   },
-  "CL_SS_HULL 0100": {
+  "CLASS - CL_SS_HULL 0100": {
     "items": [
       {
         "id": ".1",
@@ -19230,7 +19230,7 @@
       }
     ]
   },
-  "CL_SS_MACH 0100": {
+  "CLASS - CL_SS_MACH 0100": {
     "items": [
       {
         "id": ".9",
@@ -19974,13 +19974,13 @@
       }
     ]
   },
-  "DDS_0200_SURVEY REPORT ON DRY BOTTOM SURVEYS 0200": {
+  "CLASS - DDS_0200_SURVEY REPORT ON DRY BOTTOM SURVEYS 0200": {
     "items": [],
     "metadata_fields": [
-      "Place of Survey",
-      "Survey completed",
+      "Survey commenced",
       ".........",
-      "Survey commenced"
+      "Survey completed",
+      "Place of Survey"
     ],
     "tables": [
       {
@@ -20442,7 +20442,7 @@
       }
     ]
   },
-  "ESP - BC 0101": {
+  "CLASS - ESP - BC 0101": {
     "items": [
       {
         "id": "1.",
@@ -21564,7 +21564,7 @@
       }
     ]
   },
-  "ESP - OT 0101": {
+  "CLASS - ESP - OT 0101": {
     "items": [
       {
         "id": "1.",
@@ -22180,8 +22180,8 @@
       }
     ],
     "metadata_fields": [
-      "OIL TANKER",
-      "Type of Ship"
+      "Type of Ship",
+      "OIL TANKER"
     ],
     "tables": [
       {
@@ -22669,12 +22669,12 @@
       }
     ]
   },
-  "ESP - SQP 0200": {
+  "CLASS - ESP - SQP 0200": {
     "items": [],
     "metadata_fields": [],
     "tables": []
   },
-  "GP 0200 - OSAD_Class General Particulars Report 0200": {
+  "CLASS - GP 0200 - OSAD_Class General Particulars Report 0200": {
     "items": [],
     "metadata_fields": [
       "Gross / Net Tonnage"
@@ -23474,7 +23474,7 @@
       }
     ]
   },
-  "MPSRV_0100": {
+  "CLASS - MPSRV_0100": {
     "items": [
       {
         "id": "1.",
@@ -23782,7 +23782,7 @@
       }
     ]
   },
-  "REFRIGERATING INSTALLATION_PERIODIClass Periodical Survey Report for Refrigerating Installation 0100": {
+  "CLASS - REFRIGERATING INSTALLATION_PERIODIClass Periodical Survey Report for Refrigerating Installation 0100": {
     "items": [
       {
         "id": "",
@@ -24272,18 +24272,18 @@
       }
     ],
     "metadata_fields": [
-      "Dead Weight (metric tons)",
-      "in dry-dock on slipway afloat",
-      "Survey completed",
-      "Type of Ship",
-      "Length (III/3.10)",
-      "Place of Survey",
-      "Distinctive Letters",
-      "Owner and Address",
-      "IMO Nr.",
-      "Survey commenced",
       "Agent and Address",
-      "Year of Build"
+      "Place of Survey",
+      "Survey commenced",
+      "Dead Weight (metric tons)",
+      "Length (III/3.10)",
+      "Year of Build",
+      "IMO Nr.",
+      "Type of Ship",
+      "Owner and Address",
+      "Survey completed",
+      "Distinctive Letters",
+      "in dry-dock on slipway afloat"
     ],
     "tables": [
       {
@@ -24400,7 +24400,7 @@
       }
     ]
   },
-  "UMS 0100 - OSAD_Class Report for Unattended Machinery Space 0100": {
+  "CLASS - UMS 0100 - OSAD_Class Report for Unattended Machinery Space 0100": {
     "items": [],
     "metadata_fields": [
       "Keel Laid"
@@ -25263,7 +25263,7 @@
       }
     ]
   },
-  "CHCK-SMSDR_0100": {
+  "ISM COMPANY - CHCK-SMSDR_0100": {
     "items": [
       {
         "id": "1.",
@@ -25838,7 +25838,7 @@
       }
     ]
   },
-  "DOC-INT 0202 - MMSC_DOC Interim Audit Check List 0202": {
+  "ISM COMPANY - DOC-INT 0202 - MMSC_DOC Interim Audit Check List 0202": {
     "items": [
       {
         "id": "1.",
@@ -26772,11 +26772,11 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
-      "Company IMO No.",
+      "Flag State for DOC",
       "Address of Company",
       "Audit language",
-      "Flag State for DOC"
+      "Name of Managing Company",
+      "Company IMO No."
     ],
     "tables": [
       {
@@ -26825,7 +26825,7 @@
       }
     ]
   },
-  "DOC-P 0203 - MMSC_DOC PERIODICAL AUDIT CHECKLIST 02-03": {
+  "ISM COMPANY - DOC-P 0203 - MMSC_DOC PERIODICAL AUDIT CHECKLIST 02-03": {
     "items": [
       {
         "id": "1.",
@@ -28218,7 +28218,7 @@
       }
     ]
   },
-  "ISM-AL 0203 - MMSC_ISM - Audit Log 0203": {
+  "ISM COMPANY - ISM-AL 0203 - MMSC_ISM - Audit Log 0203": {
     "items": [
       {
         "id": "1",
@@ -28435,7 +28435,7 @@
       }
     ]
   },
-  "Non Conformity Report (NCR) 0102": {
+  "ISM COMPANY - Non Conformity Report (NCR) 0102": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -28515,7 +28515,7 @@
       }
     ]
   },
-  "Observation Note 0101": {
+  "ISM COMPANY - Observation Note 0101": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -28564,7 +28564,582 @@
       }
     ]
   },
-  "ISM - Observation Note 0101": {
+  "ISM SHIP - CHCK-SMSDR_0100": {
+    "items": [
+      {
+        "id": "1.",
+        "item": "A.2",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "2",
+        "item": "1.1",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "3",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "4",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "5",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "6",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "7",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "8",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "9",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.",
+        "item": "A.3",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "11",
+        "item": "2.1",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "3.",
+        "item": "A.4",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "13",
+        "item": "3.1",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "14",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "15",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "16",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "17",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "18",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "4.",
+        "item": "A.5",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "20",
+        "item": "4.1",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "21",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "22",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "23",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "24",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "25",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "26",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "27",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "28",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "5.",
+        "item": "A.6",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "30",
+        "item": "5.1",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "31",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "32",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "33",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "34",
+        "item": "5.2",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "35",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "36",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "37",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "38",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "39",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "40",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "41",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "42",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "43",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "44",
+        "item": "5.3",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "6.",
+        "item": "A.7",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "46",
+        "item": "6.1",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "7.",
+        "item": "A.8",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "48",
+        "item": "7.1",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "49",
+        "item": "7.2",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "50",
+        "item": "7.3",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "8.",
+        "item": "A.9",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "52",
+        "item": "8.1",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "53",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "54",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "9.",
+        "item": "A.10",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "56",
+        "item": "9.1",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "57",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "58",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "59",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "60",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "61",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "62",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "10.",
+        "item": "A.11",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "64",
+        "item": "10.1",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "65",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "66",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "67",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "68",
+        "item": "10.2",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "11.",
+        "item": "A.12",
+        "rule": "PHRS Reg",
+        "default_status": "N"
+      },
+      {
+        "id": "70",
+        "item": "11.1",
+        "rule": "PHRS Reg",
+        "default_status": "N/A"
+      },
+      {
+        "id": "71",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "72",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "73",
+        "item": "",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "74",
+        "item": "11.2",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.",
+        "item": "Special requirements of each Flag State / Regulation shall be paid special attention",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.1",
+        "item": "[LIBERIA FLAG] - procedure for reporting correction of PSC deficiencies",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.2",
+        "item": "[LIBERIA FLAG] - procedure for reporting PSC detention",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.3",
+        "item": "[LIBERIA FLAG] - procedure for annual safety inspection",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.4",
+        "item": "[LIBERIA FLAG] - procedure for use form RLM - 338",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.5",
+        "item": "[LIBERIA FLAG] - procedure for logging of corrective actions",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.6",
+        "item": "[LIBERIA FLAG] - procedure for reporting Accidents/Incidents (RLM-108)",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.7",
+        "item": "[LIBERIA FLAG] - procedure for marine investigations and hearings (RLM-260)",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.8",
+        "item": "[LIBERIA FLAG] - procedure for accident prevention and appointment of a safety officer",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.9",
+        "item": "[LIBERIA FLAG] - PRE-ARRIVAL CHECKLIST",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.10",
+        "item": "[PANAMA FLAG] SMS procedures for reporting to the Flag the correction of PSC/ASI Defs",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.11",
+        "item": "SOLAS REG. II-1 / 19-1 Requires crew members of passenger ships....",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.12",
+        "item": "Verify SMS procedure for preparing and updating the inventory of hazardous materials onboard",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.13",
+        "item": "Ship-Specific Risk Assessment (RA) on Cyber Risks",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.14",
+        "item": "Flag/PSC/Class/ etc deficiencies as a cause for raising Non Conformities",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.15",
+        "item": "Pre-Arrival checklist",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "12.16",
+        "item": "SMS procedure regarding Mooring and Towing inspection and maintenance (after 01/01/2024)",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      }
+    ],
+    "metadata_fields": [
+      "Name of the Company"
+    ],
+    "tables": [
+      {
+        "title": "NOTES For negative entries, major repairs and additional information, if any, described in detail. (Use attachment if necessary)",
+        "headers": [
+          "REF No.",
+          "TYPE (C/R)",
+          "COMMENTS (C) / REMARKS (R)"
+        ],
+        "rows": []
+      },
+      {
+        "title": "Equipment Table 2",
+        "headers": [
+          "Date / Place of Issuance",
+          "",
+          "",
+          "",
+          "Name and Signature of Lead Auditor"
+        ],
+        "rows": []
+      }
+    ]
+  },
+  "ISM SHIP - ISM - Observation Note 0101": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -28613,11 +29188,11 @@
       }
     ]
   },
-  "ISM PR17_0200": {
+  "ISM SHIP - ISM PR17_0200": {
     "items": [],
     "metadata_fields": [
-      "Name of the Company",
-      "Company IMO No."
+      "Company IMO No.",
+      "Name of the Company"
     ],
     "tables": [
       {
@@ -28716,7 +29291,304 @@
       }
     ]
   },
-  "SMC - INT 0102 - MMSC_ISM - SMC Interim Audit Check List 0102": {
+  "ISM SHIP - ISM-AL 0203 - MMSC_ISM - Audit Log 0203": {
+    "items": [
+      {
+        "id": "1",
+        "item": "Name",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2",
+        "item": "IMO",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "3",
+        "item": "Flag",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "4",
+        "item": "Type",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1",
+        "item": "Master",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2",
+        "item": "Chief Engineer",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "3",
+        "item": "Officers",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "4",
+        "item": "Ratings",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "DOC",
+        "item": "Validity: Endorsed date:",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "",
+        "item": "Issued date:",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "SMC",
+        "item": "Validity: Endorsed date:",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "",
+        "item": "Issued date:",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      }
+    ],
+    "metadata_fields": [],
+    "tables": [
+      {
+        "title": "AUDIT PLAN",
+        "headers": [
+          "The audit was carried out after relevant request received from the management company. The audit was carried out on a sampling basis in accordance with the applicable provisions of the ISM Code."
+        ],
+        "rows": [
+          [
+            "OPENING MEETING (Covering Introduction, confidentiality, explanation of the scope and objective of the verification, description of the audit method)"
+          ],
+          [
+            "Stated (Date / Time):"
+          ],
+          [
+            "Finished (Date / Time):"
+          ],
+          [
+            "Participants / auditees (Person(s) having direct responsibilities regarding the SMS)"
+          ],
+          [
+            "Details of opening meeting"
+          ]
+        ]
+      },
+      {
+        "title": "AUDIT ACTIVITY(describe with timeline the persons interviewed, document review, review procedures, with the persons having direct responsibilities regarding the SMS)See next page/overleaf for guidance on recording the audit activity",
+        "headers": [
+          "Stated (Date / Time):"
+        ],
+        "rows": [
+          [
+            "Finished (Date / Time):"
+          ],
+          [
+            "Details of audit activity"
+          ]
+        ]
+      },
+      {
+        "title": "CLOSING MEETING(Summary of findings, explanation that the verification was based on a sampling basis and if no NCRs were reporter it does not mean than non exist)",
+        "headers": [
+          "Stated (Date / Time):"
+        ],
+        "rows": [
+          [
+            "Finished (Date / Time):"
+          ],
+          [
+            "Participants / auditees (Person(s) having direct responsibilities regarding the SMS)"
+          ],
+          [
+            "Details of closing meeting"
+          ]
+        ]
+      },
+      {
+        "title": "COMPANY AUDIT ACTIVITY (example) (interviews, document review, review procedures, with the persons having direct responsibilities regarding the SMS)",
+        "headers": [
+          "(Date / Time): , Document review on SMS manuals, records, distribution and revisions records, etc"
+        ],
+        "rows": [
+          [
+            "(Date / Time): , Policies, Objectives"
+          ],
+          [
+            "(Date / Time): , Management Review record"
+          ],
+          [
+            "(Date / Time): , shore Staff familiarization / Training"
+          ],
+          [
+            "(Date / Time): , Internal audits"
+          ],
+          [
+            "(Date / Time): , Ship-Shore Drills"
+          ],
+          [
+            "(Date / Time): , verification of maintenance implementation"
+          ],
+          [
+            "(Date / Time): , Interviews (names/rank: GM, DPA, technical, Operations, crewing, supplies)"
+          ],
+          [
+            "(Date / Time): , Check the certificates and records, of at least one fleet vessel per type, etc"
+          ],
+          [
+            "(Date / Time): , check correction of PSC, FSI, Class deficiencies and implementation of closing NCs"
+          ],
+          [
+            "(Date / Time): , other examinations made"
+          ]
+        ]
+      },
+      {
+        "title": "VESSEL AUDIT ACTIVITY (example)(interviews, document review, review procedures, with the persons having direct responsibilities regarding the SMS)",
+        "headers": [
+          "(Date / Time): , Vessel's Documents (certificates, SMS manuals, records, etc)"
+        ],
+        "rows": [
+          [
+            "(Date / Time): , Policies, Objectives"
+          ],
+          [
+            "(Date / Time): , Master's Review"
+          ],
+          [
+            "(Date / Time): , Familiarization / Training"
+          ],
+          [
+            "(Date / Time): , Internal audits"
+          ],
+          [
+            "(Date / Time): , Emergencies / Drills"
+          ],
+          [
+            "(Date / Time): , Deck / Engine procedures, including maintenance"
+          ],
+          [
+            "(Date / Time): , Tour visit on deck and ER"
+          ],
+          [
+            "(Date / Time): , Drill witnessed (scenario: )"
+          ],
+          [
+            "(Date / Time): , Interviews (names/rank: Master, Chief Engineer, Chief Officer)"
+          ],
+          [
+            "(Date / Time): , other examinations made"
+          ]
+        ]
+      },
+      {
+        "title": "Equipment Table 6",
+        "headers": [
+          "Master’s name, signature & stamp (SMC audits only)DPA’s name, signature & stamp (DOC audits only)",
+          "Auditor to PhRS (name, signature & stamp)"
+        ],
+        "rows": []
+      }
+    ]
+  },
+  "ISM SHIP - Non Conformity Report (NCR) 0102": {
+    "items": [],
+    "metadata_fields": [],
+    "tables": [
+      {
+        "title": "Equipment Table 1",
+        "headers": [
+          "Ship’s / Company’s Name",
+          "Audit Date/Place",
+          "NCN Nº"
+        ],
+        "rows": [
+          [
+            "Major Non-conformity Minor Non-Conformity",
+            "SMS Reference",
+            "ISM Code Ref. No."
+          ]
+        ]
+      },
+      {
+        "title": "A. Description of non-conformity: (to be completed by the Auditor)",
+        "headers": [
+          ""
+        ],
+        "rows": []
+      },
+      {
+        "title": "Equipment Table 3",
+        "headers": [
+          "",
+          "",
+          ""
+        ],
+        "rows": [
+          [
+            "Auditor to PhRS signature",
+            "",
+            "DPA / Master signature"
+          ]
+        ]
+      },
+      {
+        "title": "B. Corrective action to be completed by: (max 3 months)",
+        "headers": [
+          "Description of Corrective action : (Agreed between the Auditor and the Master or DPA)"
+        ],
+        "rows": [
+          [
+            "Closed out on :",
+            "Master / DPA signature on closing :"
+          ]
+        ]
+      },
+      {
+        "title": "Equipment Table 5",
+        "headers": [
+          "",
+          "Corrective action(s) have been completed with satisfaction"
+        ],
+        "rows": [
+          [
+            "",
+            "Corrective action(s) have not been completed and Auditor’s comments are as follows:"
+          ],
+          [
+            "",
+            "Major non-conformity downgraded to minor for reason stated below:"
+          ]
+        ]
+      },
+      {
+        "title": "Equipment Table 6",
+        "headers": [
+          "",
+          "Auditor to PhRS"
+        ],
+        "rows": []
+      }
+    ]
+  },
+  "ISM SHIP - SMC - INT 0102 - MMSC_ISM - SMC Interim Audit Check List 0102": {
     "items": [
       {
         "id": "1.1",
@@ -29123,7 +29995,7 @@
       }
     ]
   },
-  "SMC - P 0200 - MMSC_SMC PERIODICAL AUDIT CHECKLIST 0200": {
+  "ISM SHIP - SMC - P 0200 - MMSC_SMC PERIODICAL AUDIT CHECKLIST 0200": {
     "items": [
       {
         "id": "1.1",
@@ -29716,7 +30588,7 @@
       }
     ]
   },
-  "CHCK_ SSP_0100": {
+  "ISPS - CHCK_ SSP_0100": {
     "items": [
       {
         "id": "1",
@@ -30674,8 +31546,8 @@
       }
     ],
     "metadata_fields": [
-      "Name of the Company",
-      "Company IMO No."
+      "Company IMO No.",
+      "Name of the Company"
     ],
     "tables": [
       {
@@ -30700,7 +31572,7 @@
       }
     ]
   },
-  "ISPS Code NCR_1-0": {
+  "ISPS - ISPS Code NCR_1-0": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -30803,7 +31675,7 @@
       }
     ]
   },
-  "ISSC-INT 0104 - MMSC_ISPS Interim audit Checklist 1-4": {
+  "ISPS - ISSC-INT 0104 - MMSC_ISPS Interim audit Checklist 1-4": {
     "items": [
       {
         "id": "1.1",
@@ -31420,7 +32292,7 @@
       }
     ]
   },
-  "ISSC-P 0107 - MMSC_ISPS audit Checklist 1-7": {
+  "ISPS - ISSC-P 0107 - MMSC_ISPS audit Checklist 1-7": {
     "items": [
       {
         "id": "1.1",
@@ -32095,7 +32967,7 @@
       }
     ]
   },
-  "MLC 2006 RPS PROVIDER AUDIT CHECKLIST_0101": {
+  "MLC COMPANY - MLC 2006 RPS PROVIDER AUDIT CHECKLIST_0101": {
     "items": [
       {
         "id": "1",
@@ -32581,7 +33453,7 @@
       }
     ]
   },
-  "DMLC PART II REVIEW 0104_DMLC PART-II REVIEW CHECKLIST 0104": {
+  "MLC SHIP - DMLC PART II REVIEW 0104_DMLC PART-II REVIEW CHECKLIST 0104": {
     "items": [
       {
         "id": "1",
@@ -33593,9 +34465,9 @@
       }
     ],
     "metadata_fields": [
-      "MLC Ship-owner Name",
       "Flag state",
-      "IMO Nr."
+      "IMO Nr.",
+      "MLC Ship-owner Name"
     ],
     "tables": [
       {
@@ -33755,7 +34627,7 @@
       }
     ]
   },
-  "MLC 0206 - MMSC_MLC inspection checklist 2-6": {
+  "MLC SHIP - MLC 0206 - MMSC_MLC inspection checklist 2-6": {
     "items": [
       {
         "id": "Nr",
@@ -34456,8 +35328,8 @@
     ],
     "metadata_fields": [
       "MLC Ship-Owner",
-      "Working language onboard",
-      "MLC Ship-Owner IMO No."
+      "MLC Ship-Owner IMO No.",
+      "Working language onboard"
     ],
     "tables": [
       {
@@ -34568,7 +35440,7 @@
       }
     ]
   },
-  "MLC-INT 0102 - MMSC_MLC 2006 INTERIM CHECKLIST 0102": {
+  "MLC SHIP - MLC-INT 0102 - MMSC_MLC 2006 INTERIM CHECKLIST 0102": {
     "items": [
       {
         "id": "Nr",
@@ -34801,8 +35673,8 @@
     ],
     "metadata_fields": [
       "MLC Ship-Owner",
-      "Working language onboard",
-      "MLC Ship-Owner IMO No."
+      "MLC Ship-Owner IMO No.",
+      "Working language onboard"
     ],
     "tables": [
       {
@@ -34913,7 +35785,7 @@
       }
     ]
   },
-  "MLC_ILO 0102 - MMSC_MLC-ILO REPORT FOR EXISTING SHIPS 0102": {
+  "MLC SHIP - MLC_ILO 0102 - MMSC_MLC-ILO REPORT FOR EXISTING SHIPS 0102": {
     "items": [
       {
         "id": "1.1",
@@ -35469,9 +36341,9 @@
       }
     ],
     "metadata_fields": [
+      "SHIP-OWNERS",
       "Date of keel laid",
-      "TYPE OF SHIP",
-      "SHIP-OWNERS"
+      "TYPE OF SHIP"
     ],
     "tables": [
       {
@@ -35564,7 +36436,7 @@
       }
     ]
   },
-  "MLC_MANUAL_CHKL_MLC MANUAL 0100": {
+  "MLC SHIP - MLC_MANUAL_CHKL_MLC MANUAL 0100": {
     "items": [
       {
         "id": "1.",
@@ -35694,8 +36566,8 @@
       }
     ],
     "metadata_fields": [
-      "Name of the Company",
-      "Company IMO No."
+      "Company IMO No.",
+      "Name of the Company"
     ],
     "tables": [
       {
@@ -35720,7 +36592,7 @@
       }
     ]
   },
-  "CAS_OCC_1-0": {
+  "OTHERS - CAS_OCC_1-0": {
     "items": [
       {
         "id": "1.1",
@@ -36073,18 +36945,171 @@
       }
     ]
   },
-  "COMPL_SRV_1-0": {
+  "OTHERS - CHCK_ VUTM_0100": {
+    "items": [
+      {
+        "id": "1.",
+        "item": "TM Report consist of:",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.1",
+        "item": "Cover page and general particulars",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.2",
+        "item": "Copy of recognition certificate of firm carried out thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.3",
+        "item": "Copy of document, confirming qualification of operator/supervisor, carried out thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.4",
+        "item": "Copy of the document, confirming calibration of measuring device used for ultrasonic thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.5",
+        "item": "Tabular forms for recording of thickness measurements, prescribed by Instruction on thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.6",
+        "item": "The assessment of area reduction of strength deck and bottom with bilge strake transverse section is carried out in applicable cases",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "1.7",
+        "item": "Sketches, schemes and shell expansion",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.",
+        "item": "This is to confirm that",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.1",
+        "item": "Thickness measurements have been performed in scope prescribed by approved enhanced survey program in accordance with requirements of PhRS Rules on class surveys of ships in service depending on type and age of the ship",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.2",
+        "item": "Permissible residual scantlings of hull structures, mentioned in UTM Report, are in compliance with PhRS Rules",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.3",
+        "item": "Approved or elaborated by PhRS enhanced survey program of a ship, having ESP notation in class symbol, has been submitted to PhRS surveyor attending on board the ship before commencement of the survey and thickness measurements of the ship’s hull structures",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.4",
+        "item": "All UTM Report pages, including cover page, are signed by the operator, who carried out thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.5",
+        "item": "Tables, sketches, schemes and shell expansion, included in UTM Report, are signed by the operator, carried out thickness measurements",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.6",
+        "item": "The scope of thickness measurements is on compliance with relevant instructions for surveys",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.7",
+        "item": "Permissible residual thickness or permissible diminutions of ship’s hull structures are indicated in UTM report table forms, and assessment of actual gaugings is carried out",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.8",
+        "item": "Substantial corrosion zones and/or zones with deep or intensive pitting are indicated in UTM report",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.9",
+        "item": "Current information on substantial corrosion zones and/or zones with deep or intensive pitting is included in the ship’s survey status and other PhRS reports upon the results of performed survey",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.10",
+        "item": "Areas required to be repaired are indicated in UTM report",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.11",
+        "item": "There is a report, confirming fulfillment of repair of ship's hull structures on the results of thickness measurements and examination of the hull subject to ascertaining of defects, (state report details in Surveyor’s Notes section)",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      },
+      {
+        "id": "2.12",
+        "item": "There are comments, remarks upon the results of verification (are listed below in the Surveyor’s Notes section)",
+        "rule": "PHRS Reg",
+        "default_status": "Y"
+      }
+    ],
+    "metadata_fields": [],
+    "tables": [
+      {
+        "title": "SURVEYOR’S NOTES For negative entries, major repairs and additional information, if any, described in detail. (Use attachment if necessary)",
+        "headers": [
+          "REF No.",
+          "TYPE (C/R)",
+          "COMMENTS (C) / REMARKS (R)"
+        ],
+        "rows": []
+      },
+      {
+        "title": "Equipment Table 2",
+        "headers": [
+          "Date / Place of verification",
+          "",
+          "",
+          "",
+          "Name and Signature of PhRS Surveyor"
+        ],
+        "rows": []
+      }
+    ]
+  },
+  "OTHERS - COMPL_SRV_1-0": {
     "items": [],
     "metadata_fields": [
-      "Ship Name",
-      "Service suppliers used (as applicable)",
-      "Remarks / NCRs / Observations",
       "YES (Fill in below) / NIL",
-      "Completion Date",
-      "Project No.",
+      "Remarks / NCRs / Observations",
       "Endorsement of Certificates (list below)",
       "YES (list below) / NIL",
-      "Issuance of Certificates (list below)"
+      "Completion Date",
+      "Service suppliers used (as applicable)",
+      "Issuance of Certificates (list below)",
+      "Ship Name",
+      "Project No."
     ],
     "tables": [
       {
@@ -36196,7 +37221,7 @@
       }
     ]
   },
-  "FVS_SR 0100": {
+  "OTHERS - FVS_SR 0100": {
     "items": [
       {
         "id": "1.",
@@ -37382,17 +38407,17 @@
       }
     ]
   },
-  "ITC_VRF_RPRT_0100": {
+  "OTHERS - ITC_VRF_RPRT_0100": {
     "items": [],
     "metadata_fields": [],
     "tables": []
   },
-  "NARRATIVE REPORT FOR LAY UP": {
+  "OTHERS - NARRATIVE REPORT FOR LAY UP": {
     "items": [],
     "metadata_fields": [],
     "tables": []
   },
-  "NAR_0200": {
+  "OTHERS - NAR_0200": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -37466,7 +38491,7 @@
       }
     ]
   },
-  "NMI_0100_Near Miss": {
+  "OTHERS - NMI_0100_Near Miss": {
     "items": [
       {
         "id": "1.1",
@@ -37516,7 +38541,7 @@
       }
     ]
   },
-  "Notice for Recommendations": {
+  "OTHERS - Notice for Recommendations": {
     "items": [],
     "metadata_fields": [
       "Date of survey",
@@ -37551,7 +38576,7 @@
       }
     ]
   },
-  "PSC OCCASIONAL INSPECTION REPORT_0102": {
+  "OTHERS - PSC OCCASIONAL INSPECTION REPORT_0102": {
     "items": [
       {
         "id": "1.1",
@@ -38524,7 +39549,7 @@
       }
     ]
   },
-  "REPORT ON SHIP'S REMOTE SURVEY_RS_0100": {
+  "OTHERS - REPORT ON SHIP'S REMOTE SURVEY_RS_0100": {
     "items": [
       {
         "id": "1.",
@@ -38771,7 +39796,7 @@
       }
     ]
   },
-  "SSER_0100": {
+  "OTHERS - SSER_0100": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -39060,17 +40085,17 @@
       }
     ]
   },
-  "TEST REPORT FOR THE BOLLARD PULL TEST_0100": {
+  "OTHERS - TEST REPORT FOR THE BOLLARD PULL TEST_0100": {
     "items": [],
     "metadata_fields": [
-      "Gross tonnage (GT)",
-      "Owner",
-      "Full load draught (m)",
       "Name",
       "Moulded Breadth (m)",
       "Moulded Depth (m)",
+      "SHIP PARTICULARS",
+      "Gross tonnage (GT)",
       "Length B.P. (m)",
-      "SHIP PARTICULARS"
+      "Full load draught (m)",
+      "Owner"
     ],
     "tables": [
       {
@@ -39221,12 +40246,12 @@
       }
     ]
   },
-  "Transfer of Certification form TOC_ISM_ISPS_MLC_1_0": {
+  "ISPS - Transfer of Certification form TOC_ISM_ISPS_MLC_1_0": {
     "items": [],
     "metadata_fields": [
+      "Company IMO number",
       "Address",
-      "Company / MLC Shipowner name",
-      "Company IMO number"
+      "Company / MLC Shipowner name"
     ],
     "tables": [
       {
@@ -39376,7 +40401,7 @@
       }
     ]
   },
-  "ANNEX I IOPP_2-0": {
+  "STATUTORY - ANNEX I IOPP_2-0": {
     "items": [
       {
         "id": "1.",
@@ -40147,7 +41172,7 @@
       }
     ]
   },
-  "Annex II NLS_2-0": {
+  "STATUTORY - Annex II NLS_2-0": {
     "items": [
       {
         "id": "1.",
@@ -40492,7 +41517,7 @@
       }
     ]
   },
-  "ANNEX IV SPP_2-0": {
+  "STATUTORY - ANNEX IV SPP_2-0": {
     "items": [
       {
         "id": "1.",
@@ -40675,7 +41700,7 @@
       }
     ]
   },
-  "ANNEX VI_0401": {
+  "STATUTORY - ANNEX VI_0401": {
     "items": [
       {
         "id": "1.",
@@ -41260,7 +42285,7 @@
       }
     ]
   },
-  "ANNEX V_GPP_0200": {
+  "STATUTORY - ANNEX V_GPP_0200": {
     "items": [
       {
         "id": "I.",
@@ -41437,7 +42462,7 @@
       }
     ]
   },
-  "BWM-AInR 0202": {
+  "STATUTORY - BWM-AInR 0202": {
     "items": [
       {
         "id": "1.",
@@ -41728,7 +42753,7 @@
       }
     ]
   },
-  "BWM-I 0100": {
+  "STATUTORY - BWM-I 0100": {
     "items": [
       {
         "id": "1.",
@@ -41929,23 +42954,23 @@
       }
     ]
   },
-  "CARIBBEAN CARGO SHIP SAFETY REPORT_0100": {
+  "STATUTORY - CARIBBEAN CARGO SHIP SAFETY REPORT_0100": {
     "items": [],
     "metadata_fields": [
-      "Owner",
-      "NET TONNAGE",
-      "GROSS TONNAGE (ITC)",
-      "IMO NO. / OFFICIAL No.",
-      "HORSEPOWER",
-      "PROPULSION",
-      "DATE KEEL LAID",
-      "REG. LENGTH",
-      "DRY DOCK DATE",
-      "FUEL CAPACITY",
-      "DEADWEIGHT TONS",
       "Operator",
       "Classification Society",
-      "Agent"
+      "DATE KEEL LAID",
+      "NET TONNAGE",
+      "DEADWEIGHT TONS",
+      "PROPULSION",
+      "GROSS TONNAGE (ITC)",
+      "HORSEPOWER",
+      "FUEL CAPACITY",
+      "Agent",
+      "IMO NO. / OFFICIAL No.",
+      "Owner",
+      "DRY DOCK DATE",
+      "REG. LENGTH"
     ],
     "tables": [
       {
@@ -41975,7 +43000,7 @@
       }
     ]
   },
-  "CGCR-0100": {
+  "STATUTORY - CGCR-0100": {
     "items": [
       {
         "id": "2.",
@@ -42113,7 +43138,7 @@
       }
     ]
   },
-  "CGDR-0100": {
+  "STATUTORY - CGDR-0100": {
     "items": [
       {
         "id": "2.",
@@ -42257,7 +43282,7 @@
       }
     ]
   },
-  "DG_0200": {
+  "STATUTORY - DG_0200": {
     "items": [
       {
         "id": "1.",
@@ -43363,7 +44388,7 @@
       }
     ]
   },
-  "DSC 0100 - OSAD": {
+  "STATUTORY - DSC 0100 - OSAD": {
     "items": [
       {
         "id": "1",
@@ -43691,24 +44716,24 @@
       }
     ],
     "metadata_fields": [
+      "Number of Crew",
+      "Main engine(s) / Type / Total Power",
+      "Trading Area",
+      "Agent and Address",
+      "Number of Passengers",
+      "Survey completed",
+      "(In case of \"other\" please specify)",
+      "Survey commenced",
+      "Place of Survey",
+      "Year of Build",
+      "IMO Nr.",
+      "Owner and Address",
+      "Length (Overall)",
       "Net Tonnage",
       "Built Type",
-      "Survey completed",
       "Type of Vessel",
-      "Main engine(s) / Type / Total Power",
-      "(In case of \"other\" please specify)",
-      "Length (Overall)",
       "Builder",
-      "Place of Survey",
-      "Number of Crew",
-      "Number of Passengers",
-      "Distinctive Letters",
-      "Owner and Address",
-      "IMO Nr.",
-      "Survey commenced",
-      "Agent and Address",
-      "Trading Area",
-      "Year of Build"
+      "Distinctive Letters"
     ],
     "tables": [
       {
@@ -44571,11 +45596,11 @@
       }
     ]
   },
-  "EIAPP Survey Report_0100": {
+  "STATUTORY - EIAPP Survey Report_0100": {
     "items": [],
     "metadata_fields": [
-      "Distinctive number or letters",
-      "The engine is installed on the ship"
+      "The engine is installed on the ship",
+      "Distinctive number or letters"
     ],
     "tables": [
       {
@@ -44839,7 +45864,7 @@
       }
     ]
   },
-  "HSC_Report_1-0": {
+  "STATUTORY - HSC_Report_1-0": {
     "items": [
       {
         "id": "",
@@ -46583,12 +47608,12 @@
       }
     ],
     "metadata_fields": [
-      "Name of Surveyor",
+      "Choose an item.",
+      "Year of Build",
       "Type of Ship",
       "Date of Survey",
-      "Place of Survey",
-      "Choose an item.",
-      "Year of Build"
+      "Name of Surveyor",
+      "Place of Survey"
     ],
     "tables": [
       {
@@ -46969,7 +47994,7 @@
       }
     ]
   },
-  "IAFS CHCKLST 0102": {
+  "STATUTORY - IAFS CHCKLST 0102": {
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -47329,7 +48354,7 @@
       }
     ]
   },
-  "IBC_0200": {
+  "STATUTORY - IBC_0200": {
     "items": [
       {
         "id": "1.",
@@ -47944,7 +48969,7 @@
       }
     ]
   },
-  "IGC_0300": {
+  "STATUTORY - IGC_0300": {
     "items": [
       {
         "id": "1.",
@@ -48511,16 +49536,16 @@
       }
     ]
   },
-  "IHM_SR_0101": {
+  "STATUTORY - IHM_SR_0101": {
     "items": [],
     "metadata_fields": [
-      "Ship Name",
-      "Type of Ship",
       "Date(s) of survey",
       "IMO Nr",
-      "Place of Survey",
       "on dock afloat",
-      "Year of build"
+      "Type of Ship",
+      "Year of build",
+      "Ship Name",
+      "Place of Survey"
     ],
     "tables": [
       {
@@ -48747,7 +49772,7 @@
       }
     ]
   },
-  "IMSBC_2-0": {
+  "STATUTORY - IMSBC_2-0": {
     "items": [
       {
         "id": "1.",
@@ -49572,7 +50597,7 @@
       }
     ]
   },
-  "LGSR-0100": {
+  "STATUTORY - LGSR-0100": {
     "items": [
       {
         "id": "2.",
@@ -49714,8 +50739,8 @@
       }
     ],
     "metadata_fields": [
-      "Weather Conditions",
-      "Port & Location of Test"
+      "Port & Location of Test",
+      "Weather Conditions"
     ],
     "tables": [
       {
@@ -49753,7 +50778,7 @@
       }
     ]
   },
-  "LL REC 0101 - OSAD_Load Line Record of Assignments 0101": {
+  "STATUTORY - LL REC 0101 - OSAD_Load Line Record of Assignments 0101": {
     "items": [
       {
         "id": "1",
@@ -49848,11 +50873,11 @@
     ],
     "metadata_fields": [
       "Freeboard assigned as a ship of type",
-      "Yard Number",
+      "Date of Build (Conversion)",
       "Shipbuilders",
       "Date and Place of initial survey",
-      "Nationality",
-      "Date of Build (Conversion)"
+      "Yard Number",
+      "Nationality"
     ],
     "tables": [
       {
@@ -50482,7 +51507,7 @@
       }
     ]
   },
-  "LL_0200": {
+  "STATUTORY - LL_0200": {
     "items": [
       {
         "id": "1.",
@@ -50773,23 +51798,23 @@
       }
     ]
   },
-  "MODU_Survey Checklist_Annual_Intermediate_1-1": {
+  "STATUTORY - MODU_Survey Checklist_Annual_Intermediate_1-1": {
     "items": [],
     "metadata_fields": [
-      "Date keel laid",
-      "Ship Name",
-      "MODU Code 1979",
-      "Area of operation",
       "Date(s) of survey",
+      "Area of operation",
       "IMO Nr",
-      "Type",
-      "Place of Survey",
-      "on dock afloat",
-      "Last survey of the underwater part",
       "(keel laid on or after 01 January 2012)",
-      "MODU Code 1989",
+      "on dock afloat",
+      "Type",
+      "Date keel laid",
+      "MODU Code 1979",
+      "Last survey of the underwater part",
+      "Ship Name",
       "MODU Code 2009",
-      "The unit is surveyed for compliance with"
+      "The unit is surveyed for compliance with",
+      "Place of Survey",
+      "MODU Code 1989"
     ],
     "tables": [
       {
@@ -51084,7 +52109,7 @@
       }
     ]
   },
-  "MODU_Survey Checklist_Initial_Renewal_1-1": {
+  "STATUTORY - MODU_Survey Checklist_Initial_Renewal_1-1": {
     "items": [
       {
         "id": "No.",
@@ -52402,19 +53427,19 @@
       }
     ],
     "metadata_fields": [
-      "Date keel laid",
-      "Ship Name",
-      "MODU Code 1979",
       "Date(s) of survey",
       "IMO Nr",
-      "Type",
-      "Place of Survey",
-      "on dock afloat",
-      "Last survey of the underwater part",
       "(keel laid on or after 01 January 2012)",
-      "MODU Code 1989",
+      "on dock afloat",
+      "Type",
+      "Date keel laid",
+      "MODU Code 1979",
+      "Last survey of the underwater part",
+      "Ship Name",
       "MODU Code 2009",
-      "The unit is surveyed for compliance with"
+      "The unit is surveyed for compliance with",
+      "Place of Survey",
+      "MODU Code 1989"
     ],
     "tables": [
       {
@@ -52747,7 +53772,7 @@
       }
     ]
   },
-  "PSS_0201": {
+  "STATUTORY - PSS_0201": {
     "items": [
       {
         "id": "1.",
@@ -54715,7 +55740,7 @@
       }
     ]
   },
-  "RSE-I 0202 - OSAD": {
+  "STATUTORY - RSE-I 0202 - OSAD": {
     "items": [
       {
         "id": "1",
@@ -57011,25 +58036,25 @@
       }
     ],
     "metadata_fields": [
-      "Dead Weight (metric tons)",
-      "Type of Ship",
-      "Breadth (m)",
-      "Owner and Address",
-      "IMO Nr.",
-      "Main Engine(s) builder/type/number",
-      "Length O.A. (m)",
-      "Total KW of internal combustion engines used",
-      "Distinctive Letters",
-      "Survey commenced",
-      "in dry-dock on slipway afloat",
-      "(a) For main propulsion (b) Aux. Purposes",
-      "Place of Survey",
-      "Length B.P. (m)",
-      "(a) Main (b) Aux.",
-      "Survey completed",
-      "Boilers (number and type)",
       "Builders /Yard No",
-      "Year of Build"
+      "Total KW of internal combustion engines used",
+      "Survey completed",
+      "Distinctive Letters",
+      "Year of Build",
+      "Owner and Address",
+      "Place of Survey",
+      "(a) For main propulsion (b) Aux. Purposes",
+      "Dead Weight (metric tons)",
+      "Length B.P. (m)",
+      "Length O.A. (m)",
+      "IMO Nr.",
+      "Type of Ship",
+      "Main Engine(s) builder/type/number",
+      "in dry-dock on slipway afloat",
+      "(a) Main (b) Aux.",
+      "Survey commenced",
+      "Boilers (number and type)",
+      "Breadth (m)"
     ],
     "tables": [
       {
@@ -59845,7 +60870,7 @@
       }
     ]
   },
-  "SAF REC 0101 - OSAD_Safety Record below 500 GRT Checklist 0101": {
+  "STATUTORY - SAF REC 0101 - OSAD_Safety Record below 500 GRT Checklist 0101": {
     "items": [
       {
         "id": "1",
@@ -60317,25 +61342,25 @@
       }
     ],
     "metadata_fields": [
-      "Dead Weight (metric tons)",
-      "Type of Ship",
-      "Breadth (m)",
-      "Owner and Address",
-      "IMO Nr.",
-      "Main Engine(s) builder/type/number",
-      "Length O.A. (m)",
-      "Total KW of internal combustion engines used",
-      "Distinctive Letters",
-      "Survey commenced",
-      "in dry-dock on slipway afloat",
-      "(a) For main propulsion (b) Aux. Purposes",
-      "Place of Survey",
-      "Length B.P. (m)",
-      "(a) Main (b) Aux.",
-      "Survey completed",
-      "Boilers (number and type)",
       "Builders /Yard No",
-      "Year of Build"
+      "Total KW of internal combustion engines used",
+      "Survey completed",
+      "Distinctive Letters",
+      "Year of Build",
+      "Owner and Address",
+      "Place of Survey",
+      "(a) For main propulsion (b) Aux. Purposes",
+      "Dead Weight (metric tons)",
+      "Length B.P. (m)",
+      "Length O.A. (m)",
+      "IMO Nr.",
+      "Type of Ship",
+      "Main Engine(s) builder/type/number",
+      "in dry-dock on slipway afloat",
+      "(a) Main (b) Aux.",
+      "Survey commenced",
+      "Boilers (number and type)",
+      "Breadth (m)"
     ],
     "tables": [
       {
@@ -61587,7 +62612,7 @@
       }
     ]
   },
-  "SAF SR 0102_Safety below 500 grt report 0102": {
+  "STATUTORY - SAF SR 0102_Safety below 500 grt report 0102": {
     "items": [
       {
         "id": "1",
@@ -61651,17 +62676,17 @@
       }
     ],
     "metadata_fields": [
-      "Dead Weight (metric tons)",
-      "in dry-dock on slipway afloat",
-      "Survey completed",
-      "Type of Ship",
       "Place of Survey",
-      "Length (oa)",
-      "Distinctive Letters",
-      "Owner and Address",
-      "IMO Nr.",
       "Survey commenced",
-      "Year of Build"
+      "Dead Weight (metric tons)",
+      "Year of Build",
+      "Length (oa)",
+      "IMO Nr.",
+      "Type of Ship",
+      "Owner and Address",
+      "Survey completed",
+      "Distinctive Letters",
+      "in dry-dock on slipway afloat"
     ],
     "tables": [
       {
@@ -61740,7 +62765,7 @@
       }
     ]
   },
-  "SC_0200": {
+  "STATUTORY - SC_0200": {
     "items": [
       {
         "id": "1.",
@@ -62847,7 +63872,7 @@
       }
     ]
   },
-  "SE_0201": {
+  "STATUTORY - SE_0201": {
     "items": [
       {
         "id": "1.",
@@ -64134,7 +65159,7 @@
       }
     ]
   },
-  "SR 0203 - OSAD": {
+  "STATUTORY - SR 0203 - OSAD": {
     "items": [
       {
         "id": "1.",
@@ -66909,7 +67934,7 @@
       }
     ]
   },
-  "SRT 0200 - OSAD_Safety Radio below 500 grt report 0200": {
+  "STATUTORY - SRT 0200 - OSAD_Safety Radio below 500 grt report 0200": {
     "items": [
       {
         "id": "2",
@@ -67160,7 +68185,7 @@
       }
     ]
   },
-  "SR_R 0300 - OSAD": {
+  "STATUTORY - SR_R 0300 - OSAD": {
     "items": [
       {
         "id": "1.1",
@@ -67800,10 +68825,10 @@
       }
     ],
     "metadata_fields": [
-      "Flag / Port of registry",
       "MMSI Nr",
+      "Date keel laid",
       "Type o Ship",
-      "Date keel laid"
+      "Flag / Port of registry"
     ],
     "tables": [
       {

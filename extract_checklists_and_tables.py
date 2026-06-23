@@ -177,7 +177,27 @@ def main():
             print(f"Skipping non-zip file: {file}")
             continue
             
-        # Determine template key from filename
+        # Determine template key and prefix from filename
+        prefix = ""
+        if "ISM_COMPANY" in file:
+            prefix = "ISM COMPANY - "
+        elif "ISM_SHIP" in file:
+            prefix = "ISM SHIP - "
+        elif "MLC_COMPANY" in file:
+            prefix = "MLC COMPANY - "
+        elif "MLC_SHIP" in file:
+            prefix = "MLC SHIP - "
+        elif "ISPS" in file:
+            prefix = "ISPS - "
+        elif "CLASSIFICATION" in file:
+            prefix = "CLASS - "
+        elif "STATUTORY" in file:
+            prefix = "STATUTORY - "
+        elif "CICA" in file:
+            prefix = "CICA - "
+        elif "OTHERS" in file:
+            prefix = "OTHERS - "
+            
         clean_name = file.replace("SURVEY REPORTS_INTERNATIONAL_STATUTORY_", "")
         clean_name = clean_name.replace("SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_", "")
         clean_name = clean_name.replace("SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_", "")
@@ -191,6 +211,9 @@ def main():
         clean_name = re.sub(r'\.docx.*|\.doc.*|\.DOC.*|\.docx$', '', clean_name, flags=re.IGNORECASE).strip()
         clean_name = re.sub(r'\(\d+\)', '', clean_name).strip()
         
+        if prefix:
+            clean_name = prefix + clean_name
+            
         if not clean_name:
             continue
             
