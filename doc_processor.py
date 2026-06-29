@@ -14,7 +14,7 @@ CONTRADICTION_KEYWORDS = [
 ]
 
 class SurveyDocumentProcessor:
-    def __init__(self, file_path_or_bytes, filename=None):
+    def __init__(self, file_path_or_bytes, filename=None, force_doc_type=None):
         self.file_path_or_bytes = file_path_or_bytes
         self.filename = filename
         self.raw_text = ""
@@ -25,7 +25,12 @@ class SurveyDocumentProcessor:
         self.certificate_info = {}
         
         self._load_document()
-        self._classify_document()
+        if force_doc_type:
+            self.doc_type = force_doc_type
+            if force_doc_type == "certificate":
+                self._extract_certificate_info()
+        else:
+            self._classify_document()
 
     def _load_document(self):
         if isinstance(self.file_path_or_bytes, bytes):

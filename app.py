@@ -1152,13 +1152,20 @@ elif st.session_state.active_view == "Audit Console":
 
     with col_a2:
         st.markdown("### 📁 Belgeleri Yükle & Test Et")
-        st.info("IACS sörvey raporu PDF'leri ile birlikte gemi klas/pollution sertifikalarını yükleyebilirsiniz. Sistem bunları otomatik ayırt edip çapraz kontrol edecektir.")
+        st.info("Doğru analiz için kontrol edilecek raporu ve varsa gemi sertifikalarını ayrı ayrı yükleyin.")
         
-        uploaded_files = st.file_uploader(
-            "Çoklu PDF Dosyaları Yükleme (Rapor + Sertifika)",
+        uploaded_checklist_files = st.file_uploader(
+            "1. Kontrol Edilecek Sörvey Raporu PDF'i (Checklist)",
             type=["pdf"],
             accept_multiple_files=True,
-            key="audit_file_uploader"
+            key="audit_checklist_uploader"
+        )
+        
+        uploaded_cert_files = st.file_uploader(
+            "2. İlgili Gemi Sertifikaları PDF'leri (Seçmeli)",
+            type=["pdf"],
+            accept_multiple_files=True,
+            key="audit_cert_uploader"
         )
         
         st.write("---")
@@ -1196,26 +1203,34 @@ elif st.session_state.active_view == "Audit Console":
             st.session_state.selected_vessel_id = None
             st.session_state.uploaded_vessel_info = None
             st.session_state.last_uploaded_keys = None
-            if "audit_file_uploader" in st.session_state:
-                del st.session_state["audit_file_uploader"]
+            if "audit_checklist_uploader" in st.session_state:
+                del st.session_state["audit_checklist_uploader"]
+            if "audit_cert_uploader" in st.session_state:
+                del st.session_state["audit_cert_uploader"]
             st.rerun()
     with col_b2:
         analyze_btn = st.button("🚀 Belgeleri Oku ve Denetimi Başlat", type="primary", use_container_width=True)
 
     if analyze_btn:
-        target_bytes_list = []
-        if uploaded_files:
-            for f in uploaded_files:
-                target_bytes_list.append((f.name, f.getvalue()))
-        elif vessel_name == "MV OCEAN VOYAGER" or selected_v_option.startswith("MV OCEAN VOYAGER"):
+        target_checklists = []
+        target_certs = []
+        
+        if uploaded_checklist_files:
+            for f in uploaded_checklist_files:
+                target_checklists.append((f.name, f.getvalue()))
+        if uploaded_cert_files:
+            for f in uploaded_cert_files:
+                target_certs.append((f.name, f.getvalue()))
+                
+        if not target_checklists and not target_certs and (vessel_name == "MV OCEAN VOYAGER" or selected_v_option.startswith("MV OCEAN VOYAGER")):
             sample_path = "sample_survey_report.pdf"
             if not os.path.exists(sample_path):
                 generate_sample_pdf(sample_path)
             with open(sample_path, "rb") as f:
-                target_bytes_list.append(("sample_survey_report.pdf", f.read()))
+                target_checklists.append(("sample_survey_report.pdf", f.read()))
                 
-        if not target_bytes_list:
-            st.error("Lütfen denetlemek için en az bir PDF belgesi yükleyin.")
+        if not target_checklists:
+            st.error("Lütfen denetlemek için en az bir Kontrol Raporu PDF belgesi yükleyin.")
         elif vessel_type == "Seçiniz":
             st.error("Lütfen gemi sınıfı / türünü seçin.")
         else:
@@ -1226,14 +1241,19 @@ elif st.session_state.active_view == "Audit Console":
                 scanned_files_detected = []
                 
                 with st.spinner("📥 PDF belgeleri sınıflandırılıyor ve okunuyor..."):
-                    for filename, pdf_bytes in target_bytes_list:
-                        processor = SurveyDocumentProcessor(pdf_bytes, filename=filename)
+                    # Process checklists
+                    for filename, pdf_bytes in target_checklists:
+                        processor = SurveyDocumentProcessor(pdf_bytes, filename=filename, force_doc_type="checklist")
                         if len(processor.raw_text.strip()) < 100:
                             scanned_files_detected.append(filename)
-                        if processor.doc_type == "certificate":
-                            certificates_extracted.append(processor.certificate_info)
-                        else:
-                            checklists_processed.append(processor)
+                        checklists_processed.append(processor)
+                        
+                    # Process certificates
+                    for filename, pdf_bytes in target_certs:
+                        processor = SurveyDocumentProcessor(pdf_bytes, filename=filename, force_doc_type="certificate")
+                        if len(processor.raw_text.strip()) < 100:
+                            scanned_files_detected.append(filename)
+                        certificates_extracted.append(processor.certificate_info)
                             
                 # Process checklist items
                 for proc in checklists_processed:
