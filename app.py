@@ -8,7 +8,11 @@ import re
 from io import BytesIO
 from datetime import datetime
 
+import sys
+import importlib
 import vessel_db as db
+if 'doc_processor' in sys.modules:
+    importlib.reload(sys.modules['doc_processor'])
 from doc_processor import SurveyDocumentProcessor, run_cross_document_checks
 from rules_engine import REGULATIONS_DB, get_rule_by_keyword, check_rule_applicability
 from create_sample_pdf import generate_sample_pdf
