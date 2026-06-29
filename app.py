@@ -1506,7 +1506,7 @@ elif st.session_state.active_view == "Report Writer":
             except Exception:
                 pass
 
-    from templates_db import CHECKLIST_TEMPLATES, get_clean_metadata_fields, TEMPLATE_TABLES
+    from templates_db import CHECKLIST_TEMPLATES, get_clean_metadata_fields, TEMPLATE_TABLES, TEMPLATE_FILENAMES
     
     with col3:
         template_name = st.selectbox("Sörvey Rapor Şablonu", list(CHECKLIST_TEMPLATES.keys()))
@@ -2139,6 +2139,116 @@ elif st.session_state.active_view == "Report Writer":
     with col6:
         survey_date = st.date_input("Sörvey Tarihi", value=datetime.now())
         
+    def fill_word_template(template_path, output_path, filled_items, v_info, project_code, surveyor_name, survey_date_str):
+        import docx
+        doc = docx.Document(template_path)
+        
+        items_map = {}
+        for item in filled_items:
+            clean_id = str(item["id"]).strip().rstrip('.')
+            items_map[clean_id] = {
+                "status": item["status"],
+                "comment": item["deficiency_action"]
+            }
+            
+        checklist_tables_filled = 0
+        for tbl in doc.tables:
+            is_checklist = False
+            row_matches = []
+            
+            for row in tbl.rows:
+                if len(row.cells) < 2:
+                    continue
+                first_cell_text = row.cells[0].text.strip().rstrip('.')
+                second_cell_text = row.cells[1].text.strip().rstrip('.')
+                
+                match_id = None
+                if first_cell_text in items_map:
+                    match_id = first_cell_text
+                elif second_cell_text in items_map:
+                    match_id = second_cell_text
+                    
+                if match_id:
+                    is_checklist = True
+                    row_matches.append((row, match_id))
+                    
+            if is_checklist:
+                checklist_tables_filled += 1
+                for row, match_id in row_matches:
+                    item_data = items_map[match_id]
+                    status = item_data["status"]
+                    comment = item_data["comment"]
+                    
+                    if len(row.cells) > 2:
+                        row.cells[2].text = status
+                    if len(row.cells) > 3:
+                        row.cells[3].text = comment
+            else:
+                # Metadata fill
+                for row in tbl.rows:
+                    for c_idx in range(len(row.cells) - 1):
+                        cell_text = row.cells[c_idx].text.strip().lower()
+                        next_cell_text = row.cells[c_idx+1].text.strip()
+                        
+                        if not next_cell_text or next_cell_text == "---" or next_cell_text == "___" or next_cell_text.startswith("["):
+                            val_to_fill = None
+                            if "name of ship" in cell_text or "gemi adı" in cell_text or "gemi adi" in cell_text:
+                                val_to_fill = v_info.get("name", "")
+                            elif "imo" in cell_text:
+                                val_to_fill = v_info.get("imo", "")
+                            elif "gross tonnage" in cell_text or "gt" in cell_text:
+                                val_to_fill = str(v_info.get("grt", ""))
+                            elif "flag" in cell_text or "bayrak" in cell_text:
+                                val_to_fill = v_info.get("flag", "")
+                            elif "port of registry" in cell_text or "bağlama limanı" in cell_text:
+                                val_to_fill = v_info.get("port_of_registry", "PANAMA")
+                            elif "date" in cell_text or "tarih" in cell_text:
+                                val_to_fill = survey_date_str
+                            elif "surveyor" in cell_text or "sörveyör" in cell_text:
+                                val_to_fill = surveyor_name
+                            elif "project code" in cell_text or "proje kodu" in cell_text:
+                                val_to_fill = project_code
+                                
+                            if val_to_fill:
+                                row.cells[c_idx+1].text = str(val_to_fill)
+                                
+        doc.save(output_path)
+        return checklist_tables_filled
+
+    def convert_docx_to_pdf_win32(docx_path, pdf_path):
+        import win32com.client
+        import pythoncom
+        
+        pythoncom.CoInitialize()
+        word = None
+        doc = None
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = False
+            
+            abs_docx = os.path.abspath(docx_path)
+            abs_pdf = os.path.abspath(pdf_path)
+            
+            doc = word.Documents.Open(abs_docx)
+            doc.SaveAs(abs_pdf, FileFormat=17) # wdFormatPDF = 17
+            doc.Close()
+            word.Quit()
+            return True
+        except Exception as e:
+            if doc:
+                try:
+                    doc.Close(SaveChanges=False)
+                except:
+                    pass
+            if word:
+                try:
+                    word.Quit()
+                except:
+                    pass
+            raise e
+        finally:
+            pythoncom.CoUninitialize()
+
     if st.button("🚀 Raporu Oluştur ve Kaydet", use_container_width=True, type="primary"):
         if not v_info["name"]:
             st.error("Lütfen gemi adını giriniz!")
@@ -2159,44 +2269,94 @@ elif st.session_state.active_view == "Report Writer":
                 
             pdf_path = os.path.join(target_dir, output_pdf_name)
             
-            # Generate the PDF
-            try:
-                from pdf_generator import generate_checklist_pdf
-                generate_checklist_pdf(
-                    pdf_path, 
-                    v_info, 
-                    project_code, 
-                    template_name, 
-                    filled_items, 
-                    surveyor_name, 
-                    survey_date.strftime("%d/%m/%Y"),
-                    custom_metadata=custom_metadata_vals,
-                    custom_tables=custom_table_data
-                )
+            # 1. Try Word Template Filling & Conversion First
+            original_filename = TEMPLATE_FILENAMES.get(template_name, "")
+            template_path = os.path.join(base_dir, "+++PHRS TUM REPORT+++", original_filename) if original_filename else ""
+            
+            word_filled_path = ""
+            used_word_template = False
+            pdf_generated_via_word = False
+            
+            if template_path and os.path.exists(template_path):
+                ext = os.path.splitext(original_filename)[1]
+                docx_output_name = output_pdf_name.replace(".pdf", "") + "_filled" + ext
+                word_filled_path = os.path.join(target_dir, docx_output_name)
                 
-                st.success(f"🎉 Sörvey Raporu başarıyla oluşturuldu ve kaydedildi!\n\nYerel Dosya Yolu: `{pdf_path}`")
+                try:
+                    fill_word_template(
+                        template_path,
+                        word_filled_path,
+                        filled_items,
+                        v_info,
+                        project_code,
+                        surveyor_name,
+                        survey_date.strftime("%d/%m/%Y")
+                    )
+                    used_word_template = True
+                    st.info(f"📝 Orijinal Word şablonu başarıyla dolduruldu: `{docx_output_name}`")
+                    
+                    try:
+                        convert_docx_to_pdf_win32(word_filled_path, pdf_path)
+                        pdf_generated_via_word = True
+                        st.success("🎨 Doldurulan Word belgesi MS Word aracılığıyla başarıyla PDF'e dönüştürüldü!")
+                    except Exception as com_ex:
+                        st.warning(f"⚠️ MS Word ile PDF dönüştürme başarısız oldu (ReportLab tabanlı PDF oluşturuluyor): {com_ex}")
+                except Exception as docx_ex:
+                    st.warning(f"⚠️ Word şablonu doldurulurken hata oluştu (ReportLab tabanlı PDF oluşturuluyor): {docx_ex}")
+                    
+            # 2. Fallback to ReportLab PDF Generator
+            if not pdf_generated_via_word:
+                try:
+                    from pdf_generator import generate_checklist_pdf
+                    generate_checklist_pdf(
+                        pdf_path, 
+                        v_info, 
+                        project_code, 
+                        template_name, 
+                        filled_items, 
+                        surveyor_name, 
+                        survey_date.strftime("%d/%m/%Y"),
+                        custom_metadata=custom_metadata_vals,
+                        custom_tables=custom_table_data
+                    )
+                except Exception as rl_ex:
+                    st.error(f"Rapor oluşturulurken hata oluştu: {rl_ex}")
+                    st.stop()
+                    
+            st.success(f"🎉 Sörvey Raporu başarıyla oluşturuldu ve kaydedildi!\n\nYerel Dosya Yolu: `{pdf_path}`")
+            
+            # Copy to PHRS_Bot/Output directory if applicable
+            bot_dir = r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
+            if os.path.exists(bot_dir):
+                bot_target = os.path.join(bot_dir, "Raporlar", v_info["name"].strip().upper(), project_code.strip())
+                os.makedirs(bot_target, exist_ok=True)
+                import shutil
+                shutil.copy2(pdf_path, os.path.join(bot_target, output_pdf_name))
+                if used_word_template and os.path.exists(word_filled_path):
+                    shutil.copy2(word_filled_path, os.path.join(bot_target, os.path.basename(word_filled_path)))
+                st.info(f"PHRS_Bot klasörüne senkronize edildi.")
                 
-                # Copy to PHRS_Bot/Output directory if applicable
-                bot_dir = r"C:\Users\LIVAPC8\Desktop\PHRS_Bot"
-                if os.path.exists(bot_dir):
-                    bot_target = os.path.join(bot_dir, "Raporlar", v_info["name"].strip().upper(), project_code.strip())
-                    os.makedirs(bot_target, exist_ok=True)
-                    import shutil
-                    shutil.copy2(pdf_path, os.path.join(bot_target, output_pdf_name))
-                    st.info(f"PHRS_Bot klasörüne senkronize edildi: `{os.path.join(bot_target, output_pdf_name)}`")
-                
-                # Provide download button in browser
-                with open(pdf_path, "rb") as f:
-                    pdf_bytes = f.read()
+            # Provide download buttons
+            with open(pdf_path, "rb") as f:
+                pdf_bytes = f.read()
+            st.download_button(
+                label="📥 PDF Raporunu İndir",
+                data=pdf_bytes,
+                file_name=output_pdf_name,
+                mime="application/pdf",
+                use_container_width=True
+            )
+            
+            if used_word_template and os.path.exists(word_filled_path):
+                with open(word_filled_path, "rb") as f:
+                    word_bytes = f.read()
                 st.download_button(
-                    label="📥 PDF Raporunu İndir",
-                    data=pdf_bytes,
-                    file_name=output_pdf_name,
-                    mime="application/pdf",
+                    label="📥 Doldurulan Word Belgesini İndir (.doc/.docx)",
+                    data=word_bytes,
+                    file_name=os.path.basename(word_filled_path),
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     use_container_width=True
                 )
-            except Exception as ex:
-                st.error(f"Rapor oluşturulurken hata oluştu: {ex}")
 
 
 # ==========================================

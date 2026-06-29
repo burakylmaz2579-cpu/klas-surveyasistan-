@@ -223,6 +223,7 @@ def main():
         
         # Format matching original structure
         all_checklists[clean_name] = {
+            "filename": file,
             "items": [
                 {"id": x["item_no"], "item": x["description"], "rule": "PHRS Reg", "default_status": x["default_status"]}
                 for x in items

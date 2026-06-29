@@ -127,6 +127,7 @@ STATIC_TEMPLATES = {
 CHECKLIST_TEMPLATES = {}
 TEMPLATE_METADATA_FIELDS = {}
 TEMPLATE_TABLES = {}
+TEMPLATE_FILENAMES = {}
 
 for k, v in STATIC_TEMPLATES.items():
     CHECKLIST_TEMPLATES[k] = []
@@ -191,6 +192,7 @@ if os.path.exists(json_path):
                         CHECKLIST_TEMPLATES[mapped_name] = []
                         TEMPLATE_METADATA_FIELDS[mapped_name] = metadata_fields
                         TEMPLATE_TABLES[mapped_name] = tables_list
+                        TEMPLATE_FILENAMES[mapped_name] = val.get("filename", "")
                         
                         for item in items_list:
                             item_no = item.get("item_no") or item.get("id") or ""

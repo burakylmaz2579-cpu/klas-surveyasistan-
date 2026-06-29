@@ -951,8 +951,25 @@ class SurveyDocumentProcessor:
             else:
                 headers = table_data[0]
                 data_rows = table_data[1:]
-                
             headers_lower = [str(h).lower() for h in headers]
+            
+            # Skip checklist tables in structured data audit
+            first_col_numeric = 0
+            total_rows = len(data_rows)
+            for r_idx, row in enumerate(data_rows):
+                if len(row) > 0:
+                    val = str(row[0]).strip()
+                    if val and (re.match(r'^\d+(\.\d+)*\.?$', val) or re.match(r'^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.?$', val)):
+                        first_col_numeric += 1
+            
+            is_checklist = False
+            if total_rows > 0 and (first_col_numeric / total_rows) >= 0.3:
+                is_checklist = True
+            if any(any(kw in h for kw in ["y/n", "durum", "onay", "uygunluk", "results", "remarks", "condition", "checklist", "kontrol"]) for h in headers_lower):
+                is_checklist = True
+                
+            if is_checklist:
+                continue
             
             # 1. Auditing Empty/Incomplete Fields in Data Tables
             # Check each data row for empty cells (excluding row label at index 0)

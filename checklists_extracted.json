@@ -1,5 +1,6 @@
 {
   "SURVEY REPORTS_INTERNATIONAL_APPLICATION FORMS_PHRS_OWNER AUTHORIZATION LETTER FOR RELEASE OF SS_1-1": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_APPLICATION FORMS_PHRS_OWNER AUTHORIZATION LETTER FOR RELEASE OF SS_1-1.docx.doc",
     "items": [
       {
         "id": "1",
@@ -86,6 +87,7 @@
     ]
   },
   "CICA - CICA REC 0101 - OSAD_CICA Record 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CICA_CICA REC 0101 - OSAD_CICA Record 0101.doc (1).docx",
     "items": [
       {
         "id": "1.2",
@@ -929,10 +931,10 @@
       }
     ],
     "metadata_fields": [
-      "distinctive Number or letters",
       "TYPE OF SHIP",
+      "DATE OF BUILD",
       "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
-      "DATE OF BUILD"
+      "distinctive Number or letters"
     ],
     "tables": [
       {
@@ -1447,6 +1449,7 @@
     ]
   },
   "CICA - CICA SR 0100 - OSAD_CICA Survey Report 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CICA_CICA SR 0100 - OSAD_CICA Survey Report 0100.DOC.docx",
     "items": [
       {
         "id": "1.6",
@@ -1948,10 +1951,10 @@
       }
     ],
     "metadata_fields": [
-      "distinctive Number or letters",
       "TYPE OF SHIP",
+      "DATE OF BUILD",
       "PATENT OF NAVIGATION (NUMBER AND EXPIRE DATE)",
-      "DATE OF BUILD"
+      "distinctive Number or letters"
     ],
     "tables": [
       {
@@ -2172,6 +2175,7 @@
     ]
   },
   "CLASS - CG 0101_Class Cargo Gear Survey Report 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CG 0101_Class Cargo Gear Survey Report 0101.doc (1).docx",
     "items": [
       {
         "id": "2",
@@ -2283,9 +2287,9 @@
       }
     ],
     "metadata_fields": [
-      "GRT / NRT",
       "Date / Place of survey",
-      "Official Number"
+      "Official Number",
+      "GRT / NRT"
     ],
     "tables": [
       {
@@ -2321,6 +2325,7 @@
     ]
   },
   "CLASS - CHCK_ VUTM_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CHCK_ VUTM_0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -2474,6 +2479,7 @@
     ]
   },
   "CLASS - Class Annual_Intermediate Report for Refrigerating Installation 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_Class Annual_Intermediate Report for Refrigerating Installation 0100.doc.docx",
     "items": [
       {
         "id": "",
@@ -2771,17 +2777,17 @@
       }
     ],
     "metadata_fields": [
+      "Survey completed",
+      "Year of Build",
+      "Survey commenced",
+      "IMO Nr.",
+      "Length (III/3.10)",
+      "Type of Ship",
+      "Distinctive Letters",
       "Agent and Address",
       "Place of Survey",
-      "Survey commenced",
-      "Dead Weight (metric tons)",
-      "Length (III/3.10)",
-      "Year of Build",
-      "IMO Nr.",
-      "Type of Ship",
       "Owner and Address",
-      "Survey completed",
-      "Distinctive Letters",
+      "Dead Weight (metric tons)",
       "in dry-dock on slipway afloat"
     ],
     "tables": [
@@ -2851,6 +2857,7 @@
     ]
   },
   "CLASS - Class Cargo Gear Tackle Survey Report 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_Class Cargo Gear Tackle Survey Report 0100.doc (1).docx",
     "items": [
       {
         "id": "A.1",
@@ -2968,8 +2975,8 @@
       }
     ],
     "metadata_fields": [
-      "GRT / NRT",
-      "Date / Place of survey"
+      "Date / Place of survey",
+      "GRT / NRT"
     ],
     "tables": [
       {
@@ -2988,6 +2995,7 @@
     ]
   },
   "CLASS - CL_AT60 0100_CHECKLIST FOR OIL TANKER CARRYING OIL WITH FLASHPOINT 60oC 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_AT60 0100_CHECKLIST FOR OIL TANKER CARRYING OIL WITH FLASHPOINT 60oC 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -4887,6 +4895,7 @@
     ]
   },
   "CLASS - CL_A_HULL 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_A_HULL 0100.docx (2).doc",
     "items": [
       {
         "id": ".1",
@@ -5089,6 +5098,7 @@
     ]
   },
   "CLASS - CL_A_MACH 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_A_MACH 0100.docx (1).doc",
     "items": [
       {
         "id": ".1",
@@ -5303,6 +5313,7 @@
     ]
   },
   "CLASS - CL_BC 0100_CLASS CHECKLIST FOR BULK CARRIER 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_BC 0100_CLASS CHECKLIST FOR BULK CARRIER 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -7130,6 +7141,7 @@
     ]
   },
   "CLASS - CL_BRG_PTN 0100_CLASS CHECKLIST FOR BARGESPONTOONS 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_BRG_PTN 0100_CLASS CHECKLIST FOR BARGESPONTOONS 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -7991,6 +8003,7 @@
     ]
   },
   "CLASS - CL_CHEM 0100_CLASS CHECKLIST FOR CHEMICAL TANKER 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_CHEM 0100_CLASS CHECKLIST FOR CHEMICAL TANKER 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -9974,6 +9987,7 @@
     ]
   },
   "CLASS - CL_GAS 0100_CLASS CHECKLIST FOR GAS CARRIER 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_GAS 0100_CLASS CHECKLIST FOR GAS CARRIER 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -12089,6 +12103,7 @@
     ]
   },
   "CLASS - CL_LSC 0100_CLASS CHECKLIST FOR LIVESTOCK CARRIERS 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_LSC 0100_CLASS CHECKLIST FOR LIVESTOCK CARRIERS 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -13862,6 +13877,7 @@
     ]
   },
   "CLASS - CL_OT 0100_CLASS CHECKLIST FOR OIL TANKER 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_OT 0100_CLASS CHECKLIST FOR OIL TANKER 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -15887,6 +15903,7 @@
     ]
   },
   "CLASS - CL_OTH_0100_CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_OTH_0100_CLASS CHECKLIST FOR OTHER SHIP TYPES 0100.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -17612,6 +17629,7 @@
     ]
   },
   "CLASS - CL_OTH_ANX 0100_ANNEX TO CLASS CHECKLIST FOR OTHER SHIP TYPES 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_OTH_ANX 0100_ANNEX TO CLASS CHECKLIST FOR OTHER SHIP TYPES 0100.DOCX (1).doc",
     "items": [
       {
         "id": "1.",
@@ -18761,6 +18779,7 @@
     ]
   },
   "CLASS - CL_SEE 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_SEE 0100.docx (3).doc",
     "items": [
       {
         "id": "Main",
@@ -18885,6 +18904,7 @@
     ]
   },
   "CLASS - CL_SS_HULL 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_SS_HULL 0100.docx (2).doc",
     "items": [
       {
         "id": ".1",
@@ -19231,6 +19251,7 @@
     ]
   },
   "CLASS - CL_SS_MACH 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_CL_SS_MACH 0100.docx.doc",
     "items": [
       {
         "id": ".9",
@@ -19975,12 +19996,13 @@
     ]
   },
   "CLASS - DDS_0200_SURVEY REPORT ON DRY BOTTOM SURVEYS 0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_DDS_0200_SURVEY REPORT ON DRY BOTTOM SURVEYS 0200.DOCX.doc",
     "items": [],
     "metadata_fields": [
-      "Survey commenced",
-      ".........",
       "Survey completed",
-      "Place of Survey"
+      "Place of Survey",
+      ".........",
+      "Survey commenced"
     ],
     "tables": [
       {
@@ -20443,6 +20465,7 @@
     ]
   },
   "CLASS - ESP - BC 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_ESP - BC 0101.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -21418,8 +21441,8 @@
       }
     ],
     "metadata_fields": [
-      "BULK CARRIER",
-      "Type of Ship"
+      "Type of Ship",
+      "BULK CARRIER"
     ],
     "tables": [
       {
@@ -21565,6 +21588,7 @@
     ]
   },
   "CLASS - ESP - OT 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_ESP - OT 0101.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -22670,11 +22694,13 @@
     ]
   },
   "CLASS - ESP - SQP 0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_ESP - SQP 0200.docx.doc",
     "items": [],
     "metadata_fields": [],
     "tables": []
   },
   "CLASS - GP 0200 - OSAD_Class General Particulars Report 0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_GP 0200 - OSAD_Class General Particulars Report 0200.docx.doc",
     "items": [],
     "metadata_fields": [
       "Gross / Net Tonnage"
@@ -23475,6 +23501,7 @@
     ]
   },
   "CLASS - MPSRV_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_MPSRV_0100.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -23736,8 +23763,8 @@
       }
     ],
     "metadata_fields": [
-      "Ship Type",
-      "Ship’s Age"
+      "Ship’s Age",
+      "Ship Type"
     ],
     "tables": [
       {
@@ -23783,6 +23810,7 @@
     ]
   },
   "CLASS - REFRIGERATING INSTALLATION_PERIODIClass Periodical Survey Report for Refrigerating Installation 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_REFRIGERATING INSTALLATION_PERIODIClass Periodical Survey Report for Refrigerating Installation 0100.doc.docx",
     "items": [
       {
         "id": "",
@@ -24272,17 +24300,17 @@
       }
     ],
     "metadata_fields": [
+      "Survey completed",
+      "Year of Build",
+      "Survey commenced",
+      "IMO Nr.",
+      "Length (III/3.10)",
+      "Type of Ship",
+      "Distinctive Letters",
       "Agent and Address",
       "Place of Survey",
-      "Survey commenced",
-      "Dead Weight (metric tons)",
-      "Length (III/3.10)",
-      "Year of Build",
-      "IMO Nr.",
-      "Type of Ship",
       "Owner and Address",
-      "Survey completed",
-      "Distinctive Letters",
+      "Dead Weight (metric tons)",
       "in dry-dock on slipway afloat"
     ],
     "tables": [
@@ -24401,6 +24429,7 @@
     ]
   },
   "CLASS - UMS 0100 - OSAD_Class Report for Unattended Machinery Space 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_CLASSIFICATION_UMS 0100 - OSAD_Class Report for Unattended Machinery Space 0100.doc.docx",
     "items": [],
     "metadata_fields": [
       "Keel Laid"
@@ -25264,6 +25293,7 @@
     ]
   },
   "ISM COMPANY - CHCK-SMSDR_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_CHCK-SMSDR_0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -25839,6 +25869,7 @@
     ]
   },
   "ISM COMPANY - DOC-INT 0202 - MMSC_DOC Interim Audit Check List 0202": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_DOC-INT 0202 - MMSC_DOC Interim Audit Check List 0202.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -26772,11 +26803,11 @@
       }
     ],
     "metadata_fields": [
-      "Flag State for DOC",
       "Address of Company",
+      "Flag State for DOC",
       "Audit language",
-      "Name of Managing Company",
-      "Company IMO No."
+      "Company IMO No.",
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -26826,6 +26857,7 @@
     ]
   },
   "ISM COMPANY - DOC-P 0203 - MMSC_DOC PERIODICAL AUDIT CHECKLIST 02-03": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_DOC-P 0203 - MMSC_DOC PERIODICAL AUDIT CHECKLIST 02-03.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -28095,9 +28127,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -28219,6 +28251,7 @@
     ]
   },
   "ISM COMPANY - ISM-AL 0203 - MMSC_ISM - Audit Log 0203": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_ISM-AL 0203 - MMSC_ISM - Audit Log 0203.doc.docx",
     "items": [
       {
         "id": "1",
@@ -28436,6 +28469,7 @@
     ]
   },
   "ISM COMPANY - Non Conformity Report (NCR) 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_Non Conformity Report (NCR) 0102.doc.docx",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -28516,6 +28550,7 @@
     ]
   },
   "ISM COMPANY - Observation Note 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_COMPANY_Observation Note 0101.doc.docx",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -28565,6 +28600,7 @@
     ]
   },
   "ISM SHIP - CHCK-SMSDR_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_CHCK-SMSDR_0100.DOCX (1).doc",
     "items": [
       {
         "id": "1.",
@@ -29140,6 +29176,7 @@
     ]
   },
   "ISM SHIP - ISM - Observation Note 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_ISM - Observation Note 0101.doc.docx",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -29189,10 +29226,11 @@
     ]
   },
   "ISM SHIP - ISM PR17_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_ISM PR17_0200.DOCX.doc",
     "items": [],
     "metadata_fields": [
-      "Company IMO No.",
-      "Name of the Company"
+      "Name of the Company",
+      "Company IMO No."
     ],
     "tables": [
       {
@@ -29292,6 +29330,7 @@
     ]
   },
   "ISM SHIP - ISM-AL 0203 - MMSC_ISM - Audit Log 0203": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_ISM-AL 0203 - MMSC_ISM - Audit Log 0203.doc.docx",
     "items": [
       {
         "id": "1",
@@ -29509,6 +29548,7 @@
     ]
   },
   "ISM SHIP - Non Conformity Report (NCR) 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_Non Conformity Report (NCR) 0102.doc (1).docx",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -29589,6 +29629,7 @@
     ]
   },
   "ISM SHIP - SMC - INT 0102 - MMSC_ISM - SMC Interim Audit Check List 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_SMC - INT 0102 - MMSC_ISM - SMC Interim Audit Check List 0102.docx.doc",
     "items": [
       {
         "id": "1.1",
@@ -29958,9 +29999,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -29996,6 +30037,7 @@
     ]
   },
   "ISM SHIP - SMC - P 0200 - MMSC_SMC PERIODICAL AUDIT CHECKLIST 0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISM_SHIP_SMC - P 0200 - MMSC_SMC PERIODICAL AUDIT CHECKLIST 0200.docx.doc",
     "items": [
       {
         "id": "1.1",
@@ -30551,9 +30593,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -30589,6 +30631,7 @@
     ]
   },
   "ISPS - CHCK_ SSP_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISPS_CHCK_ SSP_0100 .DOCX.doc",
     "items": [
       {
         "id": "1",
@@ -31546,8 +31589,8 @@
       }
     ],
     "metadata_fields": [
-      "Company IMO No.",
-      "Name of the Company"
+      "Name of the Company",
+      "Company IMO No."
     ],
     "tables": [
       {
@@ -31573,6 +31616,7 @@
     ]
   },
   "ISPS - ISPS Code NCR_1-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISPS_ISPS Code NCR_1-0.doc.docx",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -31676,6 +31720,7 @@
     ]
   },
   "ISPS - ISSC-INT 0104 - MMSC_ISPS Interim audit Checklist 1-4": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISPS_ISSC-INT 0104 - MMSC_ISPS Interim audit Checklist 1-4.docx.doc",
     "items": [
       {
         "id": "1.1",
@@ -32177,9 +32222,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -32293,6 +32338,7 @@
     ]
   },
   "ISPS - ISSC-P 0107 - MMSC_ISPS audit Checklist 1-7": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_ISPS_ISSC-P 0107 - MMSC_ISPS audit Checklist 1-7.docx.doc",
     "items": [
       {
         "id": "1.1",
@@ -32818,9 +32864,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of Managing Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of Managing Company"
     ],
     "tables": [
       {
@@ -32968,6 +33014,7 @@
     ]
   },
   "MLC COMPANY - MLC 2006 RPS PROVIDER AUDIT CHECKLIST_0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_COMPANY_MLC 2006 RPS PROVIDER AUDIT CHECKLIST_0101.doc.docx",
     "items": [
       {
         "id": "1",
@@ -33454,6 +33501,7 @@
     ]
   },
   "MLC SHIP - DMLC PART II REVIEW 0104_DMLC PART-II REVIEW CHECKLIST 0104": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_SHIP_DMLC PART II REVIEW 0104_DMLC PART-II REVIEW CHECKLIST 0104.docx.doc",
     "items": [
       {
         "id": "1",
@@ -34466,8 +34514,8 @@
     ],
     "metadata_fields": [
       "Flag state",
-      "IMO Nr.",
-      "MLC Ship-owner Name"
+      "MLC Ship-owner Name",
+      "IMO Nr."
     ],
     "tables": [
       {
@@ -34628,6 +34676,7 @@
     ]
   },
   "MLC SHIP - MLC 0206 - MMSC_MLC inspection checklist 2-6": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_SHIP_MLC 0206 - MMSC_MLC inspection checklist 2-6.docx.doc",
     "items": [
       {
         "id": "Nr",
@@ -35328,8 +35377,8 @@
     ],
     "metadata_fields": [
       "MLC Ship-Owner",
-      "MLC Ship-Owner IMO No.",
-      "Working language onboard"
+      "Working language onboard",
+      "MLC Ship-Owner IMO No."
     ],
     "tables": [
       {
@@ -35441,6 +35490,7 @@
     ]
   },
   "MLC SHIP - MLC-INT 0102 - MMSC_MLC 2006 INTERIM CHECKLIST 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_SHIP_MLC-INT 0102 - MMSC_MLC 2006 INTERIM CHECKLIST 0102.docx.doc",
     "items": [
       {
         "id": "Nr",
@@ -35673,8 +35723,8 @@
     ],
     "metadata_fields": [
       "MLC Ship-Owner",
-      "MLC Ship-Owner IMO No.",
-      "Working language onboard"
+      "Working language onboard",
+      "MLC Ship-Owner IMO No."
     ],
     "tables": [
       {
@@ -35786,6 +35836,7 @@
     ]
   },
   "MLC SHIP - MLC_ILO 0102 - MMSC_MLC-ILO REPORT FOR EXISTING SHIPS 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_SHIP_MLC_ILO 0102 - MMSC_MLC-ILO REPORT FOR EXISTING SHIPS 0102.doc.docx",
     "items": [
       {
         "id": "1.1",
@@ -36341,9 +36392,9 @@
       }
     ],
     "metadata_fields": [
+      "TYPE OF SHIP",
       "SHIP-OWNERS",
-      "Date of keel laid",
-      "TYPE OF SHIP"
+      "Date of keel laid"
     ],
     "tables": [
       {
@@ -36437,6 +36488,7 @@
     ]
   },
   "MLC SHIP - MLC_MANUAL_CHKL_MLC MANUAL 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_MLC_SHIP_MLC_MANUAL_CHKL_MLC MANUAL 0100.DOCX (5).doc",
     "items": [
       {
         "id": "1.",
@@ -36566,8 +36618,8 @@
       }
     ],
     "metadata_fields": [
-      "Company IMO No.",
-      "Name of the Company"
+      "Name of the Company",
+      "Company IMO No."
     ],
     "tables": [
       {
@@ -36593,6 +36645,7 @@
     ]
   },
   "OTHERS - CAS_OCC_1-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_CAS_OCC_1-0.DOCX.doc",
     "items": [
       {
         "id": "1.1",
@@ -36946,6 +36999,7 @@
     ]
   },
   "OTHERS - CHCK_ VUTM_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_CHCK_ VUTM_0100 .DOCX (4).doc",
     "items": [
       {
         "id": "1.",
@@ -37099,17 +37153,18 @@
     ]
   },
   "OTHERS - COMPL_SRV_1-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_COMPL_SRV_1-0.doc.docx",
     "items": [],
     "metadata_fields": [
-      "YES (Fill in below) / NIL",
-      "Remarks / NCRs / Observations",
-      "Endorsement of Certificates (list below)",
-      "YES (list below) / NIL",
-      "Completion Date",
       "Service suppliers used (as applicable)",
+      "Project No.",
+      "Remarks / NCRs / Observations",
       "Issuance of Certificates (list below)",
+      "Endorsement of Certificates (list below)",
+      "Completion Date",
       "Ship Name",
-      "Project No."
+      "YES (Fill in below) / NIL",
+      "YES (list below) / NIL"
     ],
     "tables": [
       {
@@ -37222,6 +37277,7 @@
     ]
   },
   "OTHERS - FVS_SR 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_FVS_SR 0100.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -38407,17 +38463,14 @@
       }
     ]
   },
-  "OTHERS - ITC_VRF_RPRT_0100": {
-    "items": [],
-    "metadata_fields": [],
-    "tables": []
-  },
   "OTHERS - NARRATIVE REPORT FOR LAY UP": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_NARRATIVE REPORT FOR LAY UP.doc (1).docx",
     "items": [],
     "metadata_fields": [],
     "tables": []
   },
   "OTHERS - NAR_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_NAR_0200.DOCX (9).doc",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -38492,6 +38545,7 @@
     ]
   },
   "OTHERS - NMI_0100_Near Miss": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_NMI_0100_Near Miss.docx.doc",
     "items": [
       {
         "id": "1.1",
@@ -38542,6 +38596,7 @@
     ]
   },
   "OTHERS - Notice for Recommendations": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_Notice for Recommendations.doc.docx",
     "items": [],
     "metadata_fields": [
       "Date of survey",
@@ -38577,6 +38632,7 @@
     ]
   },
   "OTHERS - PSC OCCASIONAL INSPECTION REPORT_0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_PSC OCCASIONAL INSPECTION REPORT_0102.docx (1).doc",
     "items": [
       {
         "id": "1.1",
@@ -39456,9 +39512,9 @@
       }
     ],
     "metadata_fields": [
-      "Name of MLC Owning Company",
+      "Address of Company",
       "Company IMO No.",
-      "Address of Company"
+      "Name of MLC Owning Company"
     ],
     "tables": [
       {
@@ -39550,6 +39606,7 @@
     ]
   },
   "OTHERS - REPORT ON SHIP'S REMOTE SURVEY_RS_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_REPORT ON SHIP'S REMOTE SURVEY_RS_0100.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -39797,6 +39854,7 @@
     ]
   },
   "OTHERS - SSER_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_SSER_0100.DOCX.doc",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -40086,16 +40144,17 @@
     ]
   },
   "OTHERS - TEST REPORT FOR THE BOLLARD PULL TEST_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_TEST REPORT FOR THE BOLLARD PULL TEST_0100.DOC.docx",
     "items": [],
     "metadata_fields": [
-      "Name",
+      "Owner",
       "Moulded Breadth (m)",
-      "Moulded Depth (m)",
-      "SHIP PARTICULARS",
-      "Gross tonnage (GT)",
       "Length B.P. (m)",
+      "Moulded Depth (m)",
+      "Gross tonnage (GT)",
+      "Name",
       "Full load draught (m)",
-      "Owner"
+      "SHIP PARTICULARS"
     ],
     "tables": [
       {
@@ -40247,10 +40306,11 @@
     ]
   },
   "ISPS - Transfer of Certification form TOC_ISM_ISPS_MLC_1_0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_OTHERS_Transfer of Certification form TOC_ISM_ISPS_MLC_1_0.docx.doc",
     "items": [],
     "metadata_fields": [
-      "Company IMO number",
       "Address",
+      "Company IMO number",
       "Company / MLC Shipowner name"
     ],
     "tables": [
@@ -40402,6 +40462,7 @@
     ]
   },
   "STATUTORY - ANNEX I IOPP_2-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_ANNEX I IOPP_2-0.DOCX (3).doc",
     "items": [
       {
         "id": "1.",
@@ -41173,6 +41234,7 @@
     ]
   },
   "STATUTORY - Annex II NLS_2-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_Annex II NLS_2-0.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -41518,6 +41580,7 @@
     ]
   },
   "STATUTORY - ANNEX IV SPP_2-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_ANNEX IV SPP_2-0.DOCX (1).doc",
     "items": [
       {
         "id": "1.",
@@ -41701,6 +41764,7 @@
     ]
   },
   "STATUTORY - ANNEX VI_0401": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_ANNEX VI_0401.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -42286,6 +42350,7 @@
     ]
   },
   "STATUTORY - ANNEX V_GPP_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_ANNEX V_GPP_0200.DOCX (3).doc",
     "items": [
       {
         "id": "I.",
@@ -42463,6 +42528,7 @@
     ]
   },
   "STATUTORY - BWM-AInR 0202": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_BWM-AInR 0202 .DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -42754,6 +42820,7 @@
     ]
   },
   "STATUTORY - BWM-I 0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_BWM-I 0100.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -42955,22 +43022,23 @@
     ]
   },
   "STATUTORY - CARIBBEAN CARGO SHIP SAFETY REPORT_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_CARIBBEAN CARGO SHIP SAFETY REPORT_0100.doc.docx",
     "items": [],
     "metadata_fields": [
       "Operator",
-      "Classification Society",
-      "DATE KEEL LAID",
-      "NET TONNAGE",
-      "DEADWEIGHT TONS",
       "PROPULSION",
+      "REG. LENGTH",
+      "Owner",
       "GROSS TONNAGE (ITC)",
+      "NET TONNAGE",
       "HORSEPOWER",
       "FUEL CAPACITY",
-      "Agent",
       "IMO NO. / OFFICIAL No.",
-      "Owner",
+      "DATE KEEL LAID",
+      "Classification Society",
+      "Agent",
       "DRY DOCK DATE",
-      "REG. LENGTH"
+      "DEADWEIGHT TONS"
     ],
     "tables": [
       {
@@ -43001,6 +43069,7 @@
     ]
   },
   "STATUTORY - CGCR-0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_CGCR-0100.DOCX.doc",
     "items": [
       {
         "id": "2.",
@@ -43139,6 +43208,7 @@
     ]
   },
   "STATUTORY - CGDR-0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_CGDR-0100.DOCX.doc",
     "items": [
       {
         "id": "2.",
@@ -43283,6 +43353,7 @@
     ]
   },
   "STATUTORY - DG_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_DG_0200.DOCX (1).doc",
     "items": [
       {
         "id": "1.",
@@ -44389,6 +44460,7 @@
     ]
   },
   "STATUTORY - DSC 0100 - OSAD": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_DSC 0100 - OSAD.DOC.docx",
     "items": [
       {
         "id": "1",
@@ -44716,24 +44788,24 @@
       }
     ],
     "metadata_fields": [
-      "Number of Crew",
-      "Main engine(s) / Type / Total Power",
       "Trading Area",
-      "Agent and Address",
       "Number of Passengers",
       "Survey completed",
-      "(In case of \"other\" please specify)",
-      "Survey commenced",
-      "Place of Survey",
       "Year of Build",
+      "Survey commenced",
       "IMO Nr.",
-      "Owner and Address",
       "Length (Overall)",
-      "Net Tonnage",
+      "Distinctive Letters",
+      "Main engine(s) / Type / Total Power",
       "Built Type",
-      "Type of Vessel",
+      "Agent and Address",
+      "Net Tonnage",
+      "Place of Survey",
       "Builder",
-      "Distinctive Letters"
+      "Owner and Address",
+      "Type of Vessel",
+      "(In case of \"other\" please specify)",
+      "Number of Crew"
     ],
     "tables": [
       {
@@ -45597,10 +45669,11 @@
     ]
   },
   "STATUTORY - EIAPP Survey Report_0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_EIAPP Survey Report_0100.docx.doc",
     "items": [],
     "metadata_fields": [
-      "The engine is installed on the ship",
-      "Distinctive number or letters"
+      "Distinctive number or letters",
+      "The engine is installed on the ship"
     ],
     "tables": [
       {
@@ -45865,6 +45938,7 @@
     ]
   },
   "STATUTORY - HSC_Report_1-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_HSC_Report_1-0.docx.doc",
     "items": [
       {
         "id": "",
@@ -47608,12 +47682,12 @@
       }
     ],
     "metadata_fields": [
-      "Choose an item.",
       "Year of Build",
       "Type of Ship",
+      "Place of Survey",
       "Date of Survey",
       "Name of Surveyor",
-      "Place of Survey"
+      "Choose an item."
     ],
     "tables": [
       {
@@ -47995,6 +48069,7 @@
     ]
   },
   "STATUTORY - IAFS CHCKLST 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_IAFS CHCKLST 0102.docx.doc",
     "items": [],
     "metadata_fields": [],
     "tables": [
@@ -48355,6 +48430,7 @@
     ]
   },
   "STATUTORY - IBC_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_IBC_0200.DOCX (1).doc",
     "items": [
       {
         "id": "1.",
@@ -48970,6 +49046,7 @@
     ]
   },
   "STATUTORY - IGC_0300": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_IGC_0300.DOCX.doc",
     "items": [
       {
         "id": "1.",
@@ -49537,15 +49614,16 @@
     ]
   },
   "STATUTORY - IHM_SR_0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_IHM_SR_0101.DOCX (7).doc",
     "items": [],
     "metadata_fields": [
-      "Date(s) of survey",
       "IMO Nr",
-      "on dock afloat",
       "Type of Ship",
-      "Year of build",
+      "on dock afloat",
+      "Place of Survey",
       "Ship Name",
-      "Place of Survey"
+      "Date(s) of survey",
+      "Year of build"
     ],
     "tables": [
       {
@@ -49773,6 +49851,7 @@
     ]
   },
   "STATUTORY - IMSBC_2-0": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_IMSBC_2-0.DOCX (4).doc",
     "items": [
       {
         "id": "1.",
@@ -50598,6 +50677,7 @@
     ]
   },
   "STATUTORY - LGSR-0100": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_LGSR-0100.DOCX.doc",
     "items": [
       {
         "id": "2.",
@@ -50739,8 +50819,8 @@
       }
     ],
     "metadata_fields": [
-      "Port & Location of Test",
-      "Weather Conditions"
+      "Weather Conditions",
+      "Port & Location of Test"
     ],
     "tables": [
       {
@@ -50779,6 +50859,7 @@
     ]
   },
   "STATUTORY - LL REC 0101 - OSAD_Load Line Record of Assignments 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_LL REC 0101 - OSAD_Load Line Record of Assignments 0101.doc.docx",
     "items": [
       {
         "id": "1",
@@ -50872,12 +50953,12 @@
       }
     ],
     "metadata_fields": [
-      "Freeboard assigned as a ship of type",
-      "Date of Build (Conversion)",
-      "Shipbuilders",
       "Date and Place of initial survey",
+      "Shipbuilders",
       "Yard Number",
-      "Nationality"
+      "Nationality",
+      "Date of Build (Conversion)",
+      "Freeboard assigned as a ship of type"
     ],
     "tables": [
       {
@@ -51508,6 +51589,7 @@
     ]
   },
   "STATUTORY - LL_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_LL_0200.DOCX (2).doc",
     "items": [
       {
         "id": "1.",
@@ -51799,22 +51881,23 @@
     ]
   },
   "STATUTORY - MODU_Survey Checklist_Annual_Intermediate_1-1": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_MODU_Survey Checklist_Annual_Intermediate_1-1.doc.docx",
     "items": [],
     "metadata_fields": [
-      "Date(s) of survey",
-      "Area of operation",
-      "IMO Nr",
-      "(keel laid on or after 01 January 2012)",
-      "on dock afloat",
-      "Type",
       "Date keel laid",
-      "MODU Code 1979",
+      "IMO Nr",
       "Last survey of the underwater part",
-      "Ship Name",
-      "MODU Code 2009",
-      "The unit is surveyed for compliance with",
+      "on dock afloat",
+      "MODU Code 1979",
+      "MODU Code 1989",
+      "(keel laid on or after 01 January 2012)",
       "Place of Survey",
-      "MODU Code 1989"
+      "Type",
+      "MODU Code 2009",
+      "Ship Name",
+      "The unit is surveyed for compliance with",
+      "Area of operation",
+      "Date(s) of survey"
     ],
     "tables": [
       {
@@ -52110,6 +52193,7 @@
     ]
   },
   "STATUTORY - MODU_Survey Checklist_Initial_Renewal_1-1": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_MODU_Survey Checklist_Initial_Renewal_1-1.doc.docx",
     "items": [
       {
         "id": "No.",
@@ -53427,19 +53511,19 @@
       }
     ],
     "metadata_fields": [
-      "Date(s) of survey",
-      "IMO Nr",
-      "(keel laid on or after 01 January 2012)",
-      "on dock afloat",
-      "Type",
       "Date keel laid",
-      "MODU Code 1979",
+      "IMO Nr",
       "Last survey of the underwater part",
-      "Ship Name",
-      "MODU Code 2009",
-      "The unit is surveyed for compliance with",
+      "on dock afloat",
+      "MODU Code 1979",
+      "MODU Code 1989",
+      "(keel laid on or after 01 January 2012)",
       "Place of Survey",
-      "MODU Code 1989"
+      "Type",
+      "MODU Code 2009",
+      "Ship Name",
+      "The unit is surveyed for compliance with",
+      "Date(s) of survey"
     ],
     "tables": [
       {
@@ -53773,6 +53857,7 @@
     ]
   },
   "STATUTORY - PSS_0201": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_PSS_0201.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -55741,6 +55826,7 @@
     ]
   },
   "STATUTORY - RSE-I 0202 - OSAD": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_RSE-I 0202 - OSAD.docx.doc",
     "items": [
       {
         "id": "1",
@@ -58036,25 +58122,25 @@
       }
     ],
     "metadata_fields": [
-      "Builders /Yard No",
-      "Total KW of internal combustion engines used",
-      "Survey completed",
-      "Distinctive Letters",
       "Year of Build",
-      "Owner and Address",
-      "Place of Survey",
       "(a) For main propulsion (b) Aux. Purposes",
       "Dead Weight (metric tons)",
-      "Length B.P. (m)",
-      "Length O.A. (m)",
-      "IMO Nr.",
-      "Type of Ship",
-      "Main Engine(s) builder/type/number",
-      "in dry-dock on slipway afloat",
-      "(a) Main (b) Aux.",
-      "Survey commenced",
       "Boilers (number and type)",
-      "Breadth (m)"
+      "Type of Ship",
+      "Distinctive Letters",
+      "Place of Survey",
+      "Breadth (m)",
+      "Owner and Address",
+      "in dry-dock on slipway afloat",
+      "IMO Nr.",
+      "(a) Main (b) Aux.",
+      "Length B.P. (m)",
+      "Total KW of internal combustion engines used",
+      "Length O.A. (m)",
+      "Survey completed",
+      "Builders /Yard No",
+      "Survey commenced",
+      "Main Engine(s) builder/type/number"
     ],
     "tables": [
       {
@@ -60871,6 +60957,7 @@
     ]
   },
   "STATUTORY - SAF REC 0101 - OSAD_Safety Record below 500 GRT Checklist 0101": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SAF REC 0101 - OSAD_Safety Record below 500 GRT Checklist 0101.doc.docx",
     "items": [
       {
         "id": "1",
@@ -61342,25 +61429,25 @@
       }
     ],
     "metadata_fields": [
-      "Builders /Yard No",
-      "Total KW of internal combustion engines used",
-      "Survey completed",
-      "Distinctive Letters",
       "Year of Build",
-      "Owner and Address",
-      "Place of Survey",
       "(a) For main propulsion (b) Aux. Purposes",
       "Dead Weight (metric tons)",
-      "Length B.P. (m)",
-      "Length O.A. (m)",
-      "IMO Nr.",
-      "Type of Ship",
-      "Main Engine(s) builder/type/number",
-      "in dry-dock on slipway afloat",
-      "(a) Main (b) Aux.",
-      "Survey commenced",
       "Boilers (number and type)",
-      "Breadth (m)"
+      "Type of Ship",
+      "Distinctive Letters",
+      "Place of Survey",
+      "Breadth (m)",
+      "Owner and Address",
+      "in dry-dock on slipway afloat",
+      "IMO Nr.",
+      "(a) Main (b) Aux.",
+      "Length B.P. (m)",
+      "Total KW of internal combustion engines used",
+      "Length O.A. (m)",
+      "Survey completed",
+      "Builders /Yard No",
+      "Survey commenced",
+      "Main Engine(s) builder/type/number"
     ],
     "tables": [
       {
@@ -62613,6 +62700,7 @@
     ]
   },
   "STATUTORY - SAF SR 0102_Safety below 500 grt report 0102": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SAF SR 0102_Safety below 500 grt report 0102.doc.docx",
     "items": [
       {
         "id": "1",
@@ -62676,16 +62764,16 @@
       }
     ],
     "metadata_fields": [
-      "Place of Survey",
-      "Survey commenced",
-      "Dead Weight (metric tons)",
+      "Survey completed",
       "Year of Build",
-      "Length (oa)",
+      "Survey commenced",
       "IMO Nr.",
       "Type of Ship",
-      "Owner and Address",
-      "Survey completed",
       "Distinctive Letters",
+      "Place of Survey",
+      "Owner and Address",
+      "Length (oa)",
+      "Dead Weight (metric tons)",
       "in dry-dock on slipway afloat"
     ],
     "tables": [
@@ -62766,6 +62854,7 @@
     ]
   },
   "STATUTORY - SC_0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SC_0200.DOCX (3).doc",
     "items": [
       {
         "id": "1.",
@@ -63873,6 +63962,7 @@
     ]
   },
   "STATUTORY - SE_0201": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SE_0201.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -65160,6 +65250,7 @@
     ]
   },
   "STATUTORY - SR 0203 - OSAD": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SR 0203 - OSAD.docx.doc",
     "items": [
       {
         "id": "1.",
@@ -67935,6 +68026,7 @@
     ]
   },
   "STATUTORY - SRT 0200 - OSAD_Safety Radio below 500 grt report 0200": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SRT 0200 - OSAD_Safety Radio below 500 grt report 0200.docx.doc",
     "items": [
       {
         "id": "2",
@@ -68040,8 +68132,8 @@
       }
     ],
     "metadata_fields": [
-      "Ship Data",
-      "MMSI"
+      "MMSI",
+      "Ship Data"
     ],
     "tables": [
       {
@@ -68186,6 +68278,7 @@
     ]
   },
   "STATUTORY - SR_R 0300 - OSAD": {
+    "filename": "SURVEY REPORTS_INTERNATIONAL_STATUTORY_SR_R 0300 - OSAD.DOCX.doc",
     "items": [
       {
         "id": "1.1",
@@ -68826,9 +68919,9 @@
     ],
     "metadata_fields": [
       "MMSI Nr",
-      "Date keel laid",
+      "Flag / Port of registry",
       "Type o Ship",
-      "Flag / Port of registry"
+      "Date keel laid"
     ],
     "tables": [
       {
