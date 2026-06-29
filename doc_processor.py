@@ -39,8 +39,10 @@ class SurveyDocumentProcessor:
             text_list.append(page.get_text())
         self.raw_text = "\n".join(text_list)
         
-        self._extract_vessel_info()
+        # 1. Text-based extraction first
+        self._extract_vessel_info_text()
         
+        # 2. Extract tables
         if isinstance(self.file_path_or_bytes, bytes):
             from io import BytesIO
             with BytesIO(self.file_path_or_bytes) as stream:
@@ -49,11 +51,12 @@ class SurveyDocumentProcessor:
         else:
             with pdfplumber.open(self.file_path_or_bytes) as pdf:
                 self._extract_tables(pdf)
+                
+        # 3. Table-based extraction second to override and refine
+        self._extract_vessel_info_table()
 
     def _classify_document(self):
         text_lower = self.raw_text.lower()
-        
-        # Fallback for scanned/non-searchable PDFs based on filename
         filename = self.filename
         if not filename and not isinstance(self.file_path_or_bytes, bytes):
             filename = os.path.basename(self.file_path_or_bytes)
@@ -61,93 +64,133 @@ class SurveyDocumentProcessor:
         if filename:
             filename = filename.lower()
             
-        if len(self.raw_text.strip()) < 100 and filename:
-            if "_ft" in filename or "cert" in filename or "certificate" in filename:
-                self.doc_type = "certificate"
-                self._extract_certificate_info()
-            else:
-                self.doc_type = "checklist"
-            return
-            
-        # Check first 800 characters for explicit certificate and checklist keywords
-        first_800 = text_lower[:800]
+        # 1. Filename-based overrides (highly reliable)
+        checklist_fn_kws = ["annex", "checklist", "check list", "report", "survey", "inspection", "audit", "record", "rec", "obs", "ncr", "cica", "cg", "cl_", "esp", "gp", "imsbc", "ll_", "se_", "sc_", "sr_", "smc", "issc", "iopp", "spp", "iapp", "bwm", "safety"]
+        cert_fn_kws = ["certificate", "sertifika", "sertifikasi", "cert_"]
         
-        cert_kws = [
-            "certificate", "sertifika", "sertifikası", "certify", "certifies", 
-            "document of compliance", "particulars of ship", "this is to certify", 
-            "issued under the authority", "attest", "attestation", "safety management certificate",
-            "record of equipment"
-        ]
-        checklist_kws = [
-            "examination", "checklist", "check list", "kontrol listesi", 
-            "survey report", "inspection report", "sörvey raporu", "denetim raporu"
-        ]
+        is_checklist_filename = any(kw in filename for kw in checklist_fn_kws) if filename else False
+        is_cert_filename = any(kw in filename for kw in cert_fn_kws) if filename else False
         
-        first_cert_idx = -1
-        for kw in cert_kws:
-            idx = first_800.find(kw)
-            if idx != -1:
-                if first_cert_idx == -1 or idx < first_cert_idx:
-                    first_cert_idx = idx
-                    
-        first_checklist_idx = -1
-        for kw in checklist_kws:
-            idx = first_800.find(kw)
-            if idx != -1:
-                if first_checklist_idx == -1 or idx < first_checklist_idx:
-                    first_checklist_idx = idx
-                    
-        # Check for status codes inside the text
+        # 2. Text-based features
         has_text_status_codes = (
             "- y -" in text_lower or "- n -" in text_lower or "- n/a -" in text_lower or
-            "-y-" in text_lower or "-n-" in text_lower or "-n/a-" in text_lower
+            "-y-" in text_lower or "-n-" in text_lower or "-n/a-" in text_lower or
+            "conformity" in text_lower or "deficiency" in text_lower
         )
         
-        checkbox_count = self.raw_text.count("☐") + self.raw_text.count("☒") + self.raw_text.count("☑")
-        checkbox_count += len(re.findall(r'\[\s*[xX✓✔]\s*\]', self.raw_text))
-        checkbox_count += len(re.findall(r'\[\s*\]', self.raw_text))
+        # Check if pdf tables look like a checklist
+        has_checklist_table = False
+        for tbl_dict in self.tables:
+            tbl = tbl_dict["data"]
+            if len(tbl) > 1:
+                header_str = " ".join([str(c).lower() for c in tbl[0] if c])
+                if any(x in header_str for x in ["status", "condition", "y/n", "uygun", "remarks", "action", "results"]):
+                    has_checklist_table = True
+                    break
+                    
+        numbered_items_count = len(re.findall(r'\b\d+\.\d+\b', self.raw_text))
         
         # Decide type
-        if first_cert_idx != -1:
-            if first_checklist_idx == -1 or first_cert_idx < first_checklist_idx:
-                self.doc_type = "certificate"
-            else:
-                self.doc_type = "checklist"
-        elif has_text_status_codes or checkbox_count >= 10:
+        if has_checklist_table or has_text_status_codes or (numbered_items_count > 10 and not is_cert_filename):
             self.doc_type = "checklist"
-        else:
-            # Fallback
-            if "certificate" in text_lower or "sertifika" in text_lower:
-                self.doc_type = "certificate"
-            else:
-                self.doc_type = "checklist"
-                
-        if self.doc_type == "certificate":
+        elif is_checklist_filename and not is_cert_filename:
+            self.doc_type = "checklist"
+        elif "this is to certify" in text_lower or "particulars of ship" in text_lower or "subject to annual" in text_lower or is_cert_filename:
+            self.doc_type = "certificate"
             self._extract_certificate_info()
+        else:
+            self.doc_type = "checklist"
 
-    def _extract_vessel_info(self):
-        vessel_name_match = re.search(r"Vessel Name\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-        if not vessel_name_match:
-            vessel_name_match = re.search(r"Gemi Adı\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-            
-        imo_match = re.search(r"IMO Number\s*:\s*([^\n\r\s]+)", self.raw_text, re.IGNORECASE)
-        if not imo_match:
-            imo_match = re.search(r"IMO No\s*:\s*([^\n\r\s]+)", self.raw_text, re.IGNORECASE)
-            
-        grt_match = re.search(r"Gross Tonnage\s*\(GRT\)\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-        if not grt_match:
-            grt_match = re.search(r"GT\s*/\s*DWT\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-            
-        vessel_type_match = re.search(r"Vessel Type\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-        if not vessel_type_match:
-            vessel_type_match = re.search(r"Gemi Türü\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
-            
+    def _extract_vessel_info_text(self):
+        lines = [line.strip() for line in self.raw_text.split('\n') if line.strip()]
+        
+        vessel_name = None
+        imo_number = None
+        grt = None
+        vessel_type = None
+        
+        # Line-by-line search
+        for idx, line in enumerate(lines):
+            l_lower = line.lower()
+            if "name of ship" in l_lower or "gemi adı" in l_lower or "gemi adi" in l_lower:
+                if idx + 1 < len(lines):
+                    val = lines[idx+1]
+                    if len(val) > 2 and "imo" not in val.lower() and "gross" not in val.lower() and "registry" not in val.lower():
+                        vessel_name = val
+            elif "imo number" in l_lower or "imo no" in l_lower:
+                if idx + 1 < len(lines):
+                    val = lines[idx+1]
+                    nums = "".join(re.findall(r'\d+', val))
+                    if nums:
+                        imo_number = nums
+            elif "gross tonnage" in l_lower or "gt / dwt" in l_lower:
+                if idx + 1 < len(lines):
+                    grt = lines[idx+1]
+            elif "vessel type" in l_lower or "gemi türü" in l_lower:
+                if idx + 1 < len(lines):
+                    vessel_type = lines[idx+1]
+                    
+        # Standard regex matches
+        if not vessel_name:
+            v_match = re.search(r"(?:Vessel Name|Gemi Adı)\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
+            if v_match:
+                vessel_name = v_match.group(1).strip()
+        if not imo_number:
+            i_match = re.search(r"(?:IMO Number|IMO No)\s*:\s*([^\n\r\s]+)", self.raw_text, re.IGNORECASE)
+            if i_match:
+                imo_number = "".join(re.findall(r'\d+', i_match.group(1)))
+        if not grt:
+            g_match = re.search(r"(?:Gross Tonnage|GT\s*/\s*DWT)\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
+            if g_match:
+                grt = g_match.group(1).strip()
+        if not vessel_type:
+            vt_match = re.search(r"(?:Vessel Type|Gemi Türü)\s*:\s*([^\n\r]+)", self.raw_text, re.IGNORECASE)
+            if vt_match:
+                vessel_type = vt_match.group(1).strip()
+                
         self.vessel_info = {
-            "name": vessel_name_match.group(1).strip() if vessel_name_match else "MV OCEAN VOYAGER",
-            "imo": imo_match.group(1).strip() if imo_match else "9876543",
-            "grt_dwt": grt_match.group(1).strip() if grt_match else "38,500 / 64,200",
-            "vessel_type": vessel_type_match.group(1).strip() if vessel_type_match else "Bulk Carrier (Dökme Yük)"
+            "name": vessel_name if vessel_name else "MV OCEAN VOYAGER",
+            "imo": imo_number if imo_number else "9876543",
+            "grt_dwt": grt if grt else "38,500 / 64,200",
+            "vessel_type": vessel_type if vessel_type else "Bulk Carrier"
         }
+
+    def _extract_vessel_info_table(self):
+        for tbl_dict in self.tables[:2]:
+            table = tbl_dict["data"]
+            for r_idx, row in enumerate(table):
+                for c_idx, cell in enumerate(row):
+                    if not cell:
+                        continue
+                    cell_clean = str(cell).strip().lower()
+                    if "name of ship" in cell_clean or "gemi adı" in cell_clean or "gemi adi" in cell_clean:
+                        vessel_name = None
+                        if c_idx + 1 < len(row) and row[c_idx+1]:
+                            vessel_name = str(row[c_idx+1]).strip()
+                        elif r_idx + 1 < len(table) and len(table[r_idx+1]) > c_idx and table[r_idx+1][c_idx]:
+                            vessel_name = str(table[r_idx+1][c_idx]).strip()
+                        if vessel_name and len(vessel_name) > 2 and "name of ship" not in vessel_name.lower():
+                            self.vessel_info["name"] = vessel_name
+                            
+                    if "imo" in cell_clean:
+                        imo = None
+                        if c_idx + 1 < len(row) and row[c_idx+1]:
+                            imo = str(row[c_idx+1]).strip()
+                        elif r_idx + 1 < len(table) and len(table[r_idx+1]) > c_idx and table[r_idx+1][c_idx]:
+                            imo = str(table[r_idx+1][c_idx]).strip()
+                        if imo:
+                            imo_nums = "".join(re.findall(r'\d+', imo))
+                            if imo_nums:
+                                self.vessel_info["imo"] = imo_nums
+                                
+                    if "gross tonnage" in cell_clean or "gt" in cell_clean:
+                        grt_val = None
+                        if c_idx + 1 < len(row) and row[c_idx+1]:
+                            grt_val = str(row[c_idx+1]).strip()
+                        elif r_idx + 1 < len(table) and len(table[r_idx+1]) > c_idx and table[r_idx+1][c_idx]:
+                            grt_val = str(table[r_idx+1][c_idx]).strip()
+                        if grt_val and "gross" not in grt_val.lower():
+                            self.vessel_info["grt_dwt"] = grt_val
 
     def _extract_certificate_info(self):
         text = self.raw_text

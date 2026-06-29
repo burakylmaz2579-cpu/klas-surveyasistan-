@@ -1612,68 +1612,138 @@ elif st.session_state.active_view == "Report Writer":
         title_lower = title.lower()
         v_type = str(v_info.get("vessel_type", "")).lower()
         grt = v_info.get("grt", 5000)
+        dwt = v_info.get("dwt", 8000)
+        
+        # 1. Determine table category
+        is_crane_table = any(x in title_lower for x in ["lifting", "capacity", "cargo gear", "crane", "derrick"])
+        is_engine_table = any(x in title_lower for x in ["engine", "generator", "machinery", "propulsion"])
+        is_fire_pump = any(x in title_lower for x in ["fire pump", "pumps", "fire main"])
+        is_lifeboat = any(x in title_lower for x in ["lifeboat", "liferaft", "survival", "davit"])
+        is_air_bottle = any(x in title_lower for x in ["air bottle", "compressor", "receiver"])
         
         # Check if rows are completely empty
         is_empty = all(all(not cell for cell in r) for r in rows)
-        if not is_empty:
-            return rows
+        if is_empty:
+            new_rows = []
+            if is_crane_table:
+                if "bulk" in v_type or "general" in v_type:
+                    new_rows = [
+                        ["No. 1 Cargo Crane (Fr. 185)", "25 deg", "30.0 t", "35.0 t"],
+                        ["No. 2 Cargo Crane (Fr. 135)", "25 deg", "30.0 t", "35.0 t"],
+                        ["No. 3 Cargo Crane (Fr. 85)", "25 deg", "30.0 t", "35.0 t"],
+                        ["No. 4 Cargo Crane (Fr. 35)", "25 deg", "30.0 t", "35.0 t"]
+                    ]
+                else:
+                    new_rows = [
+                        ["Provision Crane (Aft)", "30 deg", "2.0 t", "2.5 t"]
+                    ]
+            elif is_engine_table:
+                if grt > 15000:
+                    new_rows = [
+                        ["Main Engine No. 1", "MAN B&W 6S50MC-C", "8,600 kW", "120 rpm", "Satisfactory"],
+                        ["Aux. Generator No. 1", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
+                        ["Aux. Generator No. 2", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
+                        ["Emergency Gen. No. 1", "Cummins 6BT5.9", "120 kW", "1800 rpm", "Satisfactory"]
+                    ]
+                else:
+                    new_rows = [
+                        ["Main Engine No. 1", "MaK 8M32C", "4,000 kW", "750 rpm", "Satisfactory"],
+                        ["Aux. Generator No. 1", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
+                        ["Aux. Generator No. 2", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
+                        ["Emergency Gen. No. 1", "Deutz TD226B", "60 kW", "1500 rpm", "Satisfactory"]
+                    ]
+            elif is_fire_pump:
+                new_rows = [
+                    ["Main Fire Pump No. 1", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
+                    ["Main Fire Pump No. 2", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
+                    ["Emergency Fire Pump", "Diesel-Driven", "Steering Gear Rm", "35 m3/h", "0.4 MPa", "20m"]
+                ]
+            elif is_lifeboat:
+                new_rows = [
+                    ["No. 1 Lifeboat (Port)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
+                    ["No. 2 Lifeboat (Stbd)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
+                    ["No. 1 Liferaft", "Inflatable", "Viking", "25 persons", "Aft Port", "2024"]
+                ]
+            elif is_air_bottle:
+                new_rows = [
+                    ["Main Air Receiver No. 1", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
+                    ["Main Air Receiver No. 2", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
+                    ["Main Compressor No. 1", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"],
+                    ["Main Compressor No. 2", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"]
+                ]
             
-        new_rows = []
-        if "lifting" in title_lower or "capacity" in title_lower or "cargo gear" in title_lower:
-            if "bulk" in v_type or "general" in v_type:
-                new_rows = [
-                    ["No. 1 Cargo Crane (Fr. 185)", "25 deg", "35.0", "30.0"],
-                    ["No. 2 Cargo Crane (Fr. 135)", "25 deg", "35.0", "30.0"],
-                    ["No. 3 Cargo Crane (Fr. 85)", "25 deg", "35.0", "30.0"],
-                    ["No. 4 Cargo Crane (Fr. 35)", "25 deg", "35.0", "30.0"]
-                ]
-            else:
-                new_rows = [
-                    ["Provision Crane (Aft)", "30 deg", "3.0", "2.0"]
-                ]
-        elif "engine" in title_lower or "generator" in title_lower or "machinery" in title_lower:
-            if grt > 15000:
-                new_rows = [
-                    ["Main Engine No. 1", "MAN B&W 6S50MC-C", "8,600 kW", "120 rpm", "Satisfactory"],
-                    ["Aux. Generator No. 1", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
-                    ["Aux. Generator No. 2", "Yanmar 6EY18AL", "650 kW", "900 rpm", "Satisfactory"],
-                    ["Emergency Gen. No. 1", "Cummins 6BT5.9", "120 kW", "1800 rpm", "Satisfactory"]
-                ]
-            else:
-                new_rows = [
-                    ["Main Engine No. 1", "MaK 8M32C", "4,000 kW", "750 rpm", "Satisfactory"],
-                    ["Aux. Generator No. 1", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
-                    ["Aux. Generator No. 2", "Caterpillar C9", "250 kW", "1500 rpm", "Satisfactory"],
-                    ["Emergency Gen. No. 1", "Deutz TD226B", "60 kW", "1500 rpm", "Satisfactory"]
-                ]
-        elif "fire pump" in title_lower or "pumps" in title_lower:
-            new_rows = [
-                ["Main Fire Pump No. 1", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
-                ["Main Fire Pump No. 2", "Centrifugal", "Engine Room", "65 m3/h", "0.6 MPa", "25m"],
-                ["Emergency Fire Pump", "Diesel-Driven", "Steering Gear Rm", "35 m3/h", "0.4 MPa", "20m"]
-            ]
-        elif "lifeboat" in title_lower or "liferaft" in title_lower or "survival" in title_lower:
-            new_rows = [
-                ["No. 1 Lifeboat (Port)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
-                ["No. 2 Lifeboat (Stbd)", "Freefall / G.R.P", "Nishi-F", "25 persons", "Aft", "2015"],
-                ["No. 1 Liferaft", "Inflatable", "Viking", "25 persons", "Aft Port", "2024"]
-            ]
-        elif "air bottle" in title_lower or "compressor" in title_lower:
-            new_rows = [
-                ["Main Air Receiver No. 1", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
-                ["Main Air Receiver No. 2", "3.0 MPa", "Satisfactory", "Tested / Working", "11/2024", "Good"],
-                ["Main Compressor No. 1", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"],
-                ["Main Compressor No. 2", "30 bar", "Satisfactory", "Tested / Working", "Good", "Engine Room"]
-            ]
-        
-        if new_rows:
-            col_count = len(headers)
-            matched_rows = []
-            for r in new_rows:
-                r_padded = r[:col_count] + [""] * (col_count - len(r))
-                matched_rows.append(r_padded)
-            return matched_rows
-        return rows
+            if new_rows:
+                col_count = len(headers)
+                matched_rows = []
+                for r in new_rows:
+                    r_padded = r[:col_count] + [""] * (col_count - len(r))
+                    matched_rows.append(r_padded)
+                rows = matched_rows
+                
+        # Proactive cell-by-cell prefilling for any empty fields
+        col_headers = [str(h).lower().strip() for h in headers]
+        filled_rows = []
+        for r_idx, row in enumerate(rows):
+            new_row = list(row)
+            row_identity = str(new_row[0]).strip().lower() if len(new_row) > 0 else ""
+            
+            for c_idx, cell in enumerate(new_row):
+                if not str(cell).strip():
+                    h_name = col_headers[c_idx] if c_idx < len(col_headers) else ""
+                    
+                    if any(x in h_name for x in ["status", "condition", "result", "remarks", "approve", "verify", "durum", "onay"]):
+                        new_row[c_idx] = "Satisfactory"
+                    elif any(x in h_name for x in ["pressure", "working", "test", "bar", "mpa", "basınç"]):
+                        if "fire pump" in row_identity or is_fire_pump:
+                            new_row[c_idx] = "0.4 MPa" if "emergency" in row_identity else "0.6 MPa"
+                        elif "compressor" in row_identity or "air bottle" in row_identity or "receiver" in row_identity or is_air_bottle:
+                            new_row[c_idx] = "3.0 MPa" if "mpa" in h_name or "receiver" in row_identity else "30 bar"
+                        else:
+                            new_row[c_idx] = "Working"
+                    elif any(x in h_name for x in ["date", "last", "service", "due", "tarih"]):
+                        new_row[c_idx] = "11/2025"
+                    elif any(x in h_name for x in ["location", "place", "position", "yer"]):
+                        if "emergency" in row_identity:
+                            new_row[c_idx] = "Steering Gear Rm"
+                        elif "lifeboat" in row_identity or "liferaft" in row_identity:
+                            new_row[c_idx] = "Aft Deck"
+                        else:
+                            new_row[c_idx] = "Engine Room"
+                    elif any(x in h_name for x in ["maker", "type", "model", "marka"]):
+                        if "main engine" in row_identity:
+                            new_row[c_idx] = "MAN B&W 6S50MC-C" if grt > 15000 else "MaK 8M32C"
+                        elif "generator" in row_identity:
+                            new_row[c_idx] = "Yanmar 6EY18AL" if grt > 15000 else "Caterpillar C9"
+                        elif "lifeboat" in row_identity:
+                            new_row[c_idx] = "Freefall / G.R.P"
+                        else:
+                            new_row[c_idx] = "Standard"
+                    elif any(x in h_name for x in ["capacity", "swl", "test load", "load", "yük"]):
+                        if "swl" in h_name or "capacity" in h_name:
+                            if "provision" in row_identity:
+                                new_row[c_idx] = "2.0 t"
+                            else:
+                                new_row[c_idx] = "30.0 t" if "bulk" in v_type or "general" in v_type else "5.0 t"
+                        elif "test" in h_name or "load" in h_name:
+                            swl_val = 30.0
+                            for sibling_idx, sibling_cell in enumerate(new_row):
+                                sibling_header = col_headers[sibling_idx] if sibling_idx < len(col_headers) else ""
+                                if ("swl" in sibling_header or "capacity" in sibling_header) and sibling_cell:
+                                    nums = re.findall(r'[\d\.]+', str(sibling_cell))
+                                    if nums:
+                                        swl_val = float(nums[0])
+                                        break
+                            if swl_val <= 20.0:
+                                test_val = swl_val * 1.25
+                            elif swl_val <= 50.0:
+                                test_val = swl_val + 5.0
+                            else:
+                                test_val = swl_val * 1.1
+                            new_row[c_idx] = f"{test_val:.2f} t"
+                    else:
+                        new_row[c_idx] = "Good"
+            filled_rows.append(new_row)
+        return filled_rows
 
     # Dynamic Metadata/Particulars Prompts
     clean_meta_fields = get_clean_metadata_fields(template_name)
@@ -1810,23 +1880,28 @@ elif st.session_state.active_view == "Report Writer":
                             except Exception:
                                 pass
 
-    def generate_surveyor_comment(desc, status, matched_cert=None, cert_info=None):
+    def generate_surveyor_comment(desc, status, matched_cert=None, cert_info=None, rule=None, v_info=None):
         desc_lower = desc.lower()
+        if not v_info:
+            v_info = {}
+        v_type = str(v_info.get("vessel_type", "General Cargo")).lower()
+        grt = v_info.get("grt", 5000)
+        dwt = v_info.get("dwt", 8000)
+        flag = str(v_info.get("flag", "Panama"))
         
         if status == "N/A":
-            if "tanker" in desc_lower:
-                return "Not applicable as the vessel is not an oil/chemical tanker."
-            if "400 gross tonnage" in desc_lower or "400 gt" in desc_lower or "400 tonnes" in desc_lower:
-                return "Not applicable; vessel gross tonnage is under 400 GT."
-            if "150 gross tonnage" in desc_lower or "150 gt" in desc_lower:
-                return "Not applicable; vessel gross tonnage is under 150 GT."
-            if "passenger ship" in desc_lower or "passenger space" in desc_lower:
-                return "Not applicable; vessel is not a passenger ship."
-            if any(x in desc_lower for x in ["bilge separator", "filtering equipment", "ows", "oily water separator"]):
-                return "Not applicable: 15 ppm OWS filtering equipment is not fitted / exempt as per vessel's IOPP certificate."
-            if any(x in desc_lower for x in ["ballast water", "bwms", "d-2"]):
-                return "Not applicable: D-2 performance standard treatment system is not fitted as per vessel's BWM certificate."
-            return "Not applicable due to vessel type, tonnage parameters, or flag state exemption."
+            tanker_kws = ["tanker", "cargo pump room", "slop tank", "segregated ballast", "oil tanker", "double hull", "crude oil washing", "sts operations"]
+            if any(kw in desc_lower for kw in tanker_kws):
+                return f"Not applicable: Vessel is a {v_info.get('vessel_type', 'General Cargo')}, not a tanker (rule applies to tankers only)."
+            if "400 gross tonnage" in desc_lower or "400 gt" in desc_lower or "400 tonnes" in desc_lower or "400gt" in desc_lower:
+                return f"Not applicable: Gross tonnage ({grt} GT) is under the 400 GT statutory threshold of MARPOL/SOLAS."
+            if "150 gross tonnage" in desc_lower or "150 gt" in desc_lower or "150gt" in desc_lower:
+                return f"Not applicable: Gross tonnage ({grt} GT) is under the 150 GT threshold."
+            if "5000 dwt" in desc_lower or "5,000 tonnes deadweight" in desc_lower or "5000 dwt" in desc_lower:
+                return f"Not applicable: Deadweight ({dwt} DWT) is under the 5,000 DWT threshold."
+            if "passenger ship" in desc_lower or "passenger space" in desc_lower or "passengers" in desc_lower:
+                return f"Not applicable: Vessel is registered as cargo ship ({v_info.get('vessel_type', 'General Cargo')}), not a passenger vessel."
+            return f"Not applicable for {flag} flagged {v_info.get('vessel_type', 'General Cargo')} of {grt} GT / {dwt} DWT."
             
         if status == "N":
             if matched_cert:
@@ -1834,14 +1909,14 @@ elif st.session_state.active_view == "Report Writer":
                     return f"Required {matched_cert} has expired (Validity date: {cert_info['expiry_date']})."
                 else:
                     return f"Required {matched_cert} is missing from the vessel database records."
-            if any(x in desc_lower for x in ["bilge", "separator", "ows", "filtering"]):
-                return "Oily water separator / bilge filtering equipment alarm test failed or equipment inoperative."
-            if any(x in desc_lower for x in ["fire", "pump", "extinguisher"]):
-                return "Emergency fire pump pressure inadequate or fire fighting equipment requires service."
-            if any(x in desc_lower for x in ["lifeboat", "liferaft", "survival"]):
-                return "Survival craft equipment missing or launching arrangements require lubrication."
+            if any(x in desc_lower for x in ["ows", "separator", "filtering"]):
+                return "OWS 15 ppm bilge filter system alarm failed to activate during simulation test. Needs recalibration or replacement."
+            if any(x in desc_lower for x in ["fire", "pump", "nozzle", "hydrant"]):
+                return "Emergency fire pump suction valve stiff; pressure test failed to reach required 0.4 MPa."
+            if any(x in desc_lower for x in ["lifeboat", "liferaft", "survival", "davit"]):
+                return "Lifeboat launching davit limit switch corroded and inoperative; release mechanism needs lubrication."
             if any(x in desc_lower for x in ["radio", "vhf", "gmdss"]):
-                return "Radio equipment / GMDSS reserve source of energy fails to meet battery capacity requirements."
+                return "VHF GMDSS transceiver fails to transmit on backup batteries. Battery bank capacity low."
             return "Deficiency identified during survey; correction required prior to departure."
             
         # Status is Y
@@ -1849,30 +1924,41 @@ elif st.session_state.active_view == "Report Writer":
             if cert_info["status"] == "Expiring Soon":
                 return f"Verified valid {matched_cert} onboard. Note: Expiry date is soon ({cert_info['expiry_date']})."
             return f"Verified valid {matched_cert} onboard. Valid until {cert_info['expiry_date']}."
-        
-        if any(x in desc_lower for x in ["bilge", "separator", "ows", "filtering"]):
-            return "Oily water separator and bilge filtering equipment examined and verified in good working order."
-        if any(x in desc_lower for x in ["fire", "pump", "extinguisher", "nozzle"]):
-            return "Emergency fire pump, hydrants, hoses, and extinguishers tested and confirmed fully operational."
-        if any(x in desc_lower for x in ["lifeboat", "liferaft", "survival", "davit"]):
-            return "Survival crafts, launching davits, and visual condition verified satisfactory."
-        if any(x in desc_lower for x in ["radio", "vhf", "gmdss"]):
-            return "Radio equipment and GMDSS installations tested and found in full compliance."
-        if any(x in desc_lower for x in ["load line", "freeboard", "draft"]):
-            return "Load line markings and draft marks verified in position, painted, and legible."
-        if any(x in desc_lower for x in ["hull", "structure", "bulkhead"]):
-            return "Visual examination of accessible hull structure and boundary bulkheads carried out; found sound."
-        
-        # Generic Y comments based on leading verb
+            
+        r_lower = str(rule).lower()
+        if "solas ch iii" in r_lower or "lsa" in desc_lower or "lifeboat" in desc_lower or "liferaft" in desc_lower:
+            return "Life-saving appliances and survival craft launching arrangements inspected, tested, and verified ready for immediate use as per SOLAS Ch III Reg 20."
+        if "solas ch ii-2" in r_lower or "fire" in desc_lower or "extinguisher" in desc_lower or "hydrant" in desc_lower:
+            return "Fire-fighting systems, main line pressure, hoses, nozzles, and portable extinguishers inspected and verified fully operational as per SOLAS Ch II-2 Reg 10."
+        if "marpol annex i" in r_lower or "ows" in desc_lower or "oily" in desc_lower or "bilge separator" in desc_lower:
+            return f"15 ppm oily water separator and bilge filtering equipment examined; automatic recirculation tested and alarm verified as per MARPOL Annex I Reg 14 (Vessel GT: {grt})."
+        if "marpol annex iv" in r_lower or "sewage" in desc_lower:
+            return "Sewage treatment system operational status and disinfection chemicals verified as per MARPOL Annex IV Reg 9."
+        if "marpol annex vi" in r_lower or "iapp" in desc_lower or "emission" in desc_lower or "exhaust" in desc_lower:
+            return "Low sulfur fuel changeover records and engine EIAPP technical files checked and found in compliance with MARPOL Annex VI."
+        if "bwm" in r_lower or "ballast" in desc_lower:
+            return f"Ballast water treatment system (BWMS) and record book entries checked; compliant with BWM D-2 performance standards."
+        if "icll" in r_lower or "load line" in r_lower or "freeboard" in desc_lower or "hatch cover" in desc_lower:
+            return "Hatch covers, watertight closures, air pipes, freeboard, and draft marks examined and verified in good condition as per Load Line Convention."
+        if "solas ch iv" in r_lower or "radio" in desc_lower or "gmdss" in desc_lower or "epirb" in desc_lower:
+            return "Radio installations, EPIRB test report, and emergency GMDSS battery reserves tested and verified in compliance with SOLAS Ch IV."
+        if "mlc" in r_lower or "crew" in desc_lower or "seafarer" in desc_lower:
+            return f"Verified crew employment agreements, rest hours records, galley sanitation, and hospital locker as per MLC 2006 (Flag: {flag})."
+        if "ism" in r_lower or "smc" in r_lower or "safety management" in desc_lower:
+            return "Checked implementation of SMS onboard, emergency drill records, safety committee minutes, and master's review."
+        if "isps" in r_lower or "issc" in r_lower or "security" in desc_lower:
+            return "Ship Security Plan implementation, access control, and SSAS functionality verified onboard."
+            
         clean_desc = desc.strip().lower()
         if clean_desc.startswith("verify"):
-            return "Verified onboard and found in satisfactory condition."
+            return "Verified onboard and confirmed to be in satisfactory visual and operational condition."
         if clean_desc.startswith("check"):
-            return "Checked and confirmed to be in good working order."
+            return "Checked and confirmed in good order."
         if clean_desc.startswith("confirm"):
-            return "Confirmed compliance with applicable regulations."
-            
-        return "Inspected and found in compliance with requirements."
+            return "Confirmed to be compliant with statutory guidelines."
+        if rule and rule != "N/A":
+            return f"Inspected and found in full compliance with {rule} requirements."
+        return "Inspected and verified in satisfactory condition."
 
     for item in checklist_items:
         item_id = str(item["id"]).strip()
@@ -1952,7 +2038,7 @@ elif st.session_state.active_view == "Report Writer":
                 status_code = "N/A"
 
         # Generate comment using the professional AI Surveyor Mode comment generator
-        comment = generate_surveyor_comment(desc, status_code, matched_cert, cert_info)
+        comment = generate_surveyor_comment(desc, status_code, matched_cert, cert_info, rule=rule, v_info=v_info)
             
         # C. Historical deficiency checks (if status is Y, override with past deficiency)
         if status_code == "Y" and clean_item_id in historical_findings:
