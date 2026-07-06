@@ -1805,7 +1805,22 @@ elif st.session_state.active_view == "Report Writer":
                 
             # Pre-fill empty table templates
             prefilled_rows = prefill_table_data(title, headers, rows, v_info)
-            df = pd.DataFrame(prefilled_rows, columns=headers)
+            
+            # Ensure unique, non-empty header strings for Streamlit data_editor compliance
+            clean_headers = []
+            seen = {}
+            for col_idx, h in enumerate(headers):
+                h_str = str(h).strip() if h else ""
+                if not h_str:
+                    h_str = f"Col {col_idx+1}"
+                if h_str in seen:
+                    seen[h_str] += 1
+                    h_str = f"{h_str}_{seen[h_str]}"
+                else:
+                    seen[h_str] = 0
+                clean_headers.append(h_str)
+                
+            df = pd.DataFrame(prefilled_rows, columns=clean_headers)
             
             st.markdown(f"**{title}**")
             edited_df = st.data_editor(
@@ -1816,7 +1831,7 @@ elif st.session_state.active_view == "Report Writer":
             )
             
             custom_table_data[title] = {
-                "headers": headers,
+                "headers": clean_headers,
                 "rows": edited_df.values.tolist()
             }
         st.write("---")
